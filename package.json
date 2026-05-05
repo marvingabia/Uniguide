@@ -1,9 +1,10 @@
 {
   "name": "Tellngrow",
   "version": "1.0.0",
-  "main": "electron/main.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
     "xian-start": "node index.js",
     "xian": "nodemon index.js",
     "migrate": "node migrate.js",
