@@ -14,7 +14,20 @@
       </div>
       <div class="space-x-4 flex items-center">
         <a href="/counselor/dashboard" class="text-gray-600 hover:text-gray-800">Dashboard</a>
-        <span class="text-gray-700">👨‍💼 {{user.name}}</span>
+        <a href="/counselor/profile" class="flex items-center space-x-2 hover:text-emerald-600 transition">
+          <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-emerald-200 bg-white flex items-center justify-center flex-shrink-0">
+            {{#if user.profilePicture}}
+              {{#if (eq (substring user.profilePicture 0 1) "/")}}
+                <img src="{{user.profilePicture}}" alt="Profile" class="w-full h-full object-cover" />
+              {{else}}
+                <span class="text-xl">{{user.profilePicture}}</span>
+              {{/if}}
+            {{else}}
+              <span class="text-xl text-gray-400">👨‍💼</span>
+            {{/if}}
+          </div>
+          <span class="text-gray-700">{{user.name}}</span>
+        </a>
         <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
       </div>
     </div>
@@ -53,6 +66,10 @@
               {{else}}
               <span class="text-xs bg-gray-100 text-gray-800 px-3 py-1 rounded font-semibold">📝 Draft</span>
               {{/if}}
+              <button onclick="viewMaterial({{this.id}}, '{{this.fileType}}', '{{this.slug}}', '{{this.title}}')" 
+                      class="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 text-center font-semibold">
+                👁️ View
+              </button>
               <a href="/counselor/materials/edit/{{this.id}}" 
                  class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-center font-semibold">
                 ✏️ Edit
@@ -85,7 +102,58 @@
     </div>
   </div>
 
+  <!-- Material Viewer Modal -->
+  <div id="viewerModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full h-full max-w-6xl max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center p-4 border-b border-gray-200">
+        <h3 id="modalTitle" class="text-xl font-bold text-gray-900">Preview Material</h3>
+        <button onclick="closeViewer()" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
+          ✕
+        </button>
+      </div>
+      
+      <!-- Modal Content -->
+      <div class="flex-1 overflow-hidden">
+        <iframe id="viewerFrame" class="w-full h-full border-0"></iframe>
+      </div>
+    </div>
+  </div>
+
   <script>
+    function viewMaterial(id, fileType, slug, title) {
+      const modal = document.getElementById('viewerModal');
+      const frame = document.getElementById('viewerFrame');
+      const modalTitle = document.getElementById('modalTitle');
+      
+      modalTitle.textContent = title;
+      
+      if (fileType === 'article') {
+        frame.src = '/reading/' + slug;
+      } else {
+        frame.src = '/reading/view/' + id;
+      }
+      
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeViewer() {
+      const modal = document.getElementById('viewerModal');
+      const frame = document.getElementById('viewerFrame');
+      
+      modal.classList.add('hidden');
+      frame.src = '';
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeViewer();
+      }
+    });
+
     async function publishMaterial(id) {
       if (!confirm('Publish this material? Users will be able to see it.')) {
         return;

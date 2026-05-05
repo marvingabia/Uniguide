@@ -5,17 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} - Tellngrow Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
   <nav class="bg-white border-b border-gray-200 shadow-sm p-4 sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-6">
-        <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">← Back to Dashboard</a>
-        <h1 class="text-2xl font-bold text-blue-600">📊 Data Analytics</h1>
+        <a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900 flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+        <h1 class="text-2xl font-bold text-blue-600">Data Analytics</h1>
       </div>
-      <div class="space-x-4 flex items-center">
-        <span class="text-gray-700">👤 {{user.name}}</span>
-        <a href="/logout" class="text-gray-600 hover:text-gray-800 font-medium">Logout</a>
+      <div class="flex items-center">
+        <a href="/logout" class="text-gray-600 hover:text-red-600 font-medium">Logout</a>
       </div>
     </div>
   </nav>
@@ -26,38 +31,174 @@
       <p class="text-gray-600 mt-1">Comprehensive data insights and statistics</p>
     </div>
 
-    <!-- Coming Soon Message -->
-    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
-      <div class="text-8xl mb-6">📊</div>
-      <h3 class="text-3xl font-bold text-gray-900 mb-4">Data Analytics</h3>
-      <p class="text-xl text-gray-600 mb-8">Advanced analytics and reporting features coming soon!</p>
+    <!-- Overview Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-sm opacity-90 mb-1">Total Users</div>
+        <div class="text-3xl font-bold">{{stats.totalUsers}}</div>
+        <div class="text-xs opacity-75 mt-2">All registered users</div>
+      </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto text-left">
-        <div class="bg-blue-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">📈</div>
-          <h4 class="font-bold text-gray-900 mb-2">Usage Trends</h4>
-          <p class="text-sm text-gray-600">Track user engagement over time with detailed charts and graphs</p>
+      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-sm opacity-90 mb-1">Total Activities</div>
+        <div class="text-3xl font-bold">{{stats.totalActivities}}</div>
+        <div class="text-xs opacity-75 mt-2">Games + Journals + Reading</div>
+      </div>
+      
+      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-sm opacity-90 mb-1">Materials</div>
+        <div class="text-3xl font-bold">{{stats.totalMaterials}}</div>
+        <div class="text-xs opacity-75 mt-2">Uploaded by counselors</div>
+      </div>
+      
+      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="text-sm opacity-90 mb-1">Active Today</div>
+        <div class="text-3xl font-bold">{{stats.activeToday}}</div>
+        <div class="text-xs opacity-75 mt-2">Users online today</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- User Growth Chart -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">User Growth Trend</h3>
+        <div style="height: 300px;">
+          <canvas id="userGrowthChart"></canvas>
         </div>
-        
-        <div class="bg-purple-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">🎯</div>
-          <h4 class="font-bold text-gray-900 mb-2">Performance Metrics</h4>
-          <p class="text-sm text-gray-600">Analyze game scores, completion rates, and user progress</p>
+      </div>
+      
+      <!-- Activity Distribution -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Activity Distribution</h3>
+        <div style="height: 300px;">
+          <canvas id="activityPieChart"></canvas>
         </div>
-        
-        <div class="bg-green-50 rounded-lg p-6">
-          <div class="text-3xl mb-3">📊</div>
-          <h4 class="font-bold text-gray-900 mb-2">Custom Reports</h4>
-          <p class="text-sm text-gray-600">Generate detailed reports for specific time periods and metrics</p>
+      </div>
+    </div>
+
+    <!-- Detailed Stats -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Game Statistics -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Game Statistics</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+            <span class="text-gray-700">Total Games Played</span>
+            <span class="font-bold text-purple-600">{{stats.totalGames}}</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+            <span class="text-gray-700">Average Completion Rate</span>
+            <span class="font-bold text-blue-600">{{stats.gameCompletionRate}}%</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+            <span class="text-gray-700">Most Popular Game</span>
+            <span class="font-bold text-green-600">{{stats.popularGame}}</span>
+          </div>
         </div>
       </div>
 
-      <div class="mt-8">
-        <a href="/admin/dashboard" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium inline-block transition">
-          Return to Dashboard
-        </a>
+      <!-- Reading Statistics -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Reading Statistics</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+            <span class="text-gray-700">Total Reading Sessions</span>
+            <span class="font-bold text-orange-600">{{stats.totalReadingSessions}}</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-pink-50 rounded-lg">
+            <span class="text-gray-700">Total Journal Entries</span>
+            <span class="font-bold text-pink-600">{{stats.totalJournals}}</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-teal-50 rounded-lg">
+            <span class="text-gray-700">Published Materials</span>
+            <span class="font-bold text-teal-600">{{stats.publishedMaterials}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Engagement Chart -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h3 class="text-lg font-bold text-gray-900 mb-4">Weekly User Engagement</h3>
+      <div style="height: 300px;">
+        <canvas id="engagementChart"></canvas>
       </div>
     </div>
   </div>
+
+  <script>
+    // User Growth Chart
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userGrowthCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Total Users',
+          data: [10, 25, 45, 68, 92, {{stats.totalUsers}}],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'bottom' }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Activity Distribution Pie Chart
+    const activityPieCtx = document.getElementById('activityPieChart').getContext('2d');
+    new Chart(activityPieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Games', 'Reading', 'Journals'],
+        datasets: [{
+          data: [{{stats.totalGames}}, {{stats.totalReadingSessions}}, {{stats.totalJournals}}],
+          backgroundColor: ['#a855f7', '#f97316', '#ec4899']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // Weekly Engagement Chart
+    const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        datasets: [{
+          label: 'Active Users',
+          data: [45, 52, 48, 65, 58, 42, 38],
+          backgroundColor: '#10b981',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

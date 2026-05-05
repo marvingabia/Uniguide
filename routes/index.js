@@ -9,6 +9,7 @@ import express from "express";
 import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
+import { mkdirSync, existsSync } from 'fs';
 import * as authController from "../controllers/authController.js";
 import { isAuthenticated } from "../middleware/auth.js";
 import { isAdmin } from "../middleware/adminAuth.js";
@@ -568,6 +569,52 @@ router.post("/reading/unsave/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// Track reading activity
+router.post("/api/reading/track", isAuthenticated, async (req, res) => {
+  try {
+    const { ReadingSession } = await import('../models/index.js');
+    const { materialId, duration } = req.body;
+    
+    if (!materialId || !duration) {
+      return res.status(400).json({ success: false, message: 'Missing data' });
+    }
+    
+    // Find or create reading session for today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let session = await ReadingSession.findOne({
+      where: {
+        userId: req.user.id,
+        materialId: materialId,
+        startTime: { [Op.gte]: today }
+      }
+    });
+    
+    if (session) {
+      // Update existing session
+      await session.update({
+        duration: duration,
+        endTime: new Date()
+      });
+    } else {
+      // Create new session
+      session = await ReadingSession.create({
+        userId: req.user.id,
+        materialId: materialId,
+        duration: duration,
+        endTime: new Date()
+      });
+    }
+    
+    console.log('📊 Reading tracked:', req.user.id, 'material:', materialId, 'duration:', duration, 'sec');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Track reading error:', error);
+    res.status(500).json({ success: false, message: 'Error tracking reading' });
+  }
+});
+
 // View saved materials page
 router.get("/reading/saved", isAuthenticated, async (req, res) => {
   try {
@@ -643,7 +690,7 @@ router.get("/counselor/dashboard", isAuthenticated, async (req, res) => {
       return res.status(403).render("403", { title: "Access Denied" });
     }
     
-    const { ReadingMaterial } = await import('../models/index.js');
+    const { ReadingMaterial, Message } = await import('../models/index.js');
     
     // Get counselor's materials
     const materials = await ReadingMaterial.findAll({
@@ -658,6 +705,7 @@ router.get("/counselor/dashboard", isAuthenticated, async (req, res) => {
       where: { counselorId: req.user.id, isPublished: true } 
     });
     const totalViews = await ReadingMaterial.sum('views', { where: { counselorId: req.user.id } }) || 0;
+    const unreadMessages = await Message.count({ where: { receiverId: req.user.id, isRead: false } });
     
     res.render("counselor/dashboard", { 
       title: "Counselor Dashboard", 
@@ -666,7 +714,8 @@ router.get("/counselor/dashboard", isAuthenticated, async (req, res) => {
         totalMaterials,
         publishedMaterials,
         totalViews,
-        totalReaders: 0
+        totalReaders: 0,
+        unreadMessages
       },
       materials
     });
@@ -675,6 +724,16 @@ router.get("/counselor/dashboard", isAuthenticated, async (req, res) => {
     res.status(500).render("404", { title: "Error Loading Dashboard" });
   }
 });
+
+// Counselor Profile Routes
+router.get("/counselor/profile", isAuthenticated, (req, res) => {
+  if (req.user.role !== 'counselor') {
+    return res.status(403).render("403", { title: "Access Denied" });
+  }
+  res.render("counselor/profile", { title: "My Profile", user: req.user });
+});
+
+router.post("/counselor/profile", isAuthenticated, uploadProfilePicture.single('profilePicture'), authController.updateProfile);
 
 // Counselor Materials List
 router.get("/counselor/materials", isAuthenticated, async (req, res) => {
@@ -867,7 +926,9 @@ router.post("/counselor/materials/delete/:id", isAuthenticated, async (req, res)
       return res.status(403).json({ error: 'Access denied' });
     }
     
-    const { ReadingMaterial } = await import('../models/index.js');
+    const { ReadingMaterial, SavedMaterial, ReadingSession } = await import('../models/index.js');
+    const fs = await import('fs');
+    const path = await import('path');
     
     const material = await ReadingMaterial.findOne({
       where: { id: req.params.id, counselorId: req.user.id }
@@ -877,13 +938,39 @@ router.post("/counselor/materials/delete/:id", isAuthenticated, async (req, res)
       return res.status(404).json({ error: 'Material not found' });
     }
     
+    // Delete related records first
+    try {
+      await SavedMaterial.destroy({ where: { materialId: req.params.id } });
+      await ReadingSession.destroy({ where: { materialId: req.params.id } });
+      console.log('🗑️ Related records deleted');
+    } catch (relatedError) {
+      console.error('Related records deletion error:', relatedError);
+    }
+    
+    // Delete physical file if it exists
+    if (material.filePath && material.fileType !== 'article') {
+      try {
+        const filePath = material.filePath.startsWith('/') 
+          ? 'public' + material.filePath 
+          : material.filePath;
+        
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log('🗑️ File deleted:', filePath);
+        }
+      } catch (fileError) {
+        console.error('File deletion error:', fileError);
+      }
+    }
+    
+    // Delete the material from database
     await material.destroy();
     
-    console.log('✅ Material deleted:', req.params.id);
+    console.log('✅ Material deleted from database:', req.params.id);
     res.json({ success: true });
   } catch (error) {
     console.error('Delete material error:', error);
-    res.status(500).json({ error: 'Error deleting material' });
+    res.status(500).json({ error: 'Error deleting material', message: error.message });
   }
 });
 
@@ -919,6 +1006,13 @@ router.get("/counselor/analytics", isAuthenticated, async (req, res) => {
 });
 
 // ==================== ADMIN ROUTES (Protected + Admin Only) ====================
+// Admin Profile Routes
+router.get("/admin/profile", isAuthenticated, isAdmin, (req, res) => {
+  res.render("admin/profile", { title: "Admin Profile", user: req.user });
+});
+
+router.post("/admin/profile", isAuthenticated, isAdmin, uploadProfilePicture.single('profilePicture'), authController.updateProfile);
+
 router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { User, UserProgress, Activity, GameSession, JournalEntry, ReadingSession, ReadingMaterial } = await import('../models/index.js');
@@ -999,6 +1093,23 @@ router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
       order: [['lastActive', 'DESC']]
     });
     
+    // Get recent users (last 7 days) for notifications
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const recentUsers = await User.findAll({
+      where: {
+        role: 'user',
+        createdAt: {
+          [Op.gte]: sevenDaysAgo
+        }
+      },
+      order: [['createdAt', 'DESC']],
+      limit: 10
+    });
+    
+    const newUsersCount = recentUsers.length;
+    
     // Get detailed stats for each user
     const usersWithStats = await Promise.all(users.map(async (user) => {
       const gameSessions = await GameSession.findAll({
@@ -1076,12 +1187,36 @@ router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
       order: [['createdAt', 'DESC']],
       limit: 20
     });
+
+    // Get recent fitness activities
+    let recentFitness = [];
+    try {
+      const { Activity } = await import('../models/index.js');
+      recentFitness = await Activity.findAll({
+        where: { type: 'fitness' },
+        include: [{ model: User, attributes: ['name', 'email'] }],
+        order: [['createdAt', 'DESC']],
+        limit: 20
+      });
+    } catch (e) { console.error('Fitness activity fetch error:', e.message); }
     
     // Calculate statistics
     const totalUsers = await User.count({ where: { role: 'user' } });
     const totalGames = await GameSession.count();
     const totalJournals = await JournalEntry.count();
     const totalReadingSessions = await ReadingSession.count();
+    const totalMaterials = await ReadingMaterial.count();
+    const publishedMaterials = await ReadingMaterial.count({ where: { isPublished: true } });
+    
+    // Get all reading materials with counselor info
+    const materials = await ReadingMaterial.findAll({
+      include: [{
+        model: User,
+        as: 'counselor',
+        attributes: ['id', 'name', 'email']
+      }],
+      order: [['createdAt', 'DESC']]
+    });
     
     // Get today's active users
     const today = new Date();
@@ -1112,16 +1247,28 @@ router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
       counselors: counselorsWithStats,
       approvedCounselors,
       pendingCounselors,
+      materials,
       recentGameSessions,
       recentJournals,
+      recentFitness,
       recentReading,
       gameStats,
+      recentUsers,
+      newUsersCount,
       stats: {
         totalUsers,
         totalGames,
         totalJournals,
         totalReadingSessions,
-        activeToday
+        totalMaterials,
+        publishedMaterials,
+        activeToday,
+        unreadAdminMessages: await (async () => {
+          try {
+            const { Message } = await import('../models/index.js');
+            return await Message.count({ where: { receiverId: req.user.id, isRead: false } });
+          } catch { return 0; }
+        })()
       }
     });
   } catch (error) {
@@ -1130,17 +1277,24 @@ router.get("/admin/dashboard", isAuthenticated, isAdmin, async (req, res) => {
       title: "Admin Dashboard", 
       user: req.user,
       users: [],
+      counselors: [],
       approvedCounselors: [],
       pendingCounselors: [],
+      materials: [],
       recentGameSessions: [],
       recentJournals: [],
+      recentFitness: [],
       recentReading: [],
       gameStats: [],
+      recentUsers: [],
+      newUsersCount: 0,
       stats: {
         totalUsers: 0,
         totalGames: 0,
         totalJournals: 0,
         totalReadingSessions: 0,
+        totalMaterials: 0,
+        publishedMaterials: 0,
         activeToday: 0
       }
     });
@@ -1383,6 +1537,500 @@ router.get("/admin/certificates/download/:id", isAuthenticated, isAdmin, async (
   } catch (error) {
     console.error('Download certificate error:', error);
     res.status(500).send('Failed to download certificate');
+  }
+});
+
+// ==================== MESSAGING ROUTES ====================
+
+// Counselor: View messages inbox
+router.get("/counselor/messages", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).render("403", { title: "Access Denied" });
+    const { User, Message } = await import('../models/index.js');
+
+    // Get ALL students
+    const students = await User.findAll({
+      where: { role: 'user' },
+      attributes: ['id', 'name', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    // Get ALL admins so counselor can message them too
+    const admins = await User.findAll({
+      where: { role: 'admin' },
+      attributes: ['id', 'name', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    console.log(`💬 Counselor ${req.user.id} - found ${students.length} students, ${admins.length} admins`);
+
+    const addUnread = async (list, label) =>
+      Promise.all(list.map(async (u) => {
+        try {
+          const unreadCount = await Message.count({
+            where: { senderId: u.id, receiverId: req.user.id, isRead: false }
+          });
+          return { ...u.toJSON(), unreadCount, label };
+        } catch {
+          return { ...u.toJSON(), unreadCount: 0, label };
+        }
+      }));
+
+    const studentsWithUnread = await addUnread(students, 'Student');
+    const adminsWithUnread  = await addUnread(admins,   'Admin');
+
+    res.render("counselor/messages", {
+      title: "Messages",
+      user: req.user,
+      students: studentsWithUnread,
+      admins: adminsWithUnread
+    });
+  } catch (error) {
+    console.error('Counselor messages error:', error);
+    res.status(500).render("404", { title: "Error: " + error.message });
+  }
+});
+
+// Counselor: Get messages with a specific student (JSON)
+router.get("/counselor/messages/:userId/json", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).json([]);
+    const { Message } = await import('../models/index.js');
+    const { Op } = await import('sequelize');
+
+    const messages = await Message.findAll({
+      where: {
+        [Op.or]: [
+          { senderId: req.user.id, receiverId: req.params.userId },
+          { senderId: req.params.userId, receiverId: req.user.id }
+        ]
+      },
+      order: [['createdAt', 'ASC']]
+    });
+
+    // Mark received messages as read
+    await Message.update(
+      { isRead: true },
+      { where: { senderId: req.params.userId, receiverId: req.user.id, isRead: false } }
+    );
+
+    res.json(messages);
+  } catch (error) {
+    console.error('Get messages error:', error);
+    res.status(500).json([]);
+  }
+});
+
+// Counselor: Send message to student
+router.post("/counselor/messages/:userId/send", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).json({ error: 'Access denied' });
+    const { Message } = await import('../models/index.js');
+    const { content } = req.body;
+    if (!content || !content.trim()) return res.status(400).json({ error: 'Message cannot be empty' });
+
+    const message = await Message.create({
+      senderId: req.user.id,
+      receiverId: parseInt(req.params.userId),
+      content: content.trim()
+    });
+
+    res.json({ success: true, message });
+  } catch (error) {
+    console.error('Send message error:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// User: View messages page
+router.get("/user/messages", isAuthenticated, async (req, res) => {
+  try {
+    const { User, Message } = await import('../models/index.js');
+
+    // Get ALL counselors regardless of accountStatus
+    const counselors = await User.findAll({
+      where: { role: 'counselor' },
+      attributes: ['id', 'name', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    console.log(`💬 User ${req.user.id} - found ${counselors.length} counselors`);
+
+    const counselorsWithUnread = await Promise.all(counselors.map(async (c) => {
+      try {
+        const unreadCount = await Message.count({
+          where: { senderId: c.id, receiverId: req.user.id, isRead: false }
+        });
+        return { ...c.toJSON(), unreadCount };
+      } catch {
+        return { ...c.toJSON(), unreadCount: 0 };
+      }
+    }));
+
+    res.render("user/messages", { title: "Messages", user: req.user, counselors: counselorsWithUnread });
+  } catch (error) {
+    console.error('User messages error:', error);
+    res.status(500).render("404", { title: "Error: " + error.message });
+  }
+});
+
+// User: Get messages with a specific counselor (JSON)
+router.get("/user/messages/:counselorId/json", isAuthenticated, async (req, res) => {
+  try {
+    const { Message } = await import('../models/index.js');
+    const { Op } = await import('sequelize');
+
+    const messages = await Message.findAll({
+      where: {
+        [Op.or]: [
+          { senderId: req.user.id, receiverId: req.params.counselorId },
+          { senderId: req.params.counselorId, receiverId: req.user.id }
+        ]
+      },
+      order: [['createdAt', 'ASC']]
+    });
+
+    // Mark received messages as read
+    await Message.update(
+      { isRead: true },
+      { where: { senderId: req.params.counselorId, receiverId: req.user.id, isRead: false } }
+    );
+
+    res.json(messages);
+  } catch (error) {
+    console.error('Get messages error:', error);
+    res.status(500).json([]);
+  }
+});
+
+// User: Send message to counselor
+router.post("/user/messages/:counselorId/send", isAuthenticated, async (req, res) => {
+  try {
+    const { Message } = await import('../models/index.js');
+    const { content } = req.body;
+    if (!content || !content.trim()) return res.status(400).json({ error: 'Message cannot be empty' });
+
+    const message = await Message.create({
+      senderId: req.user.id,
+      receiverId: parseInt(req.params.counselorId),
+      content: content.trim()
+    });
+
+    res.json({ success: true, message });
+  } catch (error) {
+    console.error('Send message error:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// ==================== FITNESS VIDEO ROUTES ====================
+
+// Configure multer for video uploads
+// Ensure fitness upload directory exists at startup
+if (!existsSync('public/uploads/fitness')) {
+  mkdirSync('public/uploads/fitness', { recursive: true });
+  console.log('📁 Created fitness uploads directory');
+}
+
+const videoStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/fitness/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'fitness-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const uploadVideo = multer({
+  storage: videoStorage,
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB — supports up to ~5 min video
+  fileFilter: function (req, file, cb) {
+    console.log('📹 Upload attempt - mimetype:', file.mimetype, 'originalname:', file.originalname);
+    // Accept any video file or common video extensions
+    const allowedMimes = [
+      'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo',
+      'video/x-ms-wmv', 'video/webm', 'video/ogg', 'application/octet-stream'
+    ];
+    const allowedExts = /\.(mp4|mov|avi|wmv|webm|ogv|mkv)$/i;
+    const extOk = allowedExts.test(file.originalname);
+    const mimeOk = allowedMimes.includes(file.mimetype) || file.mimetype.startsWith('video/');
+    if (extOk || mimeOk) return cb(null, true);
+    console.log('❌ Rejected file:', file.mimetype, file.originalname);
+    cb(new Error('Only video files (MP4, MOV, AVI) are allowed!'));
+  }
+});
+
+// Counselor: Fitness videos page
+router.get("/counselor/fitness", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).render("403", { title: "Access Denied" });
+    const { FitnessVideo } = await import('../models/index.js');
+
+    let videos = [];
+    try {
+      videos = await FitnessVideo.findAll({
+        where: { counselorId: req.user.id },
+        order: [['createdAt', 'DESC']]
+      });
+      console.log(`🎬 Counselor ${req.user.id} has ${videos.length} fitness videos`);
+    } catch (dbErr) {
+      console.error('FitnessVideo DB error:', dbErr.message);
+    }
+
+    res.render("counselor/fitness", { title: "Fitness Videos", user: req.user, videos });
+  } catch (error) {
+    console.error('Fitness page error:', error);
+    res.status(500).render("404", { title: "Error: " + error.message });
+  }
+});
+
+// Counselor: Upload fitness video
+router.post("/counselor/fitness/upload", isAuthenticated, (req, res, next) => {
+  uploadVideo.single('videoFile')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err.message);
+      return res.redirect('/counselor/fitness?error=' + encodeURIComponent(err.message));
+    }
+    next();
+  });
+}, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).render("403", { title: "Access Denied" });
+    const { FitnessVideo } = await import('../models/index.js');
+
+    if (!req.file) {
+      console.log('❌ No file received in req.file');
+      const videos = await FitnessVideo.findAll({ where: { counselorId: req.user.id }, order: [['createdAt', 'DESC']] });
+      return res.render("counselor/fitness", { title: "Fitness Videos", user: req.user, videos, error_msg: 'Please select a video file.' });
+    }
+
+    const { title, description, category } = req.body;
+    // Normalize path: replace backslashes, strip leading 'public'
+    const normalizedPath = req.file.path.replace(/\\/g, '/');
+    const filePath = '/' + normalizedPath.replace(/^public\//, '');
+
+    console.log('📁 Storing filePath:', filePath);
+    console.log('📹 File info:', req.file.filename, req.file.size, 'bytes');
+
+    await FitnessVideo.create({
+      counselorId: req.user.id,
+      title,
+      description: description || '',
+      category: category || 'other',
+      fileName: req.file.filename,
+      filePath,
+      fileSize: req.file.size
+    });
+
+    console.log('✅ Fitness video uploaded:', title);
+    const videos = await FitnessVideo.findAll({ where: { counselorId: req.user.id }, order: [['createdAt', 'DESC']] });
+    res.render("counselor/fitness", { title: "Fitness Videos", user: req.user, videos, success_msg: 'Video uploaded successfully!' });
+  } catch (error) {
+    console.error('Upload fitness video error:', error);
+    res.status(500).render("404", { title: "Error: " + error.message });
+  }
+});
+
+// Counselor: Delete fitness video
+router.post("/counselor/fitness/delete/:id", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'counselor') return res.status(403).render("403", { title: "Access Denied" });
+    const { FitnessVideo } = await import('../models/index.js');
+    const fs = await import('fs');
+
+    const video = await FitnessVideo.findOne({ where: { id: req.params.id, counselorId: req.user.id } });
+    if (!video) return res.redirect('/counselor/fitness');
+
+    // Delete physical file
+    const filePath = 'public' + video.filePath;
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    await video.destroy();
+    res.redirect('/counselor/fitness');
+  } catch (error) {
+    console.error('Delete fitness video error:', error);
+    res.redirect('/counselor/fitness');
+  }
+});
+
+// User: View fitness videos
+router.get("/user/fitness", isAuthenticated, async (req, res) => {
+  try {
+    const { FitnessVideo, User } = await import('../models/index.js');
+
+    let videos = [];
+    try {
+      videos = await FitnessVideo.findAll({
+        where: { isPublished: true },
+        include: [{ model: User, as: 'counselor', attributes: ['name'] }],
+        order: [['createdAt', 'DESC']]
+      });
+    } catch (dbErr) {
+      console.error('FitnessVideo DB error (table may not exist yet):', dbErr.message);
+    }
+
+    console.log(`🏃 Found ${videos.length} fitness videos for user`);
+    res.render("user/fitness", { title: "Fitness & Exercise", user: req.user, videos });
+  } catch (error) {
+    console.error('User fitness error:', error);
+    res.status(500).render("404", { title: "Error" });
+  }
+});
+
+// User: Track fitness video view
+router.post("/user/fitness/:id/view", isAuthenticated, async (req, res) => {
+  try {
+    const { FitnessVideo, Activity } = await import('../models/index.js');
+
+    const video = await FitnessVideo.findByPk(req.params.id);
+    if (!video) return res.json({ success: false });
+
+    // Increment view count
+    await FitnessVideo.increment('views', { where: { id: req.params.id } });
+
+    // Log as activity so admin can see it
+    await Activity.create({
+      userId: req.user.id,
+      type: 'fitness',
+      subType: video.title,
+      description: `Watched fitness video: "${video.title}" (${video.category})`,
+      metadata: { videoId: video.id, category: video.category, counselorId: video.counselorId }
+    });
+
+    console.log(`🏃 User ${req.user.id} watched fitness video: ${video.title}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Track fitness view error:', error.message);
+    res.json({ success: false });
+  }
+});
+
+// ==================== ADMIN FITNESS & MESSAGES ROUTES ====================
+
+// Admin: View all fitness videos
+router.get("/admin/fitness", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { FitnessVideo, User } = await import('../models/index.js');
+
+    let videos = [];
+    try {
+      videos = await FitnessVideo.findAll({
+        include: [{ model: User, as: 'counselor', attributes: ['name'] }],
+        order: [['createdAt', 'DESC']]
+      });
+    } catch (e) { console.error('FitnessVideo fetch error:', e.message); }
+
+    const totalViews = videos.reduce((sum, v) => sum + (v.views || 0), 0);
+    const counselorIds = [...new Set(videos.map(v => v.counselorId))];
+    const categories = [...new Set(videos.map(v => v.category))];
+
+    res.render("admin/fitness", {
+      title: "Fitness Videos",
+      user: req.user,
+      videos,
+      totalVideos: videos.length,
+      totalViews,
+      totalCounselors: counselorIds.length,
+      categories
+    });
+  } catch (error) {
+    console.error('Admin fitness error:', error);
+    res.status(500).render("404", { title: "Error" });
+  }
+});
+
+// Admin: Delete any fitness video
+router.post("/admin/fitness/delete/:id", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { FitnessVideo } = await import('../models/index.js');
+    const { existsSync, unlinkSync } = await import('fs');
+
+    const video = await FitnessVideo.findByPk(req.params.id);
+    if (video) {
+      const filePath = 'public' + video.filePath;
+      if (existsSync(filePath)) unlinkSync(filePath);
+      await video.destroy();
+    }
+    res.redirect('/admin/fitness');
+  } catch (error) {
+    console.error('Admin delete fitness error:', error);
+    res.redirect('/admin/fitness');
+  }
+});
+
+// Admin: Messages page (counselors only)
+router.get("/admin/messages", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { User, Message } = await import('../models/index.js');
+
+    const counselors = await User.findAll({
+      where: { role: 'counselor' },
+      attributes: ['id', 'name', 'email'],
+      order: [['name', 'ASC']]
+    });
+
+    const counselorsWithUnread = await Promise.all(counselors.map(async (c) => {
+      try {
+        const unreadCount = await Message.count({
+          where: { senderId: c.id, receiverId: req.user.id, isRead: false }
+        });
+        return { ...c.toJSON(), unreadCount };
+      } catch { return { ...c.toJSON(), unreadCount: 0 }; }
+    }));
+
+    res.render("admin/messages", { title: "Messages", user: req.user, counselors: counselorsWithUnread });
+  } catch (error) {
+    console.error('Admin messages error:', error);
+    res.status(500).render("404", { title: "Error" });
+  }
+});
+
+// Admin: Get messages with a counselor (JSON)
+router.get("/admin/messages/:counselorId/json", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { Message } = await import('../models/index.js');
+    const { Op } = await import('sequelize');
+
+    const messages = await Message.findAll({
+      where: {
+        [Op.or]: [
+          { senderId: req.user.id, receiverId: req.params.counselorId },
+          { senderId: req.params.counselorId, receiverId: req.user.id }
+        ]
+      },
+      order: [['createdAt', 'ASC']]
+    });
+
+    await Message.update(
+      { isRead: true },
+      { where: { senderId: req.params.counselorId, receiverId: req.user.id, isRead: false } }
+    );
+
+    res.json(messages);
+  } catch (error) {
+    console.error('Admin get messages error:', error);
+    res.status(500).json([]);
+  }
+});
+
+// Admin: Send message to counselor
+router.post("/admin/messages/:counselorId/send", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { Message } = await import('../models/index.js');
+    const { content } = req.body;
+    if (!content || !content.trim()) return res.status(400).json({ error: 'Empty message' });
+
+    const message = await Message.create({
+      senderId: req.user.id,
+      receiverId: parseInt(req.params.counselorId),
+      content: content.trim()
+    });
+
+    res.json({ success: true, message });
+  } catch (error) {
+    console.error('Admin send message error:', error);
+    res.status(500).json({ error: 'Failed to send' });
   }
 });
 

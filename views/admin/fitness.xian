@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Tellngrow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <nav class="bg-white border-b border-gray-200 shadow-sm p-4 sticky top-0 z-30">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <a href="/admin/dashboard" class="text-gray-500 hover:text-purple-600 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <h1 class="text-xl font-bold text-purple-700">🏃 Fitness Videos</h1>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="text-gray-700 text-sm font-medium">{{user.name}}</span>
+        <a href="/logout" class="text-gray-500 hover:text-gray-700 text-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-6">
+
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-1">All Fitness Videos</h2>
+      <p class="text-purple-100 text-sm">View and manage all exercise videos uploaded by counselors</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <div class="text-3xl font-bold text-purple-600">{{totalVideos}}</div>
+        <div class="text-xs text-gray-500 mt-1">Total Videos</div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <div class="text-3xl font-bold text-emerald-600">{{totalViews}}</div>
+        <div class="text-xs text-gray-500 mt-1">Total Views</div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <div class="text-3xl font-bold text-blue-600">{{totalCounselors}}</div>
+        <div class="text-xs text-gray-500 mt-1">Counselors Uploading</div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <div class="text-3xl font-bold text-orange-500">{{categories.length}}</div>
+        <div class="text-xs text-gray-500 mt-1">Categories</div>
+      </div>
+    </div>
+
+    <!-- Videos Grid -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold text-gray-800">All Uploaded Videos</h3>
+        <!-- Category filter -->
+        <select id="catFilter" onchange="filterCat(this.value)"
+                class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400">
+          <option value="all">All Categories</option>
+          <option value="stretching">Stretching</option>
+          <option value="breathing">Breathing</option>
+          <option value="yoga">Yoga</option>
+          <option value="cardio">Cardio</option>
+          <option value="meditation">Meditation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      {{#if videos.length}}
+      <div id="videosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {{#each videos}}
+        <div class="video-card border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition group"
+             data-category="{{this.category}}">
+          <div class="relative bg-black aspect-video cursor-pointer"
+               onclick="playVideo('{{this.filePath}}', '{{this.title}}')">
+            <video class="w-full h-full object-contain opacity-80" preload="metadata" muted playsinline>
+              <source src="{{this.filePath}}" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition">
+              <div class="w-12 h-12 bg-white bg-opacity-95 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition">
+                <svg class="w-5 h-5 text-purple-600 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                </svg>
+              </div>
+            </div>
+            <span class="absolute top-2 left-2 text-xs bg-purple-600 text-white px-2 py-1 rounded-full capitalize font-medium">{{this.category}}</span>
+          </div>
+          <div class="p-4">
+            <h4 class="font-bold text-gray-800 mb-1 truncate">{{this.title}}</h4>
+            {{#if this.description}}
+            <p class="text-xs text-gray-500 mb-2 line-clamp-2">{{this.description}}</p>
+            {{/if}}
+            <div class="flex items-center justify-between text-xs text-gray-400">
+              <span>👨‍💼 {{this.counselor.name}}</span>
+              <span>👁️ {{this.views}} views</span>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <form action="/admin/fitness/delete/{{this.id}}" method="POST"
+                    onsubmit="return confirm('Delete this video permanently?')">
+                <button type="submit"
+                        class="text-xs bg-red-50 text-red-500 hover:bg-red-100 px-3 py-1 rounded-lg transition">
+                  🗑️ Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="text-center py-16 text-gray-400">
+        <div class="text-7xl mb-4">🎬</div>
+        <p class="text-xl font-medium">No fitness videos uploaded yet</p>
+        <p class="text-sm mt-1">Counselors haven't uploaded any exercise videos yet</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <!-- Video Player Modal -->
+  <div id="videoModal" class="hidden fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+    <div class="bg-gray-900 rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl">
+      <div class="flex justify-between items-center px-5 py-3 border-b border-gray-700">
+        <span id="videoModalTitle" class="text-white font-semibold text-sm"></span>
+        <button onclick="closeVideoModal()" class="text-gray-400 hover:text-white text-2xl leading-none">✕</button>
+      </div>
+      <video id="modalVideo" controls autoplay class="w-full max-h-[75vh] bg-black">
+        <source id="modalVideoSrc" src="" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <script>
+    function playVideo(path, title) {
+      document.getElementById('modalVideoSrc').src = path;
+      document.getElementById('modalVideo').load();
+      document.getElementById('modalVideo').play().catch(() => {});
+      document.getElementById('videoModalTitle').textContent = title;
+      document.getElementById('videoModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeVideoModal() {
+      const v = document.getElementById('modalVideo');
+      v.pause(); v.currentTime = 0;
+      document.getElementById('modalVideoSrc').src = '';
+      document.getElementById('videoModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+    function filterCat(cat) {
+      document.querySelectorAll('.video-card').forEach(c => {
+        c.style.display = (cat === 'all' || c.dataset.category === cat) ? '' : 'none';
+      });
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideoModal(); });
+  </script>
+</body>
+</html>

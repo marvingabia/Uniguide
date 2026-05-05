@@ -10,6 +10,14 @@
       width: 100%;
       height: calc(100vh - 120px);
       border: none;
+      pointer-events: auto;
+    }
+    /* Disable right-click on PDF viewer */
+    iframe {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     .library-sidebar {
       width: 300px;
@@ -122,8 +130,9 @@
           {{#if (eq material.fileType 'pdf')}}
           <!-- PDF Viewer - Use route that sets inline headers -->
           <iframe 
-            src="/reading/file/{{material.id}}" 
+            src="/reading/file/{{material.id}}#toolbar=0&navpanes=0&scrollbar=1" 
             class="pdf-viewer"
+            oncontextmenu="return false;"
             type="application/pdf">
             <p class="p-8 text-center">
               <span class="text-4xl mb-4 block">📕</span>
@@ -172,6 +181,55 @@
   <script>
     const currentMaterialId = {{material.id}};
     let libraryOpen = true;
+
+    // Disable right-click and keyboard shortcuts for download
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+
+    // Disable Ctrl+S (Save) and Ctrl+P (Print)
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p')) {
+        e.preventDefault();
+        alert('⚠️ Downloading and printing are disabled. This material is for reading only.');
+        return false;
+      }
+    });
+
+    // Track reading session
+    let readingStartTime = Date.now();
+    let readingDuration = 0;
+    
+    // Update reading duration every 30 seconds
+    setInterval(() => {
+      readingDuration = Math.floor((Date.now() - readingStartTime) / 1000);
+      if (readingDuration % 30 === 0 && readingDuration > 0) {
+        trackReadingActivity();
+      }
+    }, 30000);
+
+    // Track when user leaves the page
+    window.addEventListener('beforeunload', function() {
+      trackReadingActivity();
+    });
+
+    async function trackReadingActivity() {
+      try {
+        const duration = Math.floor((Date.now() - readingStartTime) / 1000);
+        await fetch('/api/reading/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            materialId: currentMaterialId,
+            duration: duration
+          })
+        });
+        console.log('📊 Reading activity tracked:', duration, 'seconds');
+      } catch (error) {
+        console.error('Failed to track reading:', error);
+      }
+    }
 
     // Toggle library sidebar
     function toggleLibrary() {

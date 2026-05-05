@@ -13,6 +13,8 @@ import Certificate from "./Certificatemodel.js";
 import ReadingMaterialModel from "./ReadingMaterialModel.js";
 import SavedMaterialModel from "./SavedMaterialModel.js";
 import { ReadingSession } from "./ReadingSessionModel.js";
+import { Message } from "./MessageModel.js";
+import { FitnessVideo } from "./FitnessVideoModel.js";
 
 // Initialize ReadingMaterial model
 const ReadingMaterial = ReadingMaterialModel(sequelize);
@@ -50,14 +52,24 @@ ReadingSession.belongsTo(User, { foreignKey: 'userId' });
 ReadingMaterial.hasMany(ReadingSession, { foreignKey: 'materialId', onDelete: 'CASCADE' });
 ReadingSession.belongsTo(ReadingMaterial, { foreignKey: 'materialId', as: 'material' });
 
+// Message relationships
+User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages', onDelete: 'CASCADE' });
+User.hasMany(Message, { foreignKey: 'receiverId', as: 'receivedMessages', onDelete: 'CASCADE' });
+Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
+Message.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
+
+// FitnessVideo relationships
+User.hasMany(FitnessVideo, { foreignKey: 'counselorId', as: 'fitnessVideos', onDelete: 'CASCADE' });
+FitnessVideo.belongsTo(User, { foreignKey: 'counselorId', as: 'counselor' });
+
 // Sync models
 export const syncModels = async () => {
   try {
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
     console.log("✅ Database synced successfully");
   } catch (error) {
     console.error("❌ Error syncing database:", error);
   }
 };
 
-export { sequelize, User, UserProgress, GameSession, JournalEntry, Activity, Certificate, ReadingMaterial, SavedMaterial, ReadingSession };
+export { sequelize, User, UserProgress, GameSession, JournalEntry, Activity, Certificate, ReadingMaterial, SavedMaterial, ReadingSession, Message, FitnessVideo };

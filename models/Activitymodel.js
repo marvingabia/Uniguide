@@ -9,12 +9,12 @@ export const Activity = sequelize.define("Activity", {
     references: { model: User, key: 'id' }
   },
   type: { 
-    type: DataTypes.ENUM('game', 'quiz', 'journal', 'login', 'registration', 'achievement', 'admin_action'),
+    type: DataTypes.ENUM('game', 'quiz', 'journal', 'login', 'registration', 'achievement', 'admin_action', 'fitness', 'reading'),
     allowNull: false 
   },
-  subType: { type: DataTypes.STRING }, // Specific game/quiz name
+  subType: { type: DataTypes.STRING }, // Specific game/quiz name or video title
   description: { type: DataTypes.STRING },
-  metadata: { type: DataTypes.JSON } // Store score, points, etc.
+  metadata: { type: DataTypes.JSON } // Store score, points, video ID, etc.
 });
 
 Activity.belongsTo(User, { foreignKey: 'userId' });

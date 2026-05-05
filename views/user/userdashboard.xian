@@ -101,9 +101,17 @@
       </div>
       <div class="text-gray-700">
         <a href="/user/profile" class="flex items-center space-x-2 hover:text-gray-900">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
+          <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-purple-200 bg-white flex items-center justify-center flex-shrink-0">
+            {{#if user.profilePicture}}
+              {{#if (eq (substring user.profilePicture 0 1) "/")}}
+                <img src="{{user.profilePicture}}" alt="Profile" class="w-full h-full object-cover" />
+              {{else}}
+                <span class="text-xl">{{user.profilePicture}}</span>
+              {{/if}}
+            {{else}}
+              <span class="text-xl text-gray-400">👤</span>
+            {{/if}}
+          </div>
           <span class="hidden md:inline">{{user.name}}</span>
         </a>
       </div>
@@ -149,6 +157,26 @@
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-2xl font-bold text-gray-900">📚 Reading Materials</h3>
       </div>
+    </div>
+
+    <!-- Quick Access Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <!-- Message Counselor -->
+      <a href="/user/messages" class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl p-6 hover:shadow-lg transition hover:scale-[1.02] flex items-center space-x-4">
+        <div class="text-5xl">💬</div>
+        <div>
+          <h3 class="text-xl font-bold">Message Counselor</h3>
+          <p class="text-indigo-100 text-sm mt-1">Send a message or share your concerns</p>
+        </div>
+      </a>
+      <!-- Fitness Videos -->
+      <a href="/user/fitness" class="bg-gradient-to-br from-orange-400 to-pink-500 text-white rounded-xl p-6 hover:shadow-lg transition hover:scale-[1.02] flex items-center space-x-4">
+        <div class="text-5xl">🏃</div>
+        <div>
+          <h3 class="text-xl font-bold">Fitness & Exercise</h3>
+          <p class="text-orange-100 text-sm mt-1">Watch exercise videos from your counselors</p>
+        </div>
+      </a>
     </div>
 
     <!-- Clean Library Card -->

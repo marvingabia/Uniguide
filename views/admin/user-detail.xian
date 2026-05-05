@@ -72,7 +72,7 @@
     </div>
 
     <!-- Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
         <div class="text-3xl mb-2">🎮</div>
         <div class="text-2xl font-bold text-gray-900">
@@ -87,6 +87,14 @@
           {{#if targetUser.progress}}{{targetUser.progress.totalJournalEntries}}{{else}}0{{/if}}
         </div>
         <div class="text-sm text-gray-600">Journal Entries</div>
+      </div>
+
+      <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <div class="text-3xl mb-2">📚</div>
+        <div class="text-2xl font-bold text-gray-900">
+          {{readingSessions.length}}
+        </div>
+        <div class="text-sm text-gray-600">Reading Sessions</div>
       </div>
 
       <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
@@ -111,8 +119,8 @@
           <button onclick="showTab('journals')" id="tab-journals" class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-900">
             Journals
           </button>
-          <button onclick="showTab('certificates')" id="tab-certificates" class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-900">
-            Certificates
+          <button onclick="showTab('reading')" id="tab-reading" class="px-6 py-3 font-semibold text-gray-600 hover:text-gray-900">
+            Reading
           </button>
         </div>
       </div>
@@ -163,12 +171,6 @@
                 </div>
                 <div class="flex flex-col items-end gap-2">
                   <div class="text-xs text-gray-500">{{formatDate this.createdAt}}</div>
-                  {{#if this.isPerfect}}
-                  <button onclick="generateCertificate({{../targetUser.id}}, 'game', '{{this.gameType}}', {{this.id}})" 
-                          class="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition">
-                    📜 Generate Certificate
-                  </button>
-                  {{/if}}
                 </div>
               </div>
             </div>
@@ -203,55 +205,35 @@
           </div>
         </div>
 
-        <!-- Certificates Tab -->
-        <div id="content-certificates" class="tab-content hidden">
-          <h3 class="text-lg font-bold text-gray-900 mb-4">Generated Certificates</h3>
+        <!-- Reading Tab -->
+        <div id="content-reading" class="tab-content hidden">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">Reading Sessions</h3>
           <div class="space-y-2">
-            {{#each certificates}}
-            <div class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg">
-              <div class="flex justify-between items-start">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-2">
-                    <span class="text-2xl">🏆</span>
-                    <div>
-                      <div class="font-bold text-gray-900">{{this.activityName}}</div>
-                      <div class="text-xs text-gray-600">
-                        Game - 
-                        Perfect Score: {{this.score}}/{{this.maxScore}}
-                      </div>
-                    </div>
+            {{#each readingSessions}}
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">📚</span>
+                  <div>
+                    <div class="font-semibold text-gray-900">{{this.material.title}}</div>
+                    <div class="text-xs text-gray-600">{{this.material.category}}</div>
                   </div>
-                  <div class="text-xs text-gray-500">
-                    Certificate ID: {{this.certificateId}}
-                  </div>
-                  <div class="text-xs text-gray-500">
-                    Generated: {{formatDate this.createdAt}}
-                  </div>
-                  {{#if this.sentByAdmin}}
-                  <div class="mt-2">
-                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Sent to User</span>
-                  </div>
-                  {{/if}}
                 </div>
-                <div class="flex flex-col gap-2">
-                  <a href="/admin/certificates/download/{{this.id}}" target="_blank" 
-                     class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition text-center">
-                    📥 Download
-                  </a>
-                  {{#unless this.sentByAdmin}}
-                  <button onclick="sendCertificate({{this.id}})" 
-                          class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 transition">
-                    📧 Send to User
-                  </button>
-                  {{/unless}}
-                </div>
+                <div class="text-xs text-gray-500">{{formatDate this.startTime}}</div>
+              </div>
+              <div class="flex gap-4 text-sm">
+                <span class="text-gray-600">⏱️ Duration: <span class="font-semibold">{{formatDuration this.duration}}</span></span>
+                {{#if this.completed}}
+                <span class="text-green-600 font-semibold">✓ Completed</span>
+                {{/if}}
               </div>
             </div>
             {{else}}
-            <div class="text-center text-gray-500 py-8">No certificates generated yet</div>
+            <div class="text-center text-gray-500 py-8">No reading sessions yet</div>
             {{/each}}
           </div>
         </div>
+
       </div>
     </div>
   </div>

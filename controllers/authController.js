@@ -7,11 +7,17 @@
 */
 
 import bcrypt from "bcrypt";
-import { User, UserProgress, Activity, sequelize } from "../models/index.js";
+import { User, UserProgress, Activity, sequelize, Message, FitnessVideo } from "../models/index.js";
 
-await sequelize.sync();
+await sequelize.sync({ alter: true });
 
 export const loginPage = (req, res) => {
+  // Debug: Log Firebase config (remove in production)
+  console.log('🔥 Firebase Config Check:');
+  console.log('API Key:', process.env.FIREBASE_API_KEY ? '✓ Set' : '✗ Missing');
+  console.log('Auth Domain:', process.env.FIREBASE_AUTH_DOMAIN ? '✓ Set' : '✗ Missing');
+  console.log('Project ID:', process.env.FIREBASE_PROJECT_ID ? '✓ Set' : '✗ Missing');
+  
   res.render("login", { 
     title: "Login", 
     email: '',
@@ -293,6 +299,7 @@ export const firebaseGoogleAuth = async (req, res) => {
     console.log('🆔 Firebase UID:', uid);
 
     if (!idToken || !email) {
+      console.log('❌ Missing required data');
       return res.status(400).json({ 
         success: false, 
         error: 'Missing required authentication data' 
@@ -424,9 +431,12 @@ export const firebaseGoogleAuth = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Firebase Google Auth error:', error);
+    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error message:', error.message);
     return res.status(500).json({ 
       success: false, 
-      error: 'Authentication failed. Please try again.' 
+      error: 'Authentication failed. Please try again.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -482,13 +492,25 @@ export const updateProfile = async (req, res) => {
       }
       
       await user.save();
+      
+      // Update session user object so sidebar reflects changes immediately
+      req.user = user;
     }
 
     const success_msg = error_msg ? null : "Profile updated successfully.";
-    res.render("user/profile", { title: "My Profile", user, error_msg, success_msg });
+    
+    // Determine which profile page to render based on user role
+    const profileView = user.role === 'counselor' ? 'counselor/profile' : 
+                        user.role === 'admin' ? 'admin/profile' : 
+                        'user/profile';
+    
+    res.render(profileView, { title: "My Profile", user, error_msg, success_msg });
   } catch (err) {
     console.error("Profile update error:", err);
-    res.status(500).render("user/profile", {
+    const profileView = req.user.role === 'counselor' ? 'counselor/profile' : 
+                        req.user.role === 'admin' ? 'admin/profile' : 
+                        'user/profile';
+    res.status(500).render(profileView, {
       title: "My Profile",
       user: req.user,
       error_msg: "An error occurred while updating your profile."

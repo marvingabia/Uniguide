@@ -28,10 +28,24 @@ export const User = sequelize.define("User", {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true  // Changed to true for Google users
+  },
+  googleId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  },
+  profilePicture: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  authProvider: {
+    type: DataTypes.ENUM('local', 'google', 'firebase-google'),
+    defaultValue: 'local',
+    allowNull: true
   },
   role: {
-    type: DataTypes.ENUM('user', 'admin', 'faculty'),
+    type: DataTypes.ENUM('user', 'admin', 'faculty', 'counselor'),
     defaultValue: 'user',
     allowNull: false
   },
