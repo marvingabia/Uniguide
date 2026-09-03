@@ -1,0 +1,174 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-student activePage="history"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div>
+        <h1 class="text-base font-bold text-slate-800">📋 Application History</h1>
+        <p class="text-gray-600 text-xs">Complete timeline of your Good Moral Certificate requests</p>
+      </div>
+    </div>
+
+    <div class="px-6 py-5">
+      {{> flash}}
+
+      {{#if applications.length}}
+      <div class="space-y-4">
+        {{#each applications}}
+        <div class="card hover:shadow-lg transition-shadow">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-sm font-bold text-slate-800">Request #{{this.id}}</span>
+                <span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span>
+              </div>
+              <p class="text-slate-700 font-medium text-sm mb-1">{{this.surname}}, {{this.givenName}} {{this.middleName}}</p>
+              <p class="text-gray-500 text-xs">{{this.course}} • {{this.yearLevel}}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-gray-400">Applied on</p>
+              <p class="text-sm font-semibold text-slate-700">{{formatDate this.createdAt}}</p>
+              <p class="text-xs text-gray-500">{{formatTime this.createdAt}}</p>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="bg-slate-50 rounded-lg p-3 mb-3">
+            <p class="text-xs font-semibold text-gray-600 mb-2">📅 Application Timeline</p>
+            <div class="space-y-2">
+              <!-- Application Submitted -->
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0">✓</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Application Submitted</span>
+                  <span class="text-gray-500 ml-2">{{formatDateTime this.createdAt}}</span>
+                </div>
+              </div>
+
+              <!-- Payment -->
+              {{#if this.paymentDate}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white shrink-0">💳</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Payment Submitted ({{this.paymentMethod}})</span>
+                  <span class="text-gray-500 ml-2">{{formatDateTime this.paymentDate}}</span>
+                  {{#if this.referenceNumber}}<span class="text-gray-600 ml-1">(Ref: {{this.referenceNumber}})</span>{{/if}}
+                </div>
+              </div>
+              {{else if (eq this.status 'pending')}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 shrink-0">○</span>
+                <div class="flex-1">
+                  <span class="text-gray-500">Payment pending</span>
+                </div>
+              </div>
+              {{/if}}
+
+              <!-- Payment Verified -->
+              {{#if (or (eq this.status 'payment_verified') (eq this.status 'receipt_issued') (eq this.status 'approved') (eq this.status 'released'))}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center text-white shrink-0">✓</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Payment Verified by Cashier</span>
+                  <span class="text-gray-500 ml-2">{{formatDateTime this.updatedAt}}</span>
+                </div>
+              </div>
+              {{/if}}
+
+              <!-- Receipt Issued -->
+              {{#if this.orNumber}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center text-white shrink-0">🧾</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Official Receipt Issued</span>
+                  <span class="text-gray-600 ml-2 font-mono">OR: {{this.orNumber}}</span>
+                </div>
+              </div>
+              {{/if}}
+
+              <!-- Approved -->
+              {{#if (or (eq this.status 'approved') (eq this.status 'released'))}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center text-white shrink-0">✓</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Approved by Guidance Office</span>
+                  <span class="text-gray-500 ml-2">{{formatDateTime this.updatedAt}}</span>
+                </div>
+              </div>
+              {{/if}}
+
+              <!-- Released -->
+              {{#if (eq this.status 'released')}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-teal-600 flex items-center justify-center text-white shrink-0">🎓</span>
+                <div class="flex-1">
+                  <span class="text-slate-700 font-medium">Certificate Released</span>
+                  {{#if this.releasedAt}}<span class="text-gray-500 ml-2">{{formatDateTime this.releasedAt}}</span>{{/if}}
+                  {{#if this.releasedBy}}<span class="text-gray-600 ml-1">(by {{this.releasedBy}})</span>{{/if}}
+                </div>
+              </div>
+              {{/if}}
+
+              <!-- Rejected -->
+              {{#if (eq this.status 'rejected')}}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white shrink-0">✕</span>
+                <div class="flex-1">
+                  <span class="text-red-600 font-medium">Application Rejected</span>
+                  {{#if this.remarks}}<p class="text-gray-600 mt-1">Reason: {{this.remarks}}</p>{{/if}}
+                </div>
+              </div>
+              {{/if}}
+            </div>
+          </div>
+
+          <!-- Purpose & Amount -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex-1 space-y-2">
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Documents Requested:</p>
+                <div class="space-y-1 text-sm text-slate-700">
+                  {{#if (gt this.qtyGoodMoral 0)}}<div>• Good Moral: {{this.qtyGoodMoral}} copies</div>{{/if}}
+                  {{#if (gt this.qtyCTC 0)}}<div>• CTC/Authentication: {{this.qtyCTC}} copies</div>{{/if}}
+                </div>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Purpose:</p>
+                <p class="text-sm text-slate-700">{{this.purposes}}</p>
+              </div>
+            </div>
+            {{#if this.totalAmount}}
+            <div class="text-right">
+              <p class="text-xs text-gray-500 mb-1">Amount Paid:</p>
+              <p class="text-lg font-bold text-green-700">₱{{this.totalAmount}}</p>
+            </div>
+            {{/if}}
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            <a href="/student/application/{{this.id}}" class="btn-green btn-sm flex-1 text-center">View Full Details</a>
+            {{#if (eq this.status 'pending')}}
+            <a href="/student/application/{{this.id}}/payment" class="btn-outline btn-sm flex-1 text-center">Submit Payment</a>
+            {{/if}}
+            {{#if (or (eq this.status 'rejected') (eq this.status 'pending'))}}
+            <form action="/student/application/{{this.id}}/delete" method="POST" class="inline" onsubmit="return confirm('Delete this application? This cannot be undone.')">
+              <button type="submit" class="btn-red btn-sm">🗑️ Delete</button>
+            </form>
+            {{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="card text-center py-16">
+        <div class="text-5xl mb-3">📄</div>
+        <p class="text-gray-500 text-sm mb-4">No application history yet.</p>
+        <a href="/student/apply" class="btn-green btn-sm">Apply for Good Moral Certificate</a>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

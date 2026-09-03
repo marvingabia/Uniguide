@@ -1,0 +1,63 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="applications"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <h1 class="text-base font-bold text-slate-800">📋 All Applications</h1>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+    <div class="px-5 py-5">
+      {{> flash}}
+
+      <!-- Filters -->
+      <form method="GET" action="/guidance/applications" class="flex gap-3 mb-4">
+        <input type="text" name="search" value="{{search}}" placeholder="Search student name or course..." class="input" style="max-width:260px">
+        <select name="status" class="input" style="width:auto">
+          <option value="">All Statuses</option>
+          <option value="pending"           {{#if (eq filterStatus 'pending')          }}selected{{/if}}>Pending</option>
+          <option value="payment_submitted" {{#if (eq filterStatus 'payment_submitted')}}selected{{/if}}>Payment Submitted</option>
+          <option value="payment_verified"  {{#if (eq filterStatus 'payment_verified') }}selected{{/if}}>Payment Verified</option>
+          <option value="receipt_issued"    {{#if (eq filterStatus 'receipt_issued')   }}selected{{/if}}>Receipt Issued</option>
+          <option value="approved"          {{#if (eq filterStatus 'approved')         }}selected{{/if}}>Approved</option>
+          <option value="released"          {{#if (eq filterStatus 'released')         }}selected{{/if}}>Released</option>
+          <option value="rejected"          {{#if (eq filterStatus 'rejected')         }}selected{{/if}}>Rejected</option>
+        </select>
+        <button type="submit" class="btn-green btn-sm">Filter</button>
+        <a href="/guidance/applications" class="btn-outline btn-sm">Clear</a>
+      </form>
+
+      {{#if applications.length}}
+      <div class="card p-0 overflow-hidden">
+        <table>
+          <thead><tr><th>#</th><th>Student</th><th>Course</th><th>Documents</th><th>Amount</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
+          <tbody>
+            {{#each applications}}
+            <tr>
+              <td class="text-gray-500 text-xs">{{this.id}}</td>
+              <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
+              <td class="text-slate-500 text-sm">{{this.course}}</td>
+              <td class="text-gray-600 text-xs">
+                <div class="space-y-1">
+                  {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}} copies</div>{{/if}}
+                  {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}} copies</div>{{/if}}
+                </div>
+              </td>
+              <td class="text-green-700 text-sm font-medium">{{#if this.totalAmount}}{{currency this.totalAmount}}{{else}}—{{/if}}</td>
+              <td><span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span></td>
+              <td class="text-gray-500 text-xs">{{formatDate this.createdAt}}</td>
+              <td><a href="/guidance/application/{{this.id}}" class="text-green-700 text-xs hover:underline">View →</a></td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="card text-center py-16">
+        <div class="text-5xl mb-3">📋</div>
+        <p class="text-gray-500">No applications found.</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

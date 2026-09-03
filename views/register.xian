@@ -1,119 +1,190 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-  <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 p-8 w-full max-w-md">
-    <h1 class="text-3xl font-bold text-center mb-6 text-gray-900">Register</h1>
-    
-    {{#if error_msg}}
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-      {{error_msg}}
-    </div>
-    {{/if}}
-    
-    <form action="/register" method="POST" autocomplete="off">
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-2">Full Name</label>
-        <input type="text" name="name" required autocomplete="off"
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-      </div>
-      
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-2">Email</label>
-        <input type="email" name="email" required autocomplete="off"
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-      </div>
-      
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-2">Password</label>
-        <input type="password" name="password" required minlength="6" autocomplete="new-password"
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-      </div>
-      
-      <div class="mb-6">
-        <label class="block text-gray-700 mb-2">Confirm Password</label>
-        <input type="password" name="confirmPassword" required autocomplete="new-password"
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
+{{> head}}
+
+<div class="min-h-screen flex" style="background:#f0f4f8;">
+
+  <!-- ── Left Panel ─────────────────────────────────────────── -->
+  <div class="hidden lg:flex flex-col items-center justify-center relative overflow-hidden"
+       style="width:420px;flex-shrink:0;background:linear-gradient(160deg,#1b5e38 0%,#0f3d22 100%);">
+
+    <!-- Decorative circles -->
+    <div style="position:absolute;top:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.05);"></div>
+    <div style="position:absolute;bottom:-80px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.05);"></div>
+
+    <div class="relative z-10 flex flex-col items-center text-center px-10">
+      <!-- Logo -->
+      <div style="width:110px;height:110px;background:#fff;border-radius:50%;padding:8px;margin-bottom:24px;box-shadow:0 8px 24px rgba(0,0,0,.25);">
+        <img src="/uploads/minsulogo.png" alt="MinSU Logo"
+             style="width:100%;height:100%;object-fit:contain;border-radius:50%;">
       </div>
 
-      <!-- Counselor Checkbox -->
-      <div class="mb-6 bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4">
-        <label class="flex items-start cursor-pointer">
-          <input type="checkbox" name="isFaculty" value="true" id="facultyCheckbox"
-                 class="mt-1 w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500">
-          <div class="ml-3">
-            <span class="text-gray-900 font-semibold">I am a Counselor</span>
-            <p class="text-sm text-gray-600 mt-1">
-              Counselor accounts require admin approval before you can login. You will be notified once approved.
-            </p>
+      <h1 style="color:#fff;font-size:1.5rem;font-weight:800;margin:0 0 6px;line-height:1.25;">
+        Mindoro State University
+      </h1>
+      <p style="color:#a7d4b8;font-size:1rem;font-weight:600;margin:0 0 20px;">Bongabong Campus</p>
+
+      <div style="width:48px;height:3px;background:rgba(255,255,255,.3);border-radius:9999px;margin-bottom:20px;"></div>
+
+      <p style="color:#cde8d8;font-size:.9rem;line-height:1.7;max-width:280px;">
+        Create your student account to apply for a
+        <strong style="color:#fff;">Certificate of Good Moral Character</strong> online.
+      </p>
+
+      <div style="margin-top:32px;background:rgba(255,255,255,.08);border-radius:12px;padding:16px 20px;text-align:left;width:100%;">
+        <p style="color:#a7d4b8;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px;">How it works</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="width:22px;height:22px;background:#1b5e38;border:2px solid #a7d4b8;border-radius:50%;font-size:.7rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+            <span style="color:#cde8d8;font-size:.82rem;">Register your student account</span>
           </div>
-        </label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="width:22px;height:22px;background:#1b5e38;border:2px solid #a7d4b8;border-radius:50%;font-size:.7rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+            <span style="color:#cde8d8;font-size:.82rem;">Submit your application online</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="width:22px;height:22px;background:#1b5e38;border:2px solid #a7d4b8;border-radius:50%;font-size:.7rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+            <span style="color:#cde8d8;font-size:.82rem;">Pay & receive your certificate</span>
+          </div>
+        </div>
       </div>
-      
-      <button type="submit" id="registerBtn"
-              class="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
-        Register
-      </button>
-      </button>
-    </form>
-    
-    <div class="mt-4 text-center text-gray-600">
-      Already have an account? <a href="/login" class="text-gray-900 hover:underline font-semibold">Login</a>
     </div>
   </div>
 
-  <script>
-    // Prevent form from clearing checkbox on load
-    window.addEventListener('load', function() {
-      const form = document.querySelector('form');
-      const facultyCheckbox = document.getElementById('facultyCheckbox');
-      
-      // Save checkbox state
-      const wasChecked = facultyCheckbox.checked;
-      
-      if (form) {
-        // Clear text inputs only, not checkbox
-        document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(input => {
-          input.value = '';
-        });
-      }
-      
-      // Restore checkbox state
-      facultyCheckbox.checked = wasChecked;
-    });
+  <!-- ── Right Panel: Form ───────────────────────────────────── -->
+  <div class="flex-1 flex flex-col justify-center items-center px-6 py-10 overflow-y-auto">
+    <div style="width:100%;max-width:520px;">
 
-    // Log form data before submit
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const facultyCheckbox = document.getElementById('facultyCheckbox');
-      const formData = new FormData(this);
-      
-      console.log('=== FORM SUBMIT DEBUG ===');
-      console.log('Checkbox checked:', facultyCheckbox.checked);
-      console.log('Checkbox value:', facultyCheckbox.value);
-      console.log('Form data isFaculty:', formData.get('isFaculty'));
-      console.log('All form data:');
-      for (let [key, value] of formData.entries()) {
-        console.log(`  ${key}: ${value}`);
-      }
-      console.log('========================');
-      
-      // Don't prevent default - let form submit normally
-    });
+      <!-- Mobile logo (hidden on lg) -->
+      <div class="lg:hidden flex flex-col items-center mb-6">
+        <img src="/uploads/minsulogo.png" alt="MinSU Logo"
+             style="width:64px;height:64px;object-fit:contain;border-radius:50%;background:#1b5e38;padding:6px;margin-bottom:10px;">
+        <p style="font-weight:700;color:#1b5e38;font-size:1rem;margin:0;">GuidanceConnect</p>
+        <p style="color:#64748b;font-size:.8rem;margin:2px 0 0;">MinSU — Bongabong Campus</p>
+      </div>
 
-    // Also clear on focus to remove any persistent autofill
-    document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"]').forEach(input => {
-      input.addEventListener('focus', function() {
-        // If value looks like autofill (contains @gmail.com from previous session)
-        if (this.value && this.name === 'email' && this.value.includes('@gmail.com')) {
-          this.value = '';
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+      <!-- Card -->
+      <div style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:36px 36px 28px;border:1px solid #e2e8f0;">
+
+        <!-- Header -->
+        <div style="margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="width:36px;height:36px;background:#e8f5ee;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🎓</div>
+            <h2 style="font-size:1.25rem;font-weight:800;color:#1e293b;margin:0;">Student Registration</h2>
+          </div>
+          <p style="color:#64748b;font-size:.85rem;margin:0 0 0 46px;">Fill in your details to create an account</p>
+        </div>
+
+        {{> flash}}
+
+        <form action="/register" method="POST" autocomplete="off">
+
+          <!-- Name Row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <label class="label">First Name <span style="color:#ef4444;">*</span></label>
+              <input type="text" name="firstName" class="input" placeholder="Juan" required>
+            </div>
+            <div>
+              <label class="label">Last Name <span style="color:#ef4444;">*</span></label>
+              <input type="text" name="lastName" class="input" placeholder="Dela Cruz" required>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div style="margin-bottom:14px;">
+            <label class="label">Email Address <span style="color:#ef4444;">*</span></label>
+            <input type="email" name="email" autocomplete="username" class="input" placeholder="juan@minsu.edu.ph" required>
+          </div>
+
+          <!-- Student ID + Contact -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <label class="label">Student ID</label>
+              <input type="text" name="studentId" class="input" placeholder="2024-0001">
+            </div>
+            <div>
+              <label class="label">Contact No.</label>
+              <input type="text" name="contactNo" class="input" placeholder="09XXXXXXXXX">
+            </div>
+          </div>
+
+          <!-- Course + Year Level -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div>
+              <label class="label">Course</label>
+              <input type="text" name="course" class="input" placeholder="e.g. BSIT, BSEd">
+            </div>
+            <div>
+              <label class="label">Year Level</label>
+              <select name="yearLevel" class="input">
+                <option value="">— Select —</option>
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+                <option>5th Year</option>
+                <option>Graduate</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section -->
+          <div style="margin-bottom:14px;">
+            <label class="label">Section</label>
+            <input type="text" name="section" class="input" placeholder="e.g. A, B, Irregular">
+          </div>
+
+          <!-- Divider -->
+          <div style="border-top:1px solid #e2e8f0;margin:18px 0 16px;"></div>
+          <p style="font-size:.78rem;font-weight:700;color:#1b5e38;letter-spacing:.05em;text-transform:uppercase;margin:0 0 14px;">Account Security</p>
+
+          <!-- Password -->
+          <div style="margin-bottom:14px; position:relative;">
+            <label class="label">Password <span style="color:#ef4444;">*</span></label>
+            <input id="password" type="password" name="password" autocomplete="new-password" class="input" placeholder="At least 8 characters" required minlength="8" style="padding-right:42px;">
+            <button type="button" tabindex="-1" onclick="togglePassword('password', this)" aria-label="Show password" style="position:absolute; right:12px; top:39px; background:none; border:none; color:#64748b; cursor:pointer; font-size:1rem;">👁</button>
+          </div>
+
+          <!-- Confirm Password -->
+          <div style="margin-bottom:24px; position:relative;">
+            <label class="label">Confirm Password <span style="color:#ef4444;">*</span></label>
+            <input id="confirmPassword" type="password" name="confirmPassword" autocomplete="new-password" class="input" placeholder="Repeat your password" required style="padding-right:42px;">
+            <button type="button" tabindex="-1" onclick="togglePassword('confirmPassword', this)" aria-label="Show confirm password" style="position:absolute; right:12px; top:39px; background:none; border:none; color:#64748b; cursor:pointer; font-size:1rem;">👁</button>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit"
+            style="width:100%;background:linear-gradient(135deg,#1b5e38,#2d7a52);color:#fff;border:none;padding:13px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:opacity .2s;"
+            onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+            Create My Account
+          </button>
+        </form>
+
+        <!-- Sign in link -->
+        <p style="text-align:center;color:#64748b;font-size:.85rem;margin:18px 0 0;">
+          Already have an account?
+          <a href="/login" style="color:#1b5e38;font-weight:700;text-decoration:none;"
+             onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+            Sign In
+          </a>
+        </p>
+      </div>
+
+      <!-- Footer note -->
+      <p style="text-align:center;color:#94a3b8;font-size:.75rem;margin-top:16px;">
+        Mindoro State University — Bongabong Campus Guidance Office
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function togglePassword(inputId, button) {
+  const input = document.getElementById(inputId);
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  button.textContent = isPassword ? '🙈' : '👁';
+  button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+}
+</script>
+</body></html>

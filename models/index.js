@@ -1,75 +1,56 @@
-/*
-    MIT License
-    Copyright (c) 2025 Christian I. Cabrera || XianFire Framework
-*/
+import { sequelize } from './db.js';
+import { User } from './User.js';
+import { Application } from './Application.js';
+import { Announcement } from './Announcement.js';
+import { Appointment } from './Appointment.js';
+import { Notification } from './Notification.js';
+import { StudentProfile } from './StudentProfile.js';
+import { CounselingSession } from './CounselingSession.js';
+import { TimeSlot } from './TimeSlot.js';
 
-import { sequelize } from "./db.js";
-import { User } from "./userModel.js";
-import { UserProgress } from "./Userprogressmodel.js";
-import { GameSession } from "./Gamesessionmodel.js";
-import { JournalEntry } from "./Journalentrymodel.js";
-import { Activity } from "./Activitymodel.js";
-import Certificate from "./Certificatemodel.js";
-import ReadingMaterialModel from "./ReadingMaterialModel.js";
-import SavedMaterialModel from "./SavedMaterialModel.js";
-import { ReadingSession } from "./ReadingSessionModel.js";
-import { Message } from "./MessageModel.js";
-import { FitnessVideo } from "./FitnessVideoModel.js";
+// Application ↔ User
+User.hasMany(Application,   { foreignKey: 'userId',  as: 'applications',  onDelete: 'CASCADE' });
+Application.belongsTo(User, { foreignKey: 'userId',  as: 'student' });
 
-// Initialize ReadingMaterial model
-const ReadingMaterial = ReadingMaterialModel(sequelize);
-const SavedMaterial = SavedMaterialModel(sequelize);
+// Announcement ↔ User
+User.hasMany(Announcement,    { foreignKey: 'authorId', as: 'announcements', onDelete: 'CASCADE' });
+Announcement.belongsTo(User,  { foreignKey: 'authorId', as: 'author' });
 
-// Setup relationships
-User.hasOne(UserProgress, { foreignKey: 'userId', as: 'progress', onDelete: 'CASCADE' });
-UserProgress.belongsTo(User, { foreignKey: 'userId' });
+// Appointment ↔ User
+User.hasMany(Appointment,   { foreignKey: 'userId',  as: 'appointments',  onDelete: 'CASCADE' });
+Appointment.belongsTo(User, { foreignKey: 'userId',  as: 'student' });
 
-User.hasMany(GameSession, { foreignKey: 'userId', onDelete: 'CASCADE' });
-GameSession.belongsTo(User, { foreignKey: 'userId' });
+// Notification ↔ User
+User.hasMany(Notification,   { foreignKey: 'userId', as: 'notifications', onDelete: 'CASCADE' });
+Notification.belongsTo(User, { foreignKey: 'userId', as: 'recipient' });
 
+// StudentProfile ↔ User (one-to-one)
+User.hasOne(StudentProfile,   { foreignKey: 'userId', as: 'profile', onDelete: 'CASCADE' });
+StudentProfile.belongsTo(User, { foreignKey: 'userId', as: 'student' });
 
-User.hasMany(JournalEntry, { foreignKey: 'userId', onDelete: 'CASCADE' });
-JournalEntry.belongsTo(User, { foreignKey: 'userId' });
+// CounselingSession ↔ User (many-to-one for student)
+User.hasMany(CounselingSession,   { foreignKey: 'userId', as: 'counselingSessions', onDelete: 'CASCADE' });
+CounselingSession.belongsTo(User, { foreignKey: 'userId', as: 'student' });
 
-User.hasMany(Activity, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Activity.belongsTo(User, { foreignKey: 'userId' });
+// CounselingSession ↔ User (many-to-one for counselor)
+User.hasMany(CounselingSession,    { foreignKey: 'counselorId', as: 'conductedSessions', onDelete: 'SET NULL' });
+CounselingSession.belongsTo(User,  { foreignKey: 'counselorId', as: 'counselor' });
 
-User.hasMany(Certificate, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Certificate.belongsTo(User, { foreignKey: 'userId' });
+// TimeSlot ↔ User (many-to-one for counselor who creates slots)
+User.hasMany(TimeSlot,    { foreignKey: 'counselorId', as: 'timeSlots', onDelete: 'CASCADE' });
+TimeSlot.belongsTo(User,  { foreignKey: 'counselorId', as: 'counselor' });
 
-User.hasMany(ReadingMaterial, { foreignKey: 'counselorId', onDelete: 'CASCADE' });
-ReadingMaterial.belongsTo(User, { foreignKey: 'counselorId', as: 'counselor' });
+// Appointment ↔ TimeSlot (many-to-one)
+TimeSlot.hasMany(Appointment,   { foreignKey: 'timeSlotId', as: 'appointments', onDelete: 'SET NULL' });
+Appointment.belongsTo(TimeSlot, { foreignKey: 'timeSlotId', as: 'assignedSlot' });
 
-User.hasMany(SavedMaterial, { foreignKey: 'userId', onDelete: 'CASCADE' });
-SavedMaterial.belongsTo(User, { foreignKey: 'userId' });
-
-ReadingMaterial.hasMany(SavedMaterial, { foreignKey: 'materialId', onDelete: 'CASCADE' });
-SavedMaterial.belongsTo(ReadingMaterial, { foreignKey: 'materialId', as: 'material' });
-
-User.hasMany(ReadingSession, { foreignKey: 'userId', onDelete: 'CASCADE' });
-ReadingSession.belongsTo(User, { foreignKey: 'userId' });
-
-ReadingMaterial.hasMany(ReadingSession, { foreignKey: 'materialId', onDelete: 'CASCADE' });
-ReadingSession.belongsTo(ReadingMaterial, { foreignKey: 'materialId', as: 'material' });
-
-// Message relationships
-User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages', onDelete: 'CASCADE' });
-User.hasMany(Message, { foreignKey: 'receiverId', as: 'receivedMessages', onDelete: 'CASCADE' });
-Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
-Message.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
-
-// FitnessVideo relationships
-User.hasMany(FitnessVideo, { foreignKey: 'counselorId', as: 'fitnessVideos', onDelete: 'CASCADE' });
-FitnessVideo.belongsTo(User, { foreignKey: 'counselorId', as: 'counselor' });
-
-// Sync models
-export const syncModels = async () => {
+export const syncDB = async () => {
   try {
-    await sequelize.sync({ alter: true });
-    console.log("✅ Database synced successfully");
-  } catch (error) {
-    console.error("❌ Error syncing database:", error);
+    await sequelize.sync({ alter: { drop: false } });
+    console.log('✅ Database synced');
+  } catch (err) {
+    console.error('❌ DB sync error:', err.message);
   }
 };
 
-export { sequelize, User, UserProgress, GameSession, JournalEntry, Activity, Certificate, ReadingMaterial, SavedMaterial, ReadingSession, Message, FitnessVideo };
+export { sequelize, User, Application, Announcement, Appointment, Notification, StudentProfile, CounselingSession, TimeSlot };

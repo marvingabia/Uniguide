@@ -1,0 +1,114 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="time-slots"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <h1 class="text-base font-bold text-slate-800">⏰ Manage Available Time Slots</h1>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-5 py-6">
+      {{> flash}}
+
+      <!-- Create New Time Slots -->
+      <div class="card mb-5">
+        <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">➕ Create New Time Slots</h3>
+        <form action="/guidance/time-slots" method="POST" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="label">Date(s) *</label>
+              <input type="date" name="dates" class="input" required>
+              <p class="text-gray-500 text-xs mt-1">Select date for available slots</p>
+            </div>
+            <div>
+              <label class="label">Time Slot(s) *</label>
+              <select name="timeSlots" class="input" multiple size="5" required>
+                <option value="8:00 AM - 9:00 AM">8:00 AM - 9:00 AM</option>
+                <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
+                <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
+                <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
+                <option value="3:00 PM - 4:00 PM">3:00 PM - 4:00 PM</option>
+                <option value="4:00 PM - 5:00 PM">4:00 PM - 5:00 PM</option>
+              </select>
+              <p class="text-gray-500 text-xs mt-1">Hold Ctrl/Cmd to select multiple</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="label">Max Students per Slot *</label>
+              <input type="number" name="maxSlots" value="1" min="1" max="10" class="input" required>
+            </div>
+            <div>
+              <label class="label">Notes (optional)</label>
+              <input type="text" name="notes" class="input" placeholder="e.g., Academic counseling only">
+            </div>
+          </div>
+          <button type="submit" class="btn-green">✅ Create Time Slot(s)</button>
+        </form>
+      </div>
+
+      <!-- Existing Time Slots -->
+      <div class="card">
+        <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">📅 Available Time Slots</h3>
+        
+        {{#if timeSlots.length}}
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0;">
+                <th class="px-3 py-2 text-left">Date</th>
+                <th class="px-3 py-2 text-left">Time</th>
+                <th class="px-3 py-2 text-left">Counselor</th>
+                <th class="px-3 py-2 text-center">Capacity</th>
+                <th class="px-3 py-2 text-center">Status</th>
+                <th class="px-3 py-2 text-left">Notes</th>
+                <th class="px-3 py-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each timeSlots}}
+              <tr class="border-b border-slate-200 hover:bg-slate-50">
+                <td class="px-3 py-3 font-medium">{{formatDate date}}</td>
+                <td class="px-3 py-3">{{timeSlot}}</td>
+                <td class="px-3 py-3 text-xs">{{counselor.firstName}} {{counselor.lastName}}</td>
+                <td class="px-3 py-3 text-center">
+                  <span class="{{#if (eq bookedCount maxSlots)}}text-red-600{{else}}text-green-600{{/if}} font-bold">
+                    {{bookedCount}}/{{maxSlots}}
+                  </span>
+                </td>
+                <td class="px-3 py-3 text-center">
+                  {{#if isAvailable}}
+                  <span class="badge badge-verified">Available</span>
+                  {{else}}
+                  <span class="badge badge-pending">Disabled</span>
+                  {{/if}}
+                </td>
+                <td class="px-3 py-3 text-xs text-gray-600">{{notes}}</td>
+                <td class="px-3 py-3">
+                  <div class="flex gap-2 justify-center">
+                    <form action="/guidance/time-slots/{{id}}/toggle" method="POST" class="inline">
+                      <button type="submit" class="text-xs px-2 py-1 rounded {{#if isAvailable}}bg-yellow-100 text-yellow-700{{else}}bg-green-100 text-green-700{{/if}}">
+                        {{#if isAvailable}}Disable{{else}}Enable{{/if}}
+                      </button>
+                    </form>
+                    <form action="/guidance/time-slots/{{id}}/delete" method="POST" class="inline" onsubmit="return confirm('Delete this time slot?')">
+                      <button type="submit" class="text-xs px-2 py-1 rounded bg-red-100 text-red-700">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <p class="text-gray-500 text-sm text-center py-8">No time slots created yet. Create some above to allow students to book appointments automatically.</p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

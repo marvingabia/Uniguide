@@ -1,0 +1,50 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="notifications"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div>
+        <h1 class="text-base font-bold text-slate-800">🔔 Notifications</h1>
+        <p class="text-slate-500 text-xs">MinSU Bongabong Campus — Guidance Office</p>
+      </div>
+      <span class="text-teal-700 text-sm font-medium">👤 {{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-5 py-6">
+      {{> flash}}
+      {{#if allNotifications.length}}
+      <div class="space-y-3">
+        {{#each allNotifications}}
+        <div class="card-sm {{notifClass this.type}} rounded-xl p-4 {{#unless this.isRead}}border-l-4 border-green-500{{/unless}}">
+          <div class="flex items-start gap-3">
+            <span class="text-lg shrink-0">
+              {{#if (eq this.type 'success')}}✅
+              {{else if (eq this.type 'danger')}}❌
+              {{else if (eq this.type 'warning')}}⚠️
+              {{else}}ℹ️{{/if}}
+            </span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                {{#unless this.isRead}}<span class="inline-block w-2 h-2 rounded-full bg-green-500 shrink-0"></span>{{/unless}}
+                <p class="text-slate-700 text-sm leading-relaxed">{{this.message}}</p>
+              </div>
+              <p class="text-gray-500 text-xs">{{formatDateTime this.createdAt}}</p>
+            </div>
+            {{#if this.link}}
+            <a href="{{this.link}}" class="text-green-700 text-xs hover:underline shrink-0">View →</a>
+            {{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="card text-center py-16">
+        <div class="text-5xl mb-3">🔔</div>
+        <p class="text-gray-500">No notifications yet.</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

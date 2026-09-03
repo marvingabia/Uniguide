@@ -1,0 +1,149 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="Home"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div>
+        <h1 class="text-base font-bold text-slate-800">UniGuid Home</h1>
+        <p class="text-slate-500 text-xs">MinSU Bongabong Campus — Guidance Office</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-teal-700 text-sm font-medium">👤 {{user.firstName}} {{user.lastName}}</span>
+      </div>
+    </div>
+
+    <div class="px-5 py-5">
+      {{> flash}}
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="card flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">💰</div>
+          <div><p class="text-xl font-bold text-blue-600">{{verifiedCount}}</p><p class="text-gray-500 text-xs">Payment Verified</p></div>
+        </div>
+        <div class="card flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">📑</div>
+          <div><p class="text-xl font-bold text-purple-600">{{readyCount}}</p><p class="text-gray-500 text-xs">Ready to Process</p></div>
+        </div>
+        <div class="card flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">🎓</div>
+          <div><p class="text-xl font-bold text-green-700">{{releasedCount}}</p><p class="text-gray-500 text-xs">Released</p></div>
+        </div>
+        <div class="card flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">📊</div>
+          <div><p class="text-xl font-bold text-slate-800">{{totalApps}}</p><p class="text-gray-500 text-xs">Total Requests</p></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5">
+        <!-- Ready to Process + Approved -->
+        <div class="space-y-5">
+
+          <!-- Ready to Process (receipt_issued) -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="font-semibold text-teal-700">📑 Ready for Processing</h2>
+              <span class="text-xs text-slate-400">{{toProcess.length}} item(s)</span>
+            </div>
+            {{#if toProcess.length}}
+            <div class="card p-0 overflow-hidden">
+              <table>
+                <thead><tr><th>#</th><th>Student</th><th>Documents</th><th>OR No.</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody>
+                  {{#each toProcess}}
+                  <tr>
+                    <td class="text-gray-500 text-xs">{{this.id}}</td>
+                    <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
+                    <td class="text-gray-600 text-xs">
+                      <div class="space-y-1">
+                        {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}}</div>{{/if}}
+                        {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}}</div>{{/if}}
+                      </div>
+                    </td>
+                    <td class="text-slate-600 text-xs font-mono">{{this.orNumber}}</td>
+                    <td class="text-gray-500 text-xs">{{formatDate this.updatedAt}}</td>
+                    <td>
+                      <div class="flex gap-1">
+                        <a href="/guidance/application/{{this.id}}" class="btn-outline btn-sm">View</a>
+                        <form action="/guidance/application/{{this.id}}/approve" method="POST">
+                          <button class="btn-green btn-sm" onclick="return confirm('Approve this request?')">Approve</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{else}}
+            <div class="card text-center py-8"><p class="text-gray-600 text-sm">No requests ready for processing.</p></div>
+            {{/if}}
+          </div>
+
+          <!-- Approved → Release -->
+          {{#if approved.length}}
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="font-semibold text-teal-700">🎓 Approved — Ready to Release</h2>
+              <span class="text-xs text-slate-400">{{approved.length}} item(s)</span>
+            </div>
+            <div class="card p-0 overflow-hidden">
+              <table>
+                <thead><tr><th>#</th><th>Student</th><th>Documents</th><th>OR No.</th><th>Action</th></tr></thead>
+                <tbody>
+                  {{#each approved}}
+                  <tr>
+                    <td class="text-gray-500 text-xs">{{this.id}}</td>
+                    <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div></td>
+                    <td class="text-gray-600 text-xs">
+                      <div class="space-y-1">
+                        {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}}</div>{{/if}}
+                        {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}}</div>{{/if}}
+                      </div>
+                    </td>
+                    <td class="text-slate-600 text-xs font-mono">{{this.orNumber}}</td>
+                    <td>
+                      <form action="/guidance/application/{{this.id}}/release" method="POST">
+                        <button class="btn-green btn-sm" onclick="return confirm('Mark as released?')">✓ Release</button>
+                      </form>
+                    </td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {{/if}}
+
+          <!-- Recent Appointments -->
+          {{#if appointments.length}}
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="font-semibold text-teal-700">📅 Pending Appointments</h2>
+              <a href="/guidance/appointments" class="text-green-700 text-xs hover:underline font-medium">See all</a>
+            </div>
+            <div class="card p-0 overflow-hidden">
+              <table>
+                <thead><tr><th>Student</th><th>Purpose</th><th>Date</th><th>Time</th><th>Action</th></tr></thead>
+                <tbody>
+                  {{#each appointments}}
+                  <tr>
+                    <td class="text-slate-700 text-sm">{{this.student.firstName}} {{this.student.lastName}}</td>
+                    <td class="text-slate-500 text-xs">{{this.purpose}}</td>
+                    <td class="text-slate-500 text-xs">{{formatDate this.date}}</td>
+                    <td class="text-slate-500 text-xs">{{this.timeSlot}}</td>
+                    <td><a href="/guidance/appointments" class="text-green-700 text-xs hover:underline">Manage</a></td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

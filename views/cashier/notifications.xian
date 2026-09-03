@@ -1,0 +1,75 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-cashier activePage="notifications"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <h1 class="text-base font-bold text-slate-800">🔔 Notifications</h1>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-5 py-5">
+      {{> flash}}
+
+      <!-- Mark all as read button -->
+      {{#if (gt unreadNotifCount 0)}}
+      <div class="card mb-4 flex items-center justify-between" style="background:#fffbeb;border-color:#fbbf24;">
+        <p class="text-amber-800 text-sm font-semibold">You have {{unreadNotifCount}} unread notification{{#if (gt unreadNotifCount 1)}}s{{/if}}</p>
+        <form action="/cashier/notifications/mark-read" method="POST" style="display:inline;">
+          <button type="submit" class="btn-sm" style="background:#059669;color:#fff;padding:6px 12px;border-radius:6px;font-size:.85rem;">
+            ✓ Mark All as Read
+          </button>
+        </form>
+      </div>
+      {{/if}}
+
+      <!-- Notifications List -->
+      {{#if notifications.length}}
+      <div class="space-y-3">
+        {{#each notifications}}
+        <div class="card hover:border-green-600 transition-colors {{#unless this.isRead}}border-l-4 border-l-green-600{{/unless}}"
+             style="{{#unless this.isRead}}background:#f0fdf4;{{/unless}}">
+          <div class="flex items-start gap-3">
+            <!-- Icon based on type -->
+            <div class="flex-shrink-0 mt-1">
+              {{#if (eq this.type 'success')}}
+              <span style="color:#16a34a;font-size:1.25rem;">✅</span>
+              {{else if (eq this.type 'danger')}}
+              <span style="color:#dc2626;font-size:1.25rem;">❌</span>
+              {{else if (eq this.type 'warning')}}
+              <span style="color:#f59e0b;font-size:1.25rem;">⚠️</span>
+              {{else}}
+              <span style="color:#3b82f6;font-size:1.25rem;">ℹ️</span>
+              {{/if}}
+            </div>
+
+            <!-- Content -->
+            <div style="flex:1;">
+              <p class="text-slate-800 text-sm" style="{{#unless this.isRead}}font-weight:600;{{/unless}}">
+                {{this.message}}
+              </p>
+              <p class="text-gray-400 text-xs mt-1">
+                {{timeAgo this.createdAt}}
+              </p>
+            </div>
+
+            <!-- View link if available -->
+            {{#if this.link}}
+            <a href="{{this.link}}" class="btn-sm" style="background:#16a34a;color:#fff;padding:6px 12px;border-radius:6px;font-size:.75rem;flex-shrink:0;">
+              View
+            </a>
+            {{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="card text-center py-8">
+        <div style="font-size:3rem;margin-bottom:8px;">🔕</div>
+        <p class="text-gray-500 text-sm">No notifications yet</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

@@ -1,228 +1,261 @@
-# 🌱 Tellngrow - Mental Wellness Platform
+# GuidanceConnect — MinSU Bongabong Campus
 
-A mental health and wellness platform with games, journaling, and reading materials.
+**Mindoro State University Bongabong Campus**  
+**Online Guidance Management System**
+
+A modern, secure, and responsive web-based system for digitizing the process of requesting **Certificates of Good Moral Character** at MinSU Bongabong Campus.
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Project Overview
 
-### 1. Install Dependencies
-```cmd
+This system allows students to:
+- Submit Good Moral Certificate requests online
+- Pay electronically via GCash/LandBank
+- Receive approval notifications from the Guidance Office
+- Track their application status in real-time
+
+Three User Roles:
+1. **Student** — Apply, pay, and track requests
+2. **Cashier** — Verify payments and issue official receipts
+3. **Guidance Administrator** — Approve, process, and release certificates
+
+---
+
+## 🚀 Features
+
+### Student Module
+- ✅ Dashboard with request tracking
+- ✅ Online Good Moral Request Form
+- ✅ Electronic payment submission (GCash/LandBank QR codes)
+- ✅ Real-time notifications
+- ✅ Announcement viewing
+- ✅ Appointment booking
+- ✅ Application status tracking
+
+### Cashier Module
+- ✅ Payment verification dashboard
+- ✅ Official receipt generation
+- ✅ Daily collections report
+- ✅ Payment history
+- ✅ Screenshot/reference number review
+- ✅ Accept/reject payment workflow
+
+### Guidance Administrator Module
+- ✅ Request processing dashboard
+- ✅ Approve/reject applications
+- ✅ Certificate release management
+- ✅ Announcements management
+- ✅ Appointment management
+- ✅ User management (create staff accounts)
+- ✅ Reports generation (daily/monthly/yearly)
+
+---
+
+## 🛠 Technology Stack
+
+**Frontend**
+- HTML5, CSS3, TailwindCSS
+- Handlebars (`.xian` template files)
+
+**Backend**
+- Node.js (ES6 Modules)
+- Express.js
+- Sequelize ORM
+
+**Database**
+- MySQL
+
+**Authentication**
+- bcrypt (password hashing)
+- express-session (session management)
+- Role-based access control
+
+**File Upload**
+- Multer (payment screenshots, receipts)
+
+---
+
+## 📂 Database Tables
+
+- `users` — All users (students, cashiers, guidance)
+- `applications` — Good Moral Certificate requests
+- `payments` — Embedded in applications
+- `receipts` — Embedded in applications
+- `notifications` — Real-time user notifications
+- `announcements` — System-wide announcements
+- `appointments` — Student appointment requests
+
+---
+
+## 📊 Application Workflow
+
+```
+Step 1: Student logs in
+Step 2: Student fills out Good Moral Request Form
+Step 3: Student submits request → status: pending
+Step 4: System notifies cashier
+Step 5: Student pays (GCash/LandBank)
+Step 6: Student uploads payment screenshot + reference number → status: payment_submitted
+Step 7: Cashier verifies payment → status: payment_verified
+Step 8: Cashier generates Official Receipt (OR) → status: receipt_issued
+Step 9: System notifies Guidance Administrator
+Step 10: Guidance Administrator processes request → status: approved
+Step 11: Guidance Administrator releases certificate → status: released
+Step 12: Student receives notification: "Certificate ready for release"
+Step 13: Student claims certificate at Guidance Office
+```
+
+---
+
+## 🔧 Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone <repo-url>
+cd guidance
+```
+
+### 2. Install dependencies
+```bash
 npm install
 ```
 
-### 2. Setup Database
-- Create database: `tellngrow` (lowercase)
-- Import: `database/create_database.sql`
-- Import: `database/insert_sample_data.sql`
-
-### 3. Setup Firebase (for Google Sign-In)
-- Follow the guide: `FIREBASE_SETUP_TAGALOG.md` (Tagalog)
-- Or: `FIREBASE_SETUP.md` (English)
-- Copy `.env.example` to `.env` and add Firebase credentials
-
-### 4. Create Admin User
-```cmd
-node SIMPLE_CREATE_ADMIN.js
+### 3. Configure environment variables
+Create `.env` file:
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=guidance
+DB_PORT=3306
+SESSION_SECRET=minsu-guidance-secret-change-this
+PORT=3000
 ```
 
-### 5. Run Server
-```cmd
-npm run xian
+### 4. Create database
+```bash
+node --env-file=.env -e "import { syncDB } from './models/index.js'; await syncDB(); process.exit(0);"
 ```
 
-### 6. Open Browser
+### 5. Start the server
+```bash
+npm run dev    # Development (with nodemon)
+npm start      # Production
+```
+
+### 6. Access the system
 ```
 http://localhost:3000
 ```
 
 ---
 
-## 👤 Login Credentials
+## 👥 Default User Accounts
 
-### Email/Password Login:
+After installation, create admin accounts manually via the `/register` page or through the Guidance dashboard.
 
-#### Admin Account:
-- Email: `angelica@gmail.com`
-- Password: `pogi123`
-
-### Test User:
-- Email: `marvin@gmail.com`
-- Password: `password123`
-
-### Google Sign-In:
-- Click "Sign in with Google" button on login page
-- Uses Firebase Authentication
-- Automatically creates account if first time
-- See `FIREBASE_SETUP_TAGALOG.md` for setup instructions
+**Sample Login:**
+- **Email:** student@minsu.edu.ph  
+- **Password:** password123
 
 ---
 
-## 🎮 Features
+## 📸 Screenshots
 
-### For Users:
-- 🎮 **Games**: Color Tap, Grid Memory, Breathing Bubble, Stress Ball
-- 📔 **Journal**: Personal mood and thought tracking
-- 📚 **Reading Materials**: Mental health articles
-- 📊 **Progress Tracking**: Points, levels, streaks
+Place MinSU Bongabong Campus image at:
+```
+public/uploads/campus.jpg
+```
 
-### For Admin:
-- 👥 **User Monitoring**: View all user activities
-- 📊 **Statistics**: Games, journals, active users
-- 👤 **User Details**: Click user name to see full record
-- 🏆 **Certificates**: Generate certificates for perfect scores
+This image is used as the login/register page background.
 
 ---
 
-## 🔊 Adding Sounds
+## 📋 Status Flow
 
-### Breathing Bubble Game:
-1. Download TikTok audio from: https://snaptik.app/
-2. Rename to: `breathing-sound.mp3`
-3. Put in: `public/sounds/breathing-sound.mp3`
-4. Restart server
+| Status               | Description                                    |
+|----------------------|------------------------------------------------|
+| `pending`            | Waiting for student payment                    |
+| `payment_submitted`  | Payment screenshot uploaded, awaiting cashier  |
+| `payment_verified`   | Cashier verified payment                       |
+| `receipt_issued`     | Official receipt generated                     |
+| `approved`           | Guidance approved request                      |
+| `released`           | Certificate ready for student claim            |
+| `rejected`           | Application rejected (with remarks)            |
 
-### Other Games:
-- Color Tap: Already has online sounds
-- Grid Memory: Optional (add later)
-- Stress Ball: Optional (add later)
+---
 
-**See:** `HOW_TO_ADD_SOUNDS.md` for details
+## 🔐 Security Features
+
+- ✅ Password hashing with bcrypt
+- ✅ Session-based authentication
+- ✅ Role-based access control (RBAC)
+- ✅ SQL injection protection (Sequelize ORM)
+- ✅ File upload validation (5MB limit)
 
 ---
 
 ## 📁 Project Structure
 
 ```
-Tellngrow/
-├── controllers/        # Route controllers
-├── database/          # SQL files
-├── middleware/        # Auth middleware
-├── models/           # Database models
-├── public/           # Static files
-│   └── sounds/       # Sound files
-├── routes/           # Express routes
-├── utils/            # Utilities (certificate generator)
-├── views/            # Handlebars templates
-│   ├── admin/        # Admin pages
-│   ├── games/        # Game pages
-│   ├── journal/      # Journal pages
-│   ├── quiz/         # (removed)
-│   ├── reading/      # Reading materials
-│   ├── user/         # User pages
-│   └── partials/     # Reusable components
-├── index.js          # Main server file
-└── package.json      # Dependencies
+guidance/
+├── controllers/         # Business logic
+│   ├── authController.js
+│   ├── studentController.js
+│   ├── cashierController.js
+│   └── guidanceController.js
+├── models/              # Database models
+│   ├── User.js
+│   ├── Application.js
+│   ├── Announcement.js
+│   ├── Appointment.js
+│   ├── Notification.js
+│   └── index.js
+├── routes/              # API routes
+│   └── index.js
+├── views/               # Handlebars templates (.xian files)
+│   ├── student/
+│   ├── cashier/
+│   ├── guidance/
+│   └── partials/
+├── middleware/          # Auth middleware
+│   └── auth.js
+├── utils/               # Helper functions
+│   └── notifications.js
+├── public/              # Static assets
+│   └── uploads/         # Payment screenshots, receipts
+├── .env                 # Environment variables (DO NOT COMMIT)
+├── index.js             # Server entry point
+├── package.json         # Dependencies
+└── README.md            # This file
 ```
 
 ---
 
-## 🗄️ Database
+## 🚨 Important Notes
 
-### Tables:
-- `users` - User accounts
-- `UserProgresses` - User progress tracking
-- `GameSessions` - Game play records
-- `JournalEntries` - Journal entries
-- `Activities` - User activity log
-- `certificates` - Generated certificates
-
-### Important:
-- Database name: `tellngrow` (lowercase)
-
----
-
-## 🛠️ Troubleshooting
-
-### Port Already in Use:
-```cmd
-taskkill /IM node.exe /F
-npm run xian
-```
-
-### Admin Can't Login:
-```cmd
-node SIMPLE_CREATE_ADMIN.js
-```
-
-### No Sound in Games:
-- Check internet connection (Color Tap uses online sounds)
-- Add sound files to `public/sounds/` folder
-- Restart server
-
-### Database Errors:
-- Check database name is `tellngrow` (lowercase)
-- Check all SQL files imported
-- Check MySQL is running
-
----
-
-## 📚 Documentation Files
-
-### Essential:
-- `HOW_TO_RUN.md` - Detailed setup guide
-- `HOW_TO_ADD_SOUNDS.md` - Sound system guide
-- `DOWNLOAD_TIKTOK_SOUND_NOW.md` - TikTok audio download
-- `GAMES_SOUNDS_SUMMARY.md` - Games sound overview
-- `CERTIFICATE_SYSTEM_COMPLETE.md` - Certificate system guide
-
-### Database:
-- `database/README.md` - Database setup
-- `database/DATABASE_STRUCTURE.md` - Database schema
-- `database/QUICK_SETUP.md` - Quick database setup
-
----
-
-## 🎯 Key Features Implemented
-
-✅ User authentication and authorization
-✅ Admin dashboard with user monitoring
-✅ 4 interactive mental wellness games
-✅ Quiz system with scoring
-✅ Journal with mood tracking
-✅ Reading materials library
-✅ Progress tracking (points, levels, streaks)
-✅ Certificate generation for perfect scores
-✅ Sound system for games
-✅ Responsive design
-✅ Session management
-
----
-
-## 🔧 Tech Stack
-
-- **Backend**: Node.js, Express
-- **Database**: MySQL, Sequelize ORM
-- **Frontend**: Handlebars, TailwindCSS
-- **Auth**: Express-session, bcrypt
-- **PDF**: PDFKit (certificates)
-
----
-
-## 📝 Notes
-
-- Admin users don't appear in user list (filtered out)
-- Certificates auto-generate for perfect quiz/game scores
-- All games have mute buttons (🔊/🔇)
-- Sound files are optional - games work without them
-
----
-
-## 🚀 Deployment
-
-1. Set environment variables
-2. Update database credentials
-3. Run migrations
-4. Start server with PM2 or similar
+1. **QR Codes:** Add actual GCash and LandBank QR code images to the payment page
+2. **MinSU Campus Image:** Place the campus photo at `public/uploads/campus.jpg`
+3. **Database:** Ensure MySQL is running before starting the server
+4. **Session Secret:** Change `SESSION_SECRET` in `.env` for production
 
 ---
 
 ## 📞 Support
 
-Check documentation files for detailed guides on specific features.
+**Target Institution:**  
+Mindoro State University — Bongabong Campus  
+Guidance Office
+
+For issues or questions, contact the Guidance Office Administrator.
 
 ---
 
-**Version**: 1.0.0
-**License**: MIT
-**Author**: Tellngrow Team
+## 📜 License
+
+This system is developed exclusively for **Mindoro State University — Bongabong Campus** and is not licensed for external use.
+
+---
+
+**Developed with ❤️ for MinSU Bongabong Campus Guidance Office**

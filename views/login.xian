@@ -1,247 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}} - Tellngrow</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .bg-pattern {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    /* Mobile-first responsive design */
-    @media (max-width: 768px) {
-      .mobile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-gray-50">
-  <!-- Mobile Header (visible only on mobile) -->
-  <div class="lg:hidden mobile-header text-white py-8 px-6 text-center">
-    <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center shadow-lg mb-4">
-      <span class="text-4xl">🌱</span>
+{{> head}}
+
+<!-- Full-screen background: MinSU campus image -->
+<div class="min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Image -->
+  <img src="/uploads/MINSU.png" alt="MinSU Bongabong Campus"
+       class="absolute inset-0 w-full h-full object-cover">
+
+  <!-- Dark overlay on top of image -->
+  <div class="absolute inset-0" style="background:rgba(0,0,0,0.55);"></div>
+
+  <!-- Centered Login Card (transparent / glassmorphism) -->
+  <div class="relative z-10 w-full max-w-md mx-4">
+
+    <!-- School branding above the card -->
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-28 h-28 rounded-full border-2 border-green-400 mb-3"
+           style="background:rgba(0,80,0,0.45);">
+        <img src="/uploads/minsulogo.png" alt="MinSU Logo" class="w-24 h-24 object-contain rounded-full">
+      </div>
+      <h1 class="text-green-700 font-bold text-2xl drop-shadow">Mindoro State University</h1>
+      <p class="text-green-700 font-semibold text-base drop-shadow">Bongabong Campus</p>
     </div>
-    <h2 class="text-3xl font-bold mb-2">Tellngrow</h2>
-    <p class="text-sm opacity-90">Mental Wellness Platform</p>
-  </div>
 
-  <div class="flex min-h-screen">
-    <!-- Left Side - Login Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
-      <div class="w-full max-w-md">
-        <!-- Desktop Title (hidden on mobile) -->
-        <div class="hidden lg:block mb-8">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
-          <p class="text-gray-600">Sign in to continue to Tellngrow</p>
-        </div>
+    <!-- Transparent form card -->
+    <div class="rounded-2xl px-8 py-10 shadow-2xl"
+         style="background:rgba(255,255,255,0.10);
+                backdrop-filter:blur(14px);
+                -webkit-backdrop-filter:blur(14px);
+                border:1px solid rgba(255,255,255,0.20);">
 
-        <!-- Mobile Title (visible only on mobile) -->
-        <div class="lg:hidden mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome Back!</h1>
-          <p class="text-sm text-gray-600">Sign in to continue</p>
-        </div>
-        
-        {{#if success_msg}}
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          {{success_msg}}
-        </div>
-        {{/if}}
-        
-        {{#if error_msg}}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-          {{error_msg}}
-        </div>
-        {{/if}}
-        
-        <form action="/login" method="POST" autocomplete="off" id="loginForm">
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
-            <input type="email" name="email" id="email" required 
-                   autocomplete="off"
-                   value="{{email}}"
-                   placeholder="Enter your email"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base">
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
-            <input type="password" name="password" id="password" required 
-                   autocomplete="new-password"
-                   placeholder="Enter your password"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base">
-          </div>
-          
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
-            <a href="#" class="text-xs sm:text-sm text-blue-600 hover:underline">Need to verify email?</a>
-            <a href="/forgot-password" class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:underline">Forgot Password?</a>
-          </div>
-          
-          <button type="submit" id="loginBtn"
-                  class="w-full bg-purple-600 text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-purple-700 transition shadow-lg text-base">
-            <span id="btnText">Login</span>
-            <span id="btnLoading" class="hidden">Logging in...</span>
-          </button>
-        </form>
+      <h2 class="text-2xl font-bold text-white mb-1">Welcome back</h2>
+      <p class="text-gray-300 text-sm font-bold mb-6">Sign in to your account to continue</p>
 
-        <!-- Divider -->
-        <div class="relative my-6">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-white text-gray-500">OR</span>
-          </div>
-        </div>
+      {{> flash}}
 
-        <!-- Google Sign-In Button (Firebase) -->
-        <button type="button" id="googleSignInBtn"
-           class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 sm:py-3.5 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition shadow-sm text-base">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span id="googleBtnText">Sign in with Google</span>
-          <span id="googleBtnLoading" class="hidden">Signing in...</span>
+      <form action="/login" method="POST" class="space-y-4" autocomplete="off">
+        <div>
+          <label class="block text-gray-200 text-sm font-bold mb-1">Email Address</label>
+          <input type="email" name="email" autocomplete="username"
+                 class="w-full rounded-lg px-4 py-2.5 text-white text-sm outline-none
+                        focus:ring-2 focus:ring-green-400 placeholder-gray-400"
+                 style="background:rgba(0,0,0,0.40); border:1px solid rgba(255,255,255,0.25);"
+                 placeholder="yourname@minsu.edu.ph" required autofocus>
+        </div>
+        <div>
+          <label class="block text-gray-200 text-sm font-bold mb-1">Password</label>
+          <input type="password" name="password" autocomplete="current-password"
+                 class="w-full rounded-lg px-4 py-2.5 text-white text-sm outline-none
+                        focus:ring-2 focus:ring-green-400 placeholder-gray-400"
+                 style="background:rgba(0,0,0,0.40); border:1px solid rgba(255,255,255,0.25);"
+                 placeholder="••••••••" required>
+        </div>
+        <button type="submit"
+                class="w-full py-3 rounded-lg font-bold text-white text-base mt-2 transition-all
+                       hover:opacity-90 active:scale-95"
+                style="background:linear-gradient(135deg,#166534,#15803d);">
+          Sign In
         </button>
-        
-        <div class="mt-6 text-center text-gray-600 text-sm">
-          Don't have an account? <a href="/register" class="text-purple-600 hover:underline font-semibold">Sign Up</a>
-        </div>
-      </div>
-    </div>
+      </form>
 
-    <!-- Right Side - Branding (Desktop Only) -->
-    <div class="hidden lg:flex lg:w-1/2 bg-pattern items-center justify-center p-12">
-      <div class="text-center text-white">
-        <div class="mb-8">
-          <div class="w-32 h-32 bg-white rounded-full mx-auto flex items-center justify-center shadow-2xl">
-            <span class="text-6xl">🌱</span>
-          </div>
-        </div>
-        <h2 class="text-5xl font-bold mb-4">Tellngrow</h2>
-        <p class="text-xl mb-2 opacity-90">Mental Wellness Platform</p>
-        <p class="text-lg opacity-75">Your journey to better mental health starts here</p>
+      <!-- Divider -->
+      <div class="flex items-center my-5">
+        <div class="flex-1 border-t" style="border-color:rgba(255,255,255,0.2);"></div>
+        <span class="mx-3 text-gray-400 text-xs font-bold uppercase tracking-widest">or</span>
+        <div class="flex-1 border-t" style="border-color:rgba(255,255,255,0.2);"></div>
       </div>
+
+      <!-- Continue with Google -->
+      <a href="/auth/google"
+         class="flex items-center justify-center gap-3 w-full py-2.5 rounded-lg font-semibold text-sm transition-all hover:opacity-90 active:scale-95"
+         style="background:rgba(255,255,255,0.92); color:#1f2937;">
+        <!-- Google SVG icon -->
+        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48">
+          <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.1c-.6 3-2.3 5.5-4.8 7.2v6h7.7c4.5-4.2 7.5-10.3 7.5-17.5z"/>
+          <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.1 1.4-4.9 2.3-8.2 2.3-6.3 0-11.6-4.2-13.5-10H2.5v6.2C6.5 42.8 14.7 48 24 48z"/>
+          <path fill="#FBBC05" d="M10.5 28.5c-.5-1.4-.8-3-.8-4.5s.3-3.1.8-4.5v-6.2H2.5C.9 16.6 0 20.2 0 24s.9 7.4 2.5 10.7l8-6.2z"/>
+          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.7 0 6.5 5.2 2.5 13.3l8 6.2C12.4 13.7 17.7 9.5 24 9.5z"/>
+        </svg>
+        Continue with Google
+      </a>
+
+      <p class="text-center text-gray-300 text-sm font-bold mt-5">
+        No account yet?
+        <a href="/register" class="text-green-700 hover:text-green-200 font-bold">Register as Student</a>
+      </p>
+
+      <p class="text-center text-gray-400 text-xs font-bold mt-6">
+        Mindoro State University — Bongabong Campus<br>Guidance Office Management System
+      </p>
     </div>
   </div>
 
-  <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-    // Firebase configuration - these will be injected from server
-    const firebaseConfig = {
-      apiKey: "{{firebaseApiKey}}",
-      authDomain: "{{firebaseAuthDomain}}",
-      projectId: "{{firebaseProjectId}}",
-      storageBucket: "{{firebaseStorageBucket}}",
-      messagingSenderId: "{{firebaseMessagingSenderId}}",
-      appId: "{{firebaseAppId}}"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    // Handle form submission
-    const form = document.getElementById('loginForm');
-    const loginBtn = document.getElementById('loginBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoading = document.getElementById('btnLoading');
-    
-    form.addEventListener('submit', function(e) {
-      // Show loading state
-      loginBtn.disabled = true;
-      btnText.classList.add('hidden');
-      btnLoading.classList.remove('hidden');
-      
-      console.log('Form submitted with email:', document.getElementById('email').value);
-      
-      // Form will submit normally, don't prevent default
-    });
-
-    // Handle Google Sign-In
-    const googleSignInBtn = document.getElementById('googleSignInBtn');
-    const googleBtnText = document.getElementById('googleBtnText');
-    const googleBtnLoading = document.getElementById('googleBtnLoading');
-
-    googleSignInBtn.addEventListener('click', async () => {
-      try {
-        // Show loading state
-        googleSignInBtn.disabled = true;
-        googleBtnText.classList.add('hidden');
-        googleBtnLoading.classList.remove('hidden');
-
-        console.log('🔵 Starting Firebase Google Sign-In...');
-
-        // Sign in with Google popup
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-
-        console.log('✅ Firebase authentication successful:', user.email);
-
-        // Get the ID token
-        const idToken = await user.getIdToken();
-
-        console.log('🔑 Got Firebase ID token, sending to server...');
-
-        // Send the token to your backend
-        const response = await fetch('/auth/firebase/google', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            idToken: idToken,
-            email: user.email,
-            name: user.displayName,
-            photoURL: user.photoURL,
-            uid: user.uid
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          console.log('✅ Server authentication successful, redirecting...');
-          window.location.href = data.redirectUrl || '/user/dashboard';
-        } else {
-          console.error('❌ Server authentication failed:', data.error);
-          alert(data.error || 'Authentication failed. Please try again.');
-          
-          // Reset button state
-          googleSignInBtn.disabled = false;
-          googleBtnText.classList.remove('hidden');
-          googleBtnLoading.classList.add('hidden');
-        }
-      } catch (error) {
-        console.error('❌ Google Sign-In error:', error);
-        
-        let errorMessage = 'Failed to sign in with Google. Please try again.';
-        
-        if (error.code === 'auth/popup-closed-by-user') {
-          errorMessage = 'Sign-in cancelled. Please try again.';
-        } else if (error.code === 'auth/popup-blocked') {
-          errorMessage = 'Pop-up blocked. Please allow pop-ups for this site.';
-        }
-        
-        alert(errorMessage);
-        
-        // Reset button state
-        googleSignInBtn.disabled = false;
-        googleBtnText.classList.remove('hidden');
-        googleBtnLoading.classList.add('hidden');
-      }
-    });
-    
-    console.log('Login page ready with Firebase');
-  </script>
-</body>
-</html>
+</div>
+</body></html>

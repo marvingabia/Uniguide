@@ -1,94 +1,74 @@
-/*
-    MIT License
-    
-    Copyright (c) 2025 Christian I. Cabrera || XianFire Framework
-    Mindoro State University - Philippines
-    
-    Google OAuth Configuration
-*/
-
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { User } from '../models/index.js';
 
-// Load environment variables
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'your_client_id_here';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'your_client_secret_here';
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback';
-
-// Configure Google OAuth Strategy
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: GOOGLE_CALLBACK_URL,
-    passReqToCallback: true
+passport.use(new GoogleStrategy(
+  {
+    clientID:     process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL:  process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback'
   },
-  async (req, accessToken, refreshToken, profile, done) => {
+  async (accessToken, refreshToken, profile, done) => {
     try {
-      console.log('🔵 Google OAuth callback received');
-      console.log('📧 Google Email:', profile.emails[0].value);
-      console.log('👤 Google Name:', profile.displayName);
-      
-      // Extract user info from Google profile
-      const email = profile.emails[0].value;
-      const googleId = profile.id;
-      const name = profile.displayName;
-      const profilePicture = profile.photos[0]?.value || null;
-      
-      // Check if user already exists
-      let user = await User.findOne({ where: { email } });
-      
-      if (user) {
-        // User exists - update Google info if not set
-        console.log('✅ Existing user found:', user.email);
-        
-        if (!user.googleId) {
-          await user.update({
+      const email      = profile.emails?.[0]?.value;
+      const firstName  = profile.name?.givenName  || profile.displayName.split(' ')[0] || '';
+      const lastName   = profile.name?.familyName || profile.displayName.split(' ').slice(1).join(' ') || '';
+      const avatar     = profile.photos?.[0]?.value || null;
+      const googleId   = profile.id;
+
+      if (!email) return done(null, false, { message: 'No email returned from Google.' });
+
+      // Find existing user by googleId or email
+      let user = await User.findOne({ where: { googleId } });
+
+      if (!user) {
+        // Check if email already registered (local account)
+        user = await User.findOne({ where: { email } });
+
+        if (user) {
+          // Link Google to existing local account
+          await user.update({ googleId, avatar, authMethod: 'google' });
+        } else {
+          // Create new student account via Google
+          user = await User.create({
+            firstName,
+            lastName,
+            email,
             googleId,
-            profilePicture,
-            authProvider: 'google'
+            avatar,
+            authMethod: 'google',
+            role: 'student',
+            password: null
           });
-          console.log('🔗 Linked Google account to existing user');
         }
-        
-        return done(null, user);
       } else {
-        // Create new user
-        console.log('🆕 Creating new user from Google account');
-        
-        user = await User.create({
-          name,
-          email,
-          googleId,
-          profilePicture,
-          authProvider: 'google',
-          role: 'user',
-          accountStatus: 'active',
-          password: null // No password for Google users
-        });
-        
-        console.log('✅ New user created:', user.email);
-        return done(null, user);
+        // Update avatar in case it changed
+        await user.update({ avatar });
       }
-    } catch (error) {
-      console.error('❌ Google OAuth error:', error);
-      return done(error, null);
+
+      // Only students can use Google Sign-In
+      // Guidance and Cashier must use local credentials
+      if (user.role !== 'student') {
+        return done(null, false, {
+          message: 'Staff accounts must sign in with email and password.'
+        });
+      }
+
+      return done(null, user);
+    } catch (err) {
+      return done(err);
     }
   }
 ));
 
-// Serialize user for session
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// Deserialize user from session
+// Serialize / Deserialize (not used for sessions since we use express-session manually)
+passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findByPk(id);
     done(null, user);
-  } catch (error) {
-    done(error, null);
+  } catch (err) {
+    done(err);
   }
 });
 

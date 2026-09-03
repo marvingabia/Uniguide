@@ -1,0 +1,10 @@
+{{#if success}}
+<div class="mb-4 px-4 py-3 bg-green-100 border border-green-600 text-green-800 font-semibold rounded-lg text-sm">
+  ✅ {{success}}
+</div>
+{{/if}}
+{{#if error}}
+<div class="mb-4 px-4 py-3 bg-red-900 border border-red-600 text-red-200 rounded-lg text-sm">
+  ❌ {{error}}
+</div>
+{{/if}}

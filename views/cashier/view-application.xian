@@ -1,0 +1,278 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-cashier activePage="dashboard"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div class="flex items-center gap-3">
+        <a href="/cashier/dashboard" class="text-green-700 hover:text-green-700 text-sm">← Back</a>
+        <h1 class="text-base font-bold text-slate-800">Review Application #{{app.id}}</h1>
+      </div>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-5 py-5">
+      {{> flash}}
+
+      <!-- Header -->
+      <div class="card mb-4 flex items-center justify-between border-green-800">
+        <div>
+          <p class="text-gray-500 text-xs">Request #{{app.id}} — {{formatDateTime app.createdAt}}</p>
+          <h2 class="text-slate-800 font-bold text-lg">{{app.surname}}, {{app.givenName}} {{app.middleName}}</h2>
+          <p class="text-slate-500 text-sm">{{app.student.email}} | {{app.course}}</p>
+        </div>
+        <span class="badge {{statusClass app.status}} text-sm px-4 py-1">{{statusLabel app.status}}</span>
+      </div>
+
+      <!-- Student Info -->
+      <div class="card mb-4">
+        <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Student Information</h3>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><span class="label">Course / Year</span><span class="text-slate-700 font-semibold">{{app.course}} — {{app.yearLevel}}</span></div>
+          <div><span class="label">Contact</span><span class="text-slate-700 font-semibold">{{app.contactNumber}}</span></div>
+          <div><span class="label">Enrollment</span><span class="text-slate-700 font-semibold">{{app.enrollmentStatus}}</span></div>
+          {{#if app.academicYear}}<div><span class="label">A.Y.</span><span class="text-slate-700 font-semibold">{{app.academicYear}} {{app.semester}}</span></div>{{/if}}
+        </div>
+        <div class="mt-3">
+          <span class="label">Purpose/s</span>
+          <div class="flex flex-wrap gap-2 mt-1">
+            {{#each purposes}}<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">{{this}}</span>{{/each}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Application Form Details (Slip) -->
+      <div class="card mb-4">
+        <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">📋 Application Form Details</h3>
+        <div class="space-y-3 text-sm">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="label">Full Name</span>
+              <span class="text-slate-700 font-semibold">{{app.surname}}, {{app.givenName}} {{app.middleName}}</span>
+            </div>
+            <div>
+              <span class="label">Gender</span>
+              <span class="text-slate-700 font-semibold">{{app.gender}}</span>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <span class="label">Course</span>
+              <span class="text-slate-700 font-semibold">{{app.course}}</span>
+            </div>
+            {{#if app.major}}
+            <div>
+              <span class="label">Major</span>
+              <span class="text-slate-700 font-semibold">{{app.major}}</span>
+            </div>
+            {{/if}}
+            <div>
+              <span class="label">Year & Section</span>
+              <span class="text-slate-700 font-semibold">{{app.yearLevel}} {{#if app.section}}- Section {{app.section}}{{/if}}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="label">Enrollment Status</span>
+              <span class="text-slate-700 font-semibold">
+                {{#if (eq app.enrollmentStatus 'currently_enrolled')}}Currently Enrolled{{/if}}
+                {{#if (eq app.enrollmentStatus 'was_enrolled')}}Was Enrolled{{/if}}
+                {{#if (eq app.enrollmentStatus 'graduated')}}Graduated{{/if}}
+              </span>
+            </div>
+            {{#if app.monthYearGraduated}}
+            <div>
+              <span class="label">Month/Year Graduated</span>
+              <span class="text-slate-700 font-semibold">{{app.monthYearGraduated}}</span>
+            </div>
+            {{/if}}
+          </div>
+
+          {{#if app.otherPurpose}}
+          <div>
+            <span class="label">Other Purpose Specified</span>
+            <span class="text-slate-700 font-semibold">{{app.otherPurpose}}</span>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- Payment Proof -->
+      {{#if app.paymentScreenshot}}
+      <div class="card mb-4">
+        <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">💳 Payment Proof Submitted</h3>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="label">Payment Method</span>
+              <span class="text-slate-700 font-semibold">{{app.paymentMethod}}</span>
+            </div>
+            <div>
+              <span class="label">Reference Number</span>
+              <span class="text-slate-700 font-mono text-lg font-bold">{{app.referenceNumber}}</span>
+            </div>
+            <div>
+              <span class="label">Payment Date</span>
+              <span class="text-slate-700 font-semibold">{{formatDate app.paymentDate}}</span>
+              <span class="text-gray-600 text-xs ml-2">{{formatTime app.paymentDate}}</span>
+            </div>
+            <div>
+              <span class="label">Submitted On</span>
+              <span class="text-slate-700 font-semibold">{{formatDateTime app.updatedAt}}</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 mb-2">Payment Screenshot:</p>
+            <a href="{{app.paymentScreenshot}}" target="_blank" class="block">
+              <img src="{{app.paymentScreenshot}}" alt="Payment Proof" class="w-full rounded-lg border-2 border-green-700 hover:border-green-500 transition-colors shadow-lg">
+            </a>
+            <p class="text-green-700 text-xs mt-2 text-center hover:underline cursor-pointer">🔍 Click image to view full size</p>
+          </div>
+        </div>
+        
+        <!-- Visual indicator for verification -->
+        {{#if (eq app.status 'payment_submitted')}}
+        <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mt-3">
+          <p class="text-yellow-800 text-xs font-semibold flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Action Required: Please verify the payment details and screenshot below
+          </p>
+        </div>
+        {{/if}}
+      </div>
+      {{else}}
+      <div class="card mb-4 bg-gray-800/30 border-gray-600">
+        <p class="text-gray-400 text-sm text-center py-4">⏳ Payment proof not yet submitted by student</p>
+      </div>
+      {{/if}}
+
+      <!-- Verify Payment & Issue Receipt (Combined) -->
+      {{#if (eq app.status 'payment_submitted')}}
+      <div class="card mb-4" style="background:#1f1500;border-color:#d97706">
+        <h3 class="text-yellow-600 font-semibold mb-3 text-sm">✅ Verify Payment & Forward to Guidance</h3>
+        <p class="text-gray-400 text-xs mb-4">Verify the payment proof and forward directly to Guidance Office for processing.</p>
+        
+        <!-- Display student's order -->
+        <div class="bg-gray-900/50 rounded-lg p-4 mb-4">
+          <p class="text-gray-400 text-xs font-semibold mb-2">ORDER BREAKDOWN:</p>
+          <div class="space-y-2 text-sm">
+            {{#if (gt app.qtyGoodMoral 0)}}
+            <div class="flex justify-between items-center">
+              <span class="text-white">Good Moral (True Copy + Stamp)</span>
+              <span class="text-green-400 font-bold">{{app.qtyGoodMoral}} × ₱70 = ₱{{multiply app.qtyGoodMoral 70}}</span>
+            </div>
+            {{/if}}
+            {{#if (gt app.qtyCTC 0)}}
+            <div class="flex justify-between items-center">
+              <span class="text-white">CTC / Authentication</span>
+              <span class="text-green-400 font-bold">{{app.qtyCTC}} × ₱10 = ₱{{multiply app.qtyCTC 10}}</span>
+            </div>
+            {{/if}}
+            <div class="border-t border-gray-700 pt-2 mt-2"></div>
+            <div class="flex justify-between items-center">
+              <span class="text-yellow-500 font-bold">TOTAL AMOUNT:</span>
+              <span class="text-yellow-500 font-bold text-lg">₱{{app.totalAmount}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <form action="/cashier/application/{{app.id}}/verify-and-issue" method="POST" enctype="multipart/form-data" class="space-y-4">
+          <div>
+            <label class="label">Official Receipt Number (optional)</label>
+            <input type="text" name="orNumber" class="input" placeholder="e.g. OR-2025-00123">
+            <p class="text-gray-500 text-xs mt-1">Leave blank if not available</p>
+          </div>
+          <button type="submit" class="btn-green w-full py-3" onclick="return confirm('Verify payment of ₱{{app.totalAmount}} and forward to Guidance Office?')">
+            ✅ Verify Payment & Forward to Guidance
+          </button>
+        </form>
+      </div>
+
+      <div class="card" style="background:#1f0505;border-color:#7f1d1d">
+        <h3 class="text-red-400 font-semibold mb-3 text-sm">❌ Reject Payment</h3>
+        <form action="/cashier/application/{{app.id}}/reject" method="POST" class="space-y-3">
+          <div>
+            <label class="label">Reason for rejection</label>
+            <textarea name="remarks" class="input" rows="2" placeholder="e.g. Invalid screenshot, reference number not found..." required></textarea>
+          </div>
+          <button type="submit" class="btn-red w-full py-2" onclick="return confirm('Reject this payment?')">Reject Application</button>
+        </form>
+      </div>
+      {{/if}}
+
+      <!-- Receipt issued summary -->
+      {{#if (or (eq app.status 'payment_verified') (eq app.status 'receipt_issued') (eq app.status 'approved') (eq app.status 'released'))}}
+      <div class="card" style="background:#0c1f0e;border-color:#166534">
+        <h3 class="text-green-700 font-semibold mb-3 text-sm">🧾 Payment Verified</h3>
+        <div class="bg-gray-900/50 rounded-lg p-4 mb-3">
+          <p class="text-gray-400 text-xs font-semibold mb-3">ORDER BREAKDOWN:</p>
+          <div class="space-y-2 text-sm">
+            {{#if (gt app.qtyGoodMoral 0)}}
+            <div class="flex justify-between">
+              <span class="text-white">Good Moral (True Copy + Stamp)</span>
+              <span class="text-green-400 font-bold">{{app.qtyGoodMoral}} × ₱70 = ₱{{multiply app.qtyGoodMoral 70}}</span>
+            </div>
+            {{/if}}
+            {{#if (gt app.qtyCTC 0)}}
+            <div class="flex justify-between">
+              <span class="text-white">CTC / Authentication</span>
+              <span class="text-green-400 font-bold">{{app.qtyCTC}} × ₱10 = ₱{{multiply app.qtyCTC 10}}</span>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm mb-3">
+          {{#if app.orNumber}}
+          <div><span class="label">OR Number</span><span class="text-slate-700 font-mono font-bold">{{app.orNumber}}</span></div>
+          {{else}}
+          <div><span class="label">OR Number</span><span class="text-gray-500 text-xs italic">Not provided</span></div>
+          {{/if}}
+          <div><span class="label">Total Collected</span><span class="text-green-700 font-bold text-lg">{{currency app.totalAmount}}</span></div>
+        </div>
+        {{#if app.receiptFile}}
+        <div class="mb-3"><a href="{{app.receiptFile}}" target="_blank" class="text-green-700 hover:underline text-sm">📄 View Receipt File</a></div>
+        {{/if}}
+        <p class="text-green-600 text-xs mb-3">✅ Payment verified and forwarded to Guidance Office for processing.</p>
+        
+        <!-- Issue Receipt Button (for payment_verified status) -->
+        {{#if (eq app.status 'payment_verified')}}
+        <form action="/cashier/application/{{app.id}}/issue-receipt" method="POST" enctype="multipart/form-data" class="mb-3">
+          <button type="submit" class="btn-green w-full py-2 text-sm" onclick="return confirm('Issue receipt and move to next stage?')">
+            🧾 Issue Receipt & Forward
+          </button>
+        </form>
+        {{/if}}
+        
+        <!-- Re-issue Receipt Option -->
+        <details class="mt-3">
+          <summary class="cursor-pointer text-yellow-600 text-xs font-semibold hover:text-yellow-500">🔄 Need to add/update receipt? Click here</summary>
+          <div class="mt-3 p-4 rounded-lg" style="background:#1f1500;border:1px solid #d97706">
+            <p class="text-gray-400 text-xs mb-3">Add OR number or upload a receipt file if needed.</p>
+            <form action="/cashier/application/{{app.id}}/reissue-receipt" method="POST" enctype="multipart/form-data" class="space-y-3">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="label">OR Number (optional)</label>
+                  <input type="text" name="orNumber" class="input" value="{{app.orNumber}}" placeholder="e.g. OR-2025-00123">
+                </div>
+                <div>
+                  <label class="label">Receipt File (optional)</label>
+                  <input type="file" name="receiptFile" accept=".pdf,image/*" class="input py-2">
+                </div>
+              </div>
+              <div>
+                <label class="label">Reason for Update *</label>
+                <textarea name="reissueReason" class="input" rows="2" placeholder="e.g., Adding OR number, updating receipt file..." required></textarea>
+              </div>
+              <button type="submit" class="btn-outline w-full py-2 text-sm" onclick="return confirm('Update receipt information?')">
+                🔄 Update Receipt Information
+              </button>
+            </form>
+          </div>
+        </details>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,114 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="reports"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <h1 class="text-base font-bold text-slate-800">📊 Reports</h1>
+      <div class="flex gap-2">
+        <button onclick="window.print()" class="btn-outline btn-sm">🖨 Print</button>
+        <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+      </div>
+    </div>
+    <div class="px-5 py-5">
+      {{> flash}}
+
+      <!-- Filters -->
+      <form method="GET" action="/guidance/reports" class="card mb-5 flex items-end gap-4">
+        <div>
+          <label class="label">Report Type</label>
+          <select name="type" class="input" style="width:auto">
+            <option value="daily"   {{#if (eq reportType 'daily')  }}selected{{/if}}>Daily</option>
+            <option value="monthly" {{#if (eq reportType 'monthly')}}selected{{/if}}>Monthly</option>
+            <option value="all"     {{#if (eq reportType 'all')    }}selected{{/if}}>All Time</option>
+          </select>
+        </div>
+        {{#if (eq reportType 'monthly')}}
+        <div>
+          <label class="label">Month</label>
+          <select name="month" class="input" style="width:auto">
+            <option value="1"  {{#if (eq selectedMonth 1) }}selected{{/if}}>January</option>
+            <option value="2"  {{#if (eq selectedMonth 2) }}selected{{/if}}>February</option>
+            <option value="3"  {{#if (eq selectedMonth 3) }}selected{{/if}}>March</option>
+            <option value="4"  {{#if (eq selectedMonth 4) }}selected{{/if}}>April</option>
+            <option value="5"  {{#if (eq selectedMonth 5) }}selected{{/if}}>May</option>
+            <option value="6"  {{#if (eq selectedMonth 6) }}selected{{/if}}>June</option>
+            <option value="7"  {{#if (eq selectedMonth 7) }}selected{{/if}}>July</option>
+            <option value="8"  {{#if (eq selectedMonth 8) }}selected{{/if}}>August</option>
+            <option value="9"  {{#if (eq selectedMonth 9) }}selected{{/if}}>September</option>
+            <option value="10" {{#if (eq selectedMonth 10)}}selected{{/if}}>October</option>
+            <option value="11" {{#if (eq selectedMonth 11)}}selected{{/if}}>November</option>
+            <option value="12" {{#if (eq selectedMonth 12)}}selected{{/if}}>December</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Year</label>
+          <input type="number" name="year" value="{{selectedYear}}" class="input" style="width:100px">
+        </div>
+        {{/if}}
+        <button type="submit" class="btn-green btn-sm">Generate</button>
+      </form>
+
+      <!-- Summary -->
+      <div class="grid grid-cols-4 gap-4 mb-5">
+        <div class="card text-center">
+          <p class="text-2xl font-bold text-white">{{applications.length}}</p>
+          <p class="text-gray-500 text-xs">Total Requests</p>
+        </div>
+        <div class="card text-center">
+          <p class="text-2xl font-bold text-green-700">{{currency totalCollection}}</p>
+          <p class="text-gray-500 text-xs">Total Collection</p>
+        </div>
+        <div class="card text-center">
+          <p class="text-2xl font-bold text-yellow-600">
+            {{#each applications}}{{#if (eq this.status 'pending')}}{{!-- count --}}{{/if}}{{/each}}
+          </p>
+          <p class="text-gray-500 text-xs">Released</p>
+        </div>
+        <div class="card text-center">
+          <p class="text-2xl font-bold text-red-400">
+          </p>
+          <p class="text-gray-500 text-xs">Rejected</p>
+        </div>
+      </div>
+
+      <!-- Table -->
+      {{#if applications.length}}
+      <div class="card p-0 overflow-hidden">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Student</th><th>Course</th><th>Purpose</th><th>Status</th><th>Amount</th><th>OR No.</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            {{#each applications}}
+            <tr>
+              <td class="text-gray-500 text-xs">{{this.id}}</td>
+              <td><div class="text-slate-700 text-sm">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
+              <td class="text-slate-500 text-sm">{{this.course}}</td>
+              <td class="text-gray-500 text-xs max-w-xs truncate">{{this.purposes}}</td>
+              <td><span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span></td>
+              <td class="text-green-700 text-sm font-medium">{{#if this.totalAmount}}{{currency this.totalAmount}}{{else}}—{{/if}}</td>
+              <td class="text-gray-400 text-xs font-mono">{{this.orNumber}}</td>
+              <td class="text-gray-500 text-xs">{{formatDate this.createdAt}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="card text-center py-16">
+        <p class="text-gray-500">No data for the selected period.</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<style>
+  @media print {
+    aside, .nav-top, button, form { display:none !important; }
+    body { background:#fff; color:#000; }
+    .card { border:1px solid #ccc; }
+    td, th { color:#000; }
+  }
+</style>
+</body></html>

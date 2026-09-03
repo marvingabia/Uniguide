@@ -1,0 +1,258 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="profiling"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div>
+        <h1 class="text-base font-bold text-slate-800">{{student.firstName}} {{student.lastName}} — Profile</h1>
+        <p class="text-slate-500 text-xs">Student ID: {{student.studentId}} | {{student.course}} {{student.yearLevel}}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="/guidance/profiling" class="text-green-700 text-sm hover:underline">← Back to List</a>
+        <span class="text-teal-700 text-sm font-medium">👤 {{user.firstName}} {{user.lastName}}</span>
+      </div>
+    </div>
+
+    <div class="px-5 py-5">
+      {{> flash}}
+
+      <div class="grid grid-cols-3 gap-5">
+        <!-- Left: Profile Info -->
+        <div class="col-span-2 space-y-5">
+          
+          <!-- Basic Info Card -->
+          <div class="card">
+            <h2 class="font-semibold text-teal-700 mb-3">📋 Basic Information</h2>
+            <form method="POST" action="/guidance/profiling/student/{{student.id}}">
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Birthdate</label>
+                  <input type="date" name="birthdate" value="{{#if student.profile.birthdate}}{{student.profile.birthdate}}{{else}}{{student.birthdate}}{{/if}}" class="input">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Contact Number</label>
+                  <input type="text" name="contactNo" value="{{student.contactNo}}" class="input" readonly>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                <textarea name="address" rows="2" class="input">{{#if student.profile.address}}{{student.profile.address}}{{else}}{{student.address}}{{/if}}</textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Guardian Name</label>
+                  <input type="text" name="guardianName" value="{{#if student.profile.guardianName}}{{student.profile.guardianName}}{{else}}{{student.guardianName}}{{/if}}" class="input">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Guardian Contact</label>
+                  <input type="text" name="guardianContact" value="{{#if student.profile.guardianContact}}{{student.profile.guardianContact}}{{else}}{{student.guardianContact}}{{/if}}" class="input">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Emergency Contact</label>
+                <input type="text" name="emergencyContact" value="{{#if student.profile.emergencyContact}}{{student.profile.emergencyContact}}{{else}}{{student.emergencyContact}}{{/if}}" class="input">
+              </div>
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Previous School</label>
+                  <input type="text" name="previousSchool" value="{{#if student.profile.previousSchool}}{{student.profile.previousSchool}}{{else}}{{student.previousSchool}}{{/if}}" class="input">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Scholarship Info</label>
+                  <input type="text" name="scholarshipInfo" value="{{#if student.profile.scholarshipInfo}}{{student.profile.scholarshipInfo}}{{else}}{{student.scholarshipInfo}}{{/if}}" class="input">
+                </div>
+              </div>
+              
+              <h3 class="font-semibold text-teal-700 mb-2 mt-4">📝 Case & Behavioral Notes</h3>
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Case Type</label>
+                  <select name="caseType" class="input">
+                    <option value="none" {{#if (eq student.profile.caseType 'none')}}selected{{/if}}>None</option>
+                    <option value="academic" {{#if (eq student.profile.caseType 'academic')}}selected{{/if}}>Academic</option>
+                    <option value="behavioral" {{#if (eq student.profile.caseType 'behavioral')}}selected{{/if}}>Behavioral</option>
+                    <option value="personal" {{#if (eq student.profile.caseType 'personal')}}selected{{/if}}>Personal</option>
+                    <option value="family" {{#if (eq student.profile.caseType 'family')}}selected{{/if}}>Family Issues</option>
+                    <option value="health" {{#if (eq student.profile.caseType 'health')}}selected{{/if}}>Health</option>
+                    <option value="other" {{#if (eq student.profile.caseType 'other')}}selected{{/if}}>Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Risk Level</label>
+                  <select name="riskLevel" class="input">
+                    <option value="low" {{#if (eq student.profile.riskLevel 'low')}}selected{{/if}}>Low</option>
+                    <option value="moderate" {{#if (eq student.profile.riskLevel 'moderate')}}selected{{/if}}>Moderate</option>
+                    <option value="high" {{#if (eq student.profile.riskLevel 'high')}}selected{{/if}}>High</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Behavioral Notes</label>
+                <textarea name="behavioralNotes" rows="3" class="input">{{student.profile.behavioralNotes}}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Remarks</label>
+                <textarea name="remarks" rows="2" class="input">{{student.profile.remarks}}</textarea>
+              </div>
+              <button type="submit" class="btn-green">💾 Save Profile</button>
+            </form>
+          </div>
+
+          <!-- Counseling Sessions -->
+          <div class="card">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="font-semibold text-teal-700">🗂️ Counseling Sessions History</h2>
+              <button onclick="document.getElementById('add-session-form').style.display='block'" class="btn-green btn-sm">+ Add Session</button>
+            </div>
+
+            <!-- Add Session Form (hidden by default) -->
+            <div id="add-session-form" style="display:none;" class="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
+              <form method="POST" action="/guidance/profiling/student/{{student.id}}/session">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Session Date</label>
+                    <input type="datetime-local" name="sessionDate" required class="input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                    <input type="number" name="duration" placeholder="30" class="input">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Session Type</label>
+                    <select name="sessionType" class="input">
+                      <option value="individual">Individual</option>
+                      <option value="group">Group</option>
+                      <option value="crisis">Crisis Intervention</option>
+                      <option value="follow-up">Follow-up</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="input">
+                      <option value="completed">Completed</option>
+                      <option value="scheduled">Scheduled</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="no-show">No-show</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Topic / Concern</label>
+                  <input type="text" name="topic" class="input" placeholder="e.g., Academic stress, Family issues">
+                </div>
+                <div class="mb-3">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Session Notes</label>
+                  <textarea name="notes" rows="3" class="input" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Action Plan / Recommendations</label>
+                  <textarea name="actionPlan" rows="2" class="input"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Follow-up Date (optional)</label>
+                  <input type="date" name="followUpDate" class="input">
+                </div>
+                <div class="flex gap-2">
+                  <button type="submit" class="btn-green">✓ Save Session</button>
+                  <button type="button" onclick="document.getElementById('add-session-form').style.display='none'" class="btn-outline">Cancel</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Sessions List -->
+            {{#if sessions.length}}
+            <div class="space-y-3">
+              {{#each sessions}}
+              <div class="bg-white border border-slate-200 rounded-lg p-3">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full {{#if (eq this.sessionType 'crisis')}}bg-red-100 text-red-700{{else if (eq this.sessionType 'group')}}bg-blue-100 text-blue-700{{else if (eq this.sessionType 'follow-up')}}bg-purple-100 text-purple-700{{else}}bg-green-100 text-green-700{{/if}}">
+                      {{this.sessionType}}
+                    </span>
+                    <span class="text-xs text-gray-500">{{formatDateTime this.sessionDate}}</span>
+                    {{#if this.duration}}<span class="text-xs text-gray-400">• {{this.duration}} min</span>{{/if}}
+                  </div>
+                  <span class="text-xs font-semibold {{#if (eq this.status 'completed')}}text-green-600{{else if (eq this.status 'scheduled')}}text-blue-600{{else}}text-gray-500{{/if}}">{{this.status}}</span>
+                </div>
+                {{#if this.topic}}<p class="text-sm font-medium text-slate-700 mb-1">📌 {{this.topic}}</p>{{/if}}
+                <p class="text-sm text-gray-700 mb-2">{{this.notes}}</p>
+                {{#if this.actionPlan}}<p class="text-xs text-slate-600 bg-slate-50 p-2 rounded mb-2"><strong>Action Plan:</strong> {{this.actionPlan}}</p>{{/if}}
+                {{#if this.followUpDate}}<p class="text-xs text-purple-600">📅 Follow-up: {{formatDate this.followUpDate}}</p>{{/if}}
+                <p class="text-xs text-gray-400 mt-2">Counselor: {{this.counselor.firstName}} {{this.counselor.lastName}}</p>
+              </div>
+              {{/each}}
+            </div>
+            {{else}}
+            <p class="text-center text-gray-500 py-8">No counseling sessions recorded yet.</p>
+            {{/if}}
+          </div>
+        </div>
+
+        <!-- Right: Summary & Quick Stats -->
+        <div class="space-y-5">
+          <!-- Profile Summary -->
+          <div class="card text-center">
+            {{#if student.profileImage}}
+              <img src="{{student.profileImage}}" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-green-100" alt="avatar">
+            {{else if student.avatar}}
+              <img src="{{student.avatar}}" class="w-24 h-24 rounded-full mx-auto mb-3 object-cover border-4 border-green-100" alt="avatar">
+            {{else}}
+              <div class="w-24 h-24 rounded-full mx-auto mb-3 bg-green-600 text-white text-3xl flex items-center justify-center font-bold border-4 border-green-100">{{student.firstName.[0]}}{{student.lastName.[0]}}</div>
+            {{/if}}
+            <h3 class="text-lg font-bold text-slate-800">{{student.firstName}} {{student.lastName}}</h3>
+            <p class="text-sm text-gray-600">{{student.email}}</p>
+            <p class="text-xs text-gray-500 mt-1">{{student.course}} • Year {{student.yearLevel}}</p>
+            <p class="text-xs text-gray-500">Student ID: {{student.studentId}}</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="card">
+            <h3 class="font-semibold text-teal-700 mb-3 text-sm">📊 Quick Stats</h3>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600">Total Sessions:</span>
+                <span class="text-sm font-bold text-slate-800">{{#if student.profile}}{{student.profile.totalSessions}}{{else}}0{{/if}}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600">Case Type:</span>
+                <span class="text-xs font-semibold text-slate-700">{{#if student.profile}}{{student.profile.caseType}}{{else}}—{{/if}}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600">Risk Level:</span>
+                <span class="text-xs font-semibold {{#if student.profile}}{{#if (eq student.profile.riskLevel 'high')}}text-red-600{{else if (eq student.profile.riskLevel 'moderate')}}text-yellow-600{{else}}text-green-600{{/if}}{{/if}}">
+                  {{#if student.profile}}{{student.profile.riskLevel}}{{else}}—{{/if}}
+                </span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-600">Last Session:</span>
+                <span class="text-xs text-slate-600">{{#if student.profile.lastSessionDate}}{{formatDate student.profile.lastSessionDate}}{{else}}—{{/if}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Applications -->
+          {{#if student.applications.length}}
+          <div class="card">
+            <h3 class="font-semibold text-teal-700 mb-2 text-sm">📄 Recent Applications</h3>
+            <div class="space-y-2">
+              {{#each student.applications}}
+              <div class="text-xs bg-slate-50 p-2 rounded">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-medium text-slate-700">#{this.id}</span>
+                  <span class="badge badge-{{this.status}}">{{this.status}}</span>
+                </div>
+                <p class="text-gray-500">{{formatDate this.createdAt}}</p>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

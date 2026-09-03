@@ -1,0 +1,98 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="announcements"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div class="flex items-center gap-3">
+        <a href="/guidance/dashboard" class="text-teal-700 text-sm font-medium">← Back</a>
+        <h1 class="text-base font-bold text-slate-800">📢 Announcements</h1>
+      </div>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+    <div class="max-w-4xl mx-auto px-5 py-6">
+      {{> flash}}
+      
+      <!-- Create New Announcement Form -->
+      <div class="card mb-6">
+        <h3 class="text-green-700 font-semibold mb-4 text-sm">➕ Create New Announcement</h3>
+        <form action="/guidance/announcements" method="POST" class="space-y-4">
+          <div>
+            <label class="label">Type</label>
+            <div class="flex gap-4 mt-1">
+              <label class="flex items-center gap-2 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600">
+                <input type="radio" name="type" value="announcement" class="accent-green-500" checked>
+                <span class="text-slate-700 text-sm">📣 Announcement</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600">
+                <input type="radio" name="type" value="event" class="accent-green-500">
+                <span class="text-slate-700 text-sm">📅 Event</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="label">Title *</label>
+            <input type="text" name="title" class="input" placeholder="e.g. GCO Office Hours Change" required>
+          </div>
+          <div>
+            <label class="label">Content *</label>
+            <textarea name="content" class="input" rows="4" placeholder="Write the full announcement or event details..." required></textarea>
+          </div>
+          <div id="eventDateField" style="display:none">
+            <label class="label">Event Date</label>
+            <input type="date" name="eventDate" class="input">
+          </div>
+          <button type="submit" class="btn-green w-full py-2 text-sm">📢 Post Announcement</button>
+        </form>
+      </div>
+
+      <!-- Existing Announcements List -->
+      <div>
+        <h3 class="text-slate-800 font-semibold mb-3 text-sm">📋 Active Announcements</h3>
+        {{#if announcements.length}}
+        <div class="space-y-3">
+          {{#each announcements}}
+          {{#if this.isActive}}
+          <div class="card">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs px-2 py-1 rounded-full {{#if (eq this.type 'event')}}bg-blue-100 text-blue-600{{else}}bg-green-100 text-green-700{{/if}}">
+                    {{#if (eq this.type 'event')}}📅 Event{{else}}📣 Announcement{{/if}}
+                  </span>
+                  <span class="text-gray-400 text-xs">{{formatDateTime this.createdAt}}</span>
+                </div>
+                <h4 class="text-slate-800 text-base font-semibold mb-1">{{this.title}}</h4>
+                <p class="text-gray-600 text-sm">{{this.content}}</p>
+                {{#if this.eventDate}}
+                <p class="text-blue-600 text-xs mt-2">📅 Event Date: {{formatDate this.eventDate}}</p>
+                {{/if}}
+              </div>
+              <form action="/guidance/announcements/{{this.id}}/delete" method="POST">
+                <button type="submit" class="text-red-500 hover:text-red-400 text-xs px-3 py-1 rounded border border-red-500 hover:bg-red-500/10" onclick="return confirm('Remove this announcement?')">
+                  ✕ Remove
+                </button>
+              </form>
+            </div>
+          </div>
+          {{/if}}
+          {{/each}}
+        </div>
+        {{else}}
+        <div class="card text-center py-8">
+          <div style="font-size:2.5rem;margin-bottom:8px;">📭</div>
+          <p class="text-gray-500 text-sm">No announcements posted yet.</p>
+          <p class="text-gray-400 text-xs mt-1">Create one using the form above.</p>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('input[name="type"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('eventDateField').style.display = r.value === 'event' && r.checked ? '' : 'none';
+  });
+});
+</script>
+</body></html>

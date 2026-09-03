@@ -1,0 +1,45 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-cashier activePage="history"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <h1 class="text-base font-bold text-slate-800">📜 Payment History</h1>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+    <div class="px-5 py-5">
+      {{> flash}}
+      {{#if payments.length}}
+      <div class="card p-0 overflow-hidden">
+        <table>
+          <thead><tr><th>#</th><th>Student</th><th>Method</th><th>Reference No.</th><th>OR No.</th><th>Amount</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            {{#each payments}}
+            <tr>
+              <td class="text-gray-500 text-xs">{{this.id}}</td>
+              <td><div class="text-slate-700 text-sm">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
+              <td><span class="badge badge-submitted text-xs">{{this.paymentMethod}}</span></td>
+              <td class="text-gray-400 text-xs font-mono">{{this.referenceNumber}}</td>
+              <td class="text-slate-600 text-xs font-mono">{{this.orNumber}}</td>
+              <td class="text-green-700 font-bold">{{currency this.totalAmount}}</td>
+              <td class="text-gray-500 text-xs">{{formatDate this.paymentDate}}</td>
+              <td><span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span></td>
+              <td>
+                <a href="/cashier/application/{{this.id}}" class="text-green-700 hover:text-green-900 text-xs font-semibold">
+                  👁️ View
+                </a>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="card text-center py-16">
+        <div class="text-5xl mb-3">📜</div>
+        <p class="text-gray-500">No payment history yet.</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

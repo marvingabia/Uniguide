@@ -1,0 +1,126 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-student activePage="apply"}}
+
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div class="flex items-center gap-3">
+        <a href="/student/dashboard" class="text-green-700 hover:text-green-700 text-sm">← Back</a>
+        <h1 class="text-base font-bold text-slate-800">Submit Payment Proof</h1>
+      </div>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-5 py-6">
+      {{> flash}}
+
+      <!-- Application info -->
+      <div class="card mb-5 border-green-800">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 text-xs mb-1">Application #{{app.id}}</p>
+            <h2 class="text-slate-800 font-bold text-lg">{{app.surname}}, {{app.givenName}}</h2>
+            <p class="text-slate-500 text-sm">{{app.course}} — {{app.yearLevel}}</p>
+          </div>
+          <span class="badge badge-pending">Pending Payment</span>
+        </div>
+      </div>
+
+      <!-- Fee Schedule -->
+      <div class="card mb-5" style="background:#0a1f0a;border-color:#166534">
+        <h3 class="text-green-700 font-semibold text-sm mb-3">💰 For Cashier Fee</h3>
+        
+        <!-- Selected Items Breakdown -->
+        <div class="mb-4 p-4 rounded-lg" style="background:#052e16;border:1px solid #166534">
+          <p class="text-gray-400 text-xs mb-3">YOUR ORDER SUMMARY:</p>
+          
+          {{#if (gt app.qtyGoodMoral 0)}}
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <p class="text-white font-medium text-sm">Good Moral (True Copy + Stamp)</p>
+              <p class="text-green-300 text-xs">₱70 × {{app.qtyGoodMoral}} {{#if (gt app.qtyGoodMoral 1)}}copies{{else}}copy{{/if}}</p>
+            </div>
+            <p class="text-white font-bold">₱{{multiply app.qtyGoodMoral 70}}.00</p>
+          </div>
+          {{/if}}
+          
+          {{#if (gt app.qtyCTC 0)}}
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <p class="text-white font-medium text-sm">CTC / Authentication Request</p>
+              <p class="text-green-300 text-xs">₱10 × {{app.qtyCTC}} {{#if (gt app.qtyCTC 1)}}copies{{else}}copy{{/if}}</p>
+            </div>
+            <p class="text-white font-bold">₱{{multiply app.qtyCTC 10}}.00</p>
+          </div>
+          {{/if}}
+          
+          <hr style="border-color:#166534;margin:12px 0">
+          <div class="flex justify-between items-center">
+            <p class="text-green-400 font-bold text-sm">TOTAL AMOUNT TO PAY:</p>
+            <p class="text-white font-bold text-2xl">₱{{app.totalAmount}}</p>
+          </div>
+        </div>
+
+        <!-- Payment Options -->
+        <div class="grid grid-cols-1 gap-4">
+
+          <!-- LandBank -->
+          <div class="card-sm" style="border:1px solid #1d4ed8;background:#0a0f2e;">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">L</div>
+              <p class="text-blue-600 font-bold text-sm">LandBank</p>
+            </div>
+            <!-- QR Code Image -->
+            <img src="/uploads/landbank-Qr.png" alt="LandBank QR" class="w-40 h-40 mx-auto rounded-lg border-2 border-blue-700 object-cover">
+            <div class="space-y-1 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Account Name</span>
+                <span class="text-white font-semibold">MinSU Bongabong Campus</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Account Number</span>
+                <span class="text-blue-600 font-bold tracking-wider">6746-0245-85</span>
+              </div>
+            </div>
+            <p class="text-gray-500 text-xs mt-2 text-center">Scan QR or deposit to account above</p>
+          </div>
+
+        </div>
+
+        <!-- Important reminder -->
+        <div class="rounded-lg px-4 py-3 text-xs text-yellow-600 mt-1" style="background:#1c1500;border:1px solid #854d0e;">
+          ⚠️ <strong>Important:</strong> After payment via LandBank, take a screenshot of your confirmation and enter the reference number below. Your application will be processed after payment is verified.
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <form action="/student/application/{{app.id}}/payment" method="POST" enctype="multipart/form-data" class="card space-y-4">
+        <h3 class="text-green-700 font-semibold text-sm">Upload Payment Proof</h3>
+
+        <div>
+          <label class="label">Payment Method *</label>
+          <select name="paymentMethod" class="input" required>
+            <option value="LandBank" selected>LandBank</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Reference Number *</label>
+          <input type="text" name="referenceNumber" class="input" placeholder="e.g. 1234567890" required>
+          <p class="text-gray-600 text-xs mt-1">Enter the LandBank reference number from your receipt</p>
+        </div>
+        <div>
+          <label class="label">Date of Payment *</label>
+          <input type="date" name="paymentDate" class="input" required>
+        </div>
+        <div>
+          <label class="label">Payment Screenshot *</label>
+          <input type="file" name="screenshot" accept="image/*" class="input py-2" required>
+          <p class="text-gray-600 text-xs mt-1">Upload a clear screenshot of your payment confirmation. Max 5MB.</p>
+        </div>
+
+        <button type="submit" class="btn-green w-full py-3 text-base">📤 Submit Payment Proof</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body></html>

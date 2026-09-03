@@ -1,0 +1,146 @@
+{{> head}}
+<div class="flex h-screen overflow-hidden">
+  {{> sidebar-guidance activePage="applications"}}
+  <div class="flex-1 overflow-y-auto bg-slate-100">
+    <div class="nav-top">
+      <div class="flex items-center gap-3">
+        <a href="/guidance/applications" class="text-green-700 hover:text-green-700 text-sm">← Back</a>
+        <h1 class="text-base font-bold text-slate-800">Application #{{app.id}}</h1>
+      </div>
+      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-5 py-5">
+      {{> flash}}
+
+      <!-- Header -->
+      <div class="card mb-4 flex items-center justify-between border-green-800">
+        <div>
+          <p class="text-gray-500 text-xs">Submitted {{formatDateTime app.createdAt}}</p>
+          <h2 class="text-slate-800 font-bold text-lg">{{app.surname}}, {{app.givenName}} {{app.middleName}}</h2>
+          <p class="text-slate-500 text-sm">{{app.student.email}}</p>
+        </div>
+        <span class="badge {{statusClass app.status}} text-sm px-4 py-1">{{statusLabel app.status}}</span>
+      </div>
+
+      <!-- Student Info -->
+      <div class="card mb-4">
+        <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Student Information</h3>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><span class="label">Course</span><span class="text-slate-700 font-semibold">{{app.course}}{{#if app.major}} — {{app.major}}{{/if}}</span></div>
+          <div><span class="label">Year Level / Section</span><span class="text-slate-700 font-semibold">{{app.yearLevel}} {{app.section}}</span></div>
+          <div><span class="label">Gender</span><span class="text-slate-700 font-semibold">{{app.gender}}</span></div>
+          <div><span class="label">Contact</span><span class="text-slate-700 font-semibold">{{app.contactNumber}}</span></div>
+          <div><span class="label">Enrollment</span><span class="text-slate-700 font-semibold">{{app.enrollmentStatus}}</span></div>
+          {{#if app.academicYear}}<div><span class="label">A.Y. / Semester</span><span class="text-slate-700 font-semibold">{{app.academicYear}} — {{app.semester}}</span></div>{{/if}}
+          {{#if app.monthYearGraduated}}<div><span class="label">Graduated</span><span class="text-slate-700 font-semibold">{{app.monthYearGraduated}}</span></div>{{/if}}
+        </div>
+        <div class="mt-3">
+          <span class="label">Purpose/s</span>
+          <div class="flex flex-wrap gap-2 mt-1">
+            {{#each purposes}}<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">{{this}}</span>{{/each}}
+            {{#if app.otherPurpose}}<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">{{app.otherPurpose}}</span>{{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment & Receipt -->
+      <div class="card mb-4">
+        <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Payment & Receipt</h3>
+        
+        <!-- Order Breakdown -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+          <p class="text-gray-600 text-xs font-semibold mb-3 uppercase tracking-wider">Order Breakdown:</p>
+          <div class="space-y-2 text-sm">
+            {{#if (gt app.qtyGoodMoral 0)}}
+            <div class="flex justify-between items-center">
+              <span class="text-slate-700">Good Moral (True Copy + Stamp)</span>
+              <span class="text-green-700 font-bold">{{app.qtyGoodMoral}} copies × ₱70.00 = ₱{{multiply app.qtyGoodMoral 70}}.00</span>
+            </div>
+            {{/if}}
+            {{#if (gt app.qtyCTC 0)}}
+            <div class="flex justify-between items-center">
+              <span class="text-slate-700">CTC / Authentication</span>
+              <span class="text-green-700 font-bold">{{app.qtyCTC}} copies × ₱10.00 = ₱{{multiply app.qtyCTC 10}}.00</span>
+            </div>
+            {{/if}}
+            <div class="border-t border-gray-300 pt-2 mt-2">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-800 font-semibold">TOTAL AMOUNT:</span>
+                <span class="text-green-700 font-bold text-lg">₱{{app.totalAmount}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div><span class="label">Payment Method</span><span class="text-slate-700 font-semibold">{{app.paymentMethod}}</span></div>
+          <div><span class="label">Reference No.</span><span class="text-slate-700 font-mono font-bold">{{app.referenceNumber}}</span></div>
+          <div><span class="label">Payment Date</span><span class="text-slate-700 font-semibold">{{formatDate app.paymentDate}}</span></div>
+          <div><span class="label">OR Number</span><span class="text-slate-700 font-mono font-bold">{{app.orNumber}}</span></div>
+        </div>
+        {{#if app.paymentScreenshot}}
+        <div class="mt-3">
+          <span class="label">Payment Screenshot</span>
+          <a href="{{app.paymentScreenshot}}" target="_blank">
+            <img src="{{app.paymentScreenshot}}" class="mt-2 max-h-44 rounded-lg border border-green-800 hover:opacity-90">
+          </a>
+        </div>
+        {{/if}}
+        {{#if app.receiptFile}}
+        <div class="mt-3">
+          <a href="{{app.receiptFile}}" target="_blank" class="text-green-700 hover:underline text-sm">📄 View Official Receipt</a>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Actions -->
+      {{#if (eq app.status 'receipt_issued')}}
+      <div class="flex gap-3">
+        <form action="/guidance/application/{{app.id}}/approve" method="POST" class="flex-1">
+          <button class="btn-green w-full py-3" onclick="return confirm('Approve and prepare certificate?')">✓ Approve Request</button>
+        </form>
+        <div class="flex-1">
+          <form action="/guidance/application/{{app.id}}/reject" method="POST" class="space-y-2">
+            <input type="text" name="remarks" class="input text-sm" placeholder="Reason for rejection" required>
+            <button class="btn-red w-full py-2" onclick="return confirm('Reject this application?')">✕ Reject</button>
+          </form>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if (eq app.status 'approved')}}
+      <form action="/guidance/application/{{app.id}}/release" method="POST">
+        <button class="btn-green w-full py-3 text-base" onclick="return confirm('Mark certificate as released? Student will be notified.')">
+          🎓 Release Certificate
+        </button>
+      </form>
+      {{/if}}
+
+      {{#if (eq app.status 'released')}}
+      <div class="card" style="background:#0a1f0a;border-color:#166534">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-700 font-bold">🎓 Certificate Released</p>
+            <p class="text-slate-500 text-sm">Released on {{formatDate app.releasedAt}} by {{app.releasedBy}}</p>
+            <p class="text-gray-500 text-sm mt-1">Claim status: <span class="text-slate-700 font-semibold">{{app.claimStatus}}</span></p>
+          </div>
+          {{#if (eq app.claimStatus 'unclaimed')}}
+          <form action="/guidance/application/{{app.id}}/claim" method="POST">
+            <button class="btn-outline btn-sm" onclick="return confirm('Mark as claimed?')">Mark Claimed</button>
+          </form>
+          {{/if}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if (eq app.status 'rejected')}}
+      <div class="card" style="background:#1f0505;border-color:#7f1d1d">
+        <p class="text-red-300 font-semibold">❌ Application Rejected</p>
+        {{#if app.remarks}}<p class="text-gray-300 text-sm mt-1">Reason: {{app.remarks}}</p>{{/if}}
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</body></html>

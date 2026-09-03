@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#1b5e38">
+  <meta name="description" content="MinSU Bongabong Campus Good Moral Certificate Online Application System">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/uploads/minsulogo.png">
+  <link rel="apple-touch-icon" href="/uploads/minsulogo.png">
+  
+  <title>{{title}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing:border-box; }
+    body { background:#f0f4f8; color:#1e293b; font-family:'Segoe UI',system-ui,sans-serif; margin:0; }
+
+    /* ── Badges ── */
+    .badge { display:inline-block; padding:3px 12px; border-radius:9999px; font-size:.72rem; font-weight:700; }
+    .badge-pending   { background:#fef9c3; color:#854d0e; }
+    .badge-submitted { background:#dbeafe; color:#1e40af; }
+    .badge-verified  { background:#dcfce7; color:#166534; }
+    .badge-receipted { background:#e0e7ff; color:#3730a3; }
+    .badge-approved  { background:#f3e8ff; color:#6b21a8; }
+    .badge-released  { background:#d1fae5; color:#065f46; }
+    .badge-rejected  { background:#fee2e2; color:#991b1b; }
+
+    /* ── Buttons ── */
+    .btn-green  { background:#1b5e38; color:#fff; padding:8px 20px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:.88rem; transition:background .2s; text-decoration:none; display:inline-block; text-align:center; touch-action:manipulation; }
+    .btn-green:hover  { background:#154d2f; }
+    .btn-green:active { transform:scale(0.98); }
+    .btn-blue   { background:#1d4ed8; color:#fff; padding:8px 20px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:.88rem; transition:background .2s; text-decoration:none; display:inline-block; text-align:center; touch-action:manipulation; }
+    .btn-blue:hover   { background:#1e40af; }
+    .btn-blue:active { transform:scale(0.98); }
+    .btn-red    { background:#dc2626; color:#fff; padding:8px 20px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:.88rem; touch-action:manipulation; }
+    .btn-red:hover    { background:#b91c1c; }
+    .btn-red:active { transform:scale(0.98); }
+    .btn-outline { background:transparent; color:#1b5e38; border:1.5px solid #1b5e38; padding:7px 18px; border-radius:8px; cursor:pointer; font-weight:600; font-size:.88rem; text-decoration:none; display:inline-block; text-align:center; touch-action:manipulation; }
+    .btn-outline:hover { background:#1b5e38; color:#fff; }
+    .btn-outline:active { transform:scale(0.98); }
+    .btn-sm { padding:5px 12px; font-size:.78rem; }
+
+    /* ── Cards ── */
+    .card    { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
+    .card-sm { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+
+    /* ── Form ── */
+    .input { background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:10px 14px; color:#1e293b; width:100%; outline:none; font-size:.9rem; min-height:44px; touch-action:manipulation; }
+    .input:focus { border-color:#1b5e38; box-shadow:0 0 0 3px rgba(27,94,56,.13); }
+    .label { font-size:.82rem; color:#1b5e38; font-weight:600; margin-bottom:5px; display:block; }
+
+    /* ── Sidebar links — used on dark green sidebar ── */
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:8px; color:#a7d4b8; text-decoration:none; font-size:.875rem; font-weight:500; transition:all .18s; touch-action:manipulation; min-height:44px; }
+    .sidebar-link:hover  { background:rgba(255,255,255,.13); color:#fff; }
+    .sidebar-link.active { background:#fff; color:#1b5e38; font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,.13); }
+    .sidebar-link .badge { font-size:.65rem; padding:2px 6px; }
+
+    /* ── Nav top ── */
+    .nav-top { background:#fff; border-bottom:1px solid #e2e8f0; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+
+    /* ── Tables ── */
+    table { width:100%; border-collapse:collapse; }
+    th { background:#f8fafc; color:#1b5e38; padding:10px 14px; text-align:left; font-size:.73rem; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; border-bottom:2px solid #e2e8f0; }
+    td { padding:10px 14px; border-bottom:1px solid #f1f5f9; color:#374151; font-size:.875rem; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:#f6fbf8; }
+
+    /* ── Notifications ── */
+    .notif-info    { background:#eff6ff; border-left:3px solid #3b82f6; }
+    .notif-success { background:#f0fdf4; border-left:3px solid #22c55e; }
+    .notif-warning { background:#fffbeb; border-left:3px solid #f59e0b; }
+    .notif-danger  { background:#fef2f2; border-left:3px solid #ef4444; }
+
+    /* ── Steps ── */
+    .step-done    { background:#1b5e38; color:#fff; }
+    .step-active  { background:#2d7a52; color:#fff; box-shadow:0 0 0 3px rgba(27,94,56,.22); }
+    .step-pending { background:#e2e8f0; color:#94a3b8; }
+
+    /* ── Misc ── */
+    .divider { border:none; border-top:1px solid #e2e8f0; margin:16px 0; }
+    .text-muted { color:#94a3b8; }
+    .truncate { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+    /* ══════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE STYLES
+       ══════════════════════════════════════════════════════════ */
+    
+    /* Mobile Menu Toggle */
+    #mobile-menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 100; background: #1b5e38; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); touch-action: manipulation; }
+    #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 98; }
+    
+    /* Sidebar mobile positioning */
+    aside { transition: transform 0.3s ease; }
+    
+    /* Mobile - Portrait (up to 640px) */
+    @media (max-width: 640px) {
+      body { font-size: 14px; }
+      
+      /* Show mobile menu button */
+      #mobile-menu-toggle { display: block; }
+      
+      /* Hide sidebar by default on mobile, show when active */
+      aside { 
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        z-index: 99;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      }
+      
+      aside.mobile-active { transform: translateX(0); }
+      #mobile-menu-overlay.active { display: block; }
+      
+      /* Main content full width on mobile */
+      .flex.h-screen { flex-direction: column; }
+      .flex-1 { width: 100% !important; margin-left: 0 !important; padding-top: 56px; }
+      
+      /* Cards padding reduction */
+      .card { padding: 16px; border-radius: 10px; }
+      .card-sm { padding: 12px; }
+      
+      /* Nav top - adjust for mobile menu button */
+      .nav-top { 
+        flex-direction: column; 
+        gap: 8px; 
+        padding: 10px 16px 10px 56px; /* Space for menu button */
+        align-items: flex-start;
+      }
+      
+      /* Buttons - full width on mobile */
+      .btn-green, .btn-blue, .btn-red, .btn-outline {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        min-height: 48px;
+      }
+      
+      /* Forms - larger touch targets */
+      .input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 16px;
+        min-height: 48px;
+      }
+      
+      select.input { font-size: 16px; }
+      
+      /* Tables - horizontal scroll with card wrapper */
+      .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -16px; padding: 0 16px; }
+      table { 
+        min-width: 600px; /* Ensure table doesn't shrink too much */
+      }
+      th, td { 
+        padding: 8px 10px; 
+        font-size: 0.8rem; 
+      }
+      
+      /* Grid - single column on mobile */
+      .grid { display: block !important; }
+      .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
+      .grid > * { margin-bottom: 12px; width: 100%; }
+      
+      /* Flex - wrap on mobile */
+      .flex { flex-wrap: wrap; }
+      .gap-4 { gap: 0.75rem; }
+      
+      /* Sidebar - mobile menu */
+      .sidebar-link { 
+        padding: 12px 16px; 
+        font-size: 0.9rem;
+        min-height: 48px;
+      }
+      
+      /* Text sizing */
+      h1 { font-size: 1.4rem !important; }
+      h2 { font-size: 1.2rem !important; }
+      h3 { font-size: 1.05rem !important; }
+      .text-xl { font-size: 1.15rem !important; }
+      .text-lg { font-size: 1rem !important; }
+      .text-base { font-size: 0.9rem !important; }
+      
+      /* Spacing adjustments */
+      .px-5 { padding-left: 1rem !important; padding-right: 1rem !important; }
+      .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+      .py-5 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+      .py-6 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+      .max-w-2xl, .max-w-3xl, .max-w-4xl, .max-w-5xl, .max-w-6xl { max-width: 100% !important; }
+      
+      /* Hide on mobile */
+      .hide-mobile { display: none !important; }
+      
+      /* Badge sizing */
+      .badge { font-size: 0.7rem; padding: 4px 10px; }
+      
+      /* Image sizing */
+      img { max-width: 100%; height: auto; }
+    }
+    
+    /* Tablet - Portrait (641px to 768px) */
+    @media (min-width: 641px) and (max-width: 768px) {
+      #mobile-menu-toggle { display: block; }
+      
+      aside { 
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        z-index: 99;
+        transform: translateX(-100%);
+      }
+      
+      aside.mobile-active { transform: translateX(0); }
+      #mobile-menu-overlay.active { display: block; }
+      
+      .flex-1 { margin-left: 0 !important; padding-top: 56px; }
+      
+      .card { padding: 18px; }
+      .input { font-size: 15px; min-height: 46px; }
+      .btn-green, .btn-blue, .btn-red { padding: 10px 20px; }
+      
+      .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+      .grid-cols-3 { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    
+    /* Tablet - Landscape (769px to 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .nav-top { padding: 12px 20px; }
+      .card { padding: 18px; }
+      
+      aside { width: 200px !important; }
+      
+      .grid-cols-3 { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    
+    /* Desktop - show sidebar normally */
+    @media (min-width: 1025px) {
+      #mobile-menu-toggle, #mobile-menu-overlay { display: none !important; }
+      aside { position: sticky !important; transform: none !important; }
+    }
+    
+    /* Touch-friendly improvements for all mobile/tablet */
+    @media (max-width: 1024px) {
+      /* Larger touch targets */
+      a, button, input, select, textarea {
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      
+      /* Prevent text selection on buttons */
+      button, .btn-green, .btn-blue, .btn-red, .btn-outline {
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+        user-select: none;
+      }
+      
+      /* Smooth scrolling */
+      html { scroll-behavior: smooth; }
+      
+      /* Image optimization */
+      img { max-width: 100%; height: auto; }
+      
+      /* Prevent body scroll when menu is open */
+      body.menu-open { overflow: hidden; }
+    }
+    
+    /* Landscape phone specific */
+    @media (max-height: 500px) and (orientation: landscape) {
+      aside { overflow-y: auto; }
+      .nav-top { padding: 8px 16px 8px 56px; }
+    }
+    
+    /* Dark mode support (optional for future) */
+    @media (prefers-color-scheme: dark) {
+      /* Can add dark mode styles here later */
+    }
+    
+    /* Print styles */
+    @media print {
+      #mobile-menu-toggle, #mobile-menu-overlay, .sidebar-link, .nav-top, button { display: none !important; }
+      aside { display: none !important; }
+      .card { border: 1px solid #000; box-shadow: none; page-break-inside: avoid; }
+      body { background: #fff; }
+      .flex-1 { margin: 0 !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+<!-- Mobile Menu Button -->
+<button id="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</button>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
+<script>
+function toggleMobileMenu() {
+  const sidebar = document.querySelector('aside');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const body = document.body;
+  
+  if (sidebar) {
+    sidebar.classList.toggle('mobile-active');
+    overlay.classList.toggle('active');
+    body.classList.toggle('menu-open');
+  }
+}
+
+function closeMobileMenu() {
+  const sidebar = document.querySelector('aside');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const body = document.body;
+  
+  if (sidebar) {
+    sidebar.classList.remove('mobile-active');
+    overlay.classList.remove('active');
+    body.classList.remove('menu-open');
+  }
+}
+
+// Close menu when clicking a link on mobile
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        closeMobileMenu();
+      }
+    });
+  });
+  
+  // Close menu on window resize if going to desktop
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      if (window.innerWidth > 1024) {
+        closeMobileMenu();
+      }
+    }, 250);
+  });
+});
+</script>
+
