@@ -46,10 +46,18 @@ Appointment.belongsTo(TimeSlot, { foreignKey: 'timeSlotId', as: 'assignedSlot' }
 
 export const syncDB = async () => {
   try {
+    // Test connection first
+    await sequelize.authenticate();
+    console.log('✅ Database connection successful');
+    
+    // Then sync models
     await sequelize.sync({ alter: { drop: false } });
-    console.log('✅ Database synced');
+    console.log('✅ Database synced successfully');
   } catch (err) {
-    console.error('❌ DB sync error:', err.message);
+    console.error('❌ Database error:', err.message);
+    console.error('   Full error:', err);
+    // Don't exit - let the app start anyway so we can debug
+    // In production, you may want to fail here
   }
 };
 
