@@ -1,7 +1,8 @@
 import { Sequelize } from 'sequelize';
 import { createRequire } from 'module';
 
-// Use CommonJS require to load mysql2 reliably in Vercel
+// Load mysql2 using CommonJS require.
+// This helps ensure Sequelize can access mysql2 in Vercel.
 const require = createRequire(import.meta.url);
 const mysql2 = require('mysql2');
 
@@ -39,7 +40,8 @@ try {
       pool: {
         max: 5,
         min: 0,
-        idle: 10000
+        idle: 10000,
+        acquire: 30000
       }
     });
 
@@ -70,7 +72,8 @@ try {
         pool: {
           max: 5,
           min: 0,
-          idle: 10000
+          idle: 10000,
+          acquire: 30000
         }
       }
     );
