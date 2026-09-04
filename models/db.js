@@ -1,13 +1,15 @@
 import { Sequelize } from 'sequelize';
-import mysql2 from 'mysql2';
+import { createRequire } from 'module';
+
+// Use CommonJS require to load mysql2 reliably in Vercel
+const require = createRequire(import.meta.url);
+const mysql2 = require('mysql2');
 
 console.log('🔍 DB Config Check:');
-
 console.log(
   '   DATABASE_URL:',
   process.env.DATABASE_URL ? '✓ Set' : '✗ Not set'
 );
-
 console.log(
   '   NODE_ENV:',
   process.env.NODE_ENV || 'development'
