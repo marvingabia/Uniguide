@@ -2,99 +2,67 @@ import { Sequelize } from 'sequelize';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+const mysql2 = require('mysql2');
 
-// Test mysql2 loading
-let mysql2;
+console.log('========================================');
+console.log('DATABASE CONFIG');
+console.log('========================================');
 
-try {
-  mysql2 = require('mysql2');
-
-  console.log('✅ mysql2 loaded successfully');
-  console.log('📦 mysql2 path:', require.resolve('mysql2'));
-
-} catch (err) {
-  console.error('❌ MYSQL2 LOAD FAILED');
-  console.error(err);
-  throw err;
-}
-
-console.log('🔍 DB Config Check:');
 console.log(
-  '   DATABASE_URL:',
+  'DATABASE_URL:',
   process.env.DATABASE_URL ? '✓ Set' : '✗ Not set'
 );
+
 console.log(
-  '   NODE_ENV:',
+  'NODE_ENV:',
   process.env.NODE_ENV || 'development'
 );
 
 let sequelize;
 
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not configured');
+}
+
 try {
-  if (process.env.DATABASE_URL) {
-    console.log('📍 Using DATABASE_URL connection');
+  const dbUrl = new URL(process.env.DATABASE_URL);
 
-    sequelize = new Sequelize(process.env.DATABASE_URL, {
-      dialect: 'mysql',
-      dialectModule: mysql2,
+  console.log('📍 Using Aiven DATABASE_URL');
+  console.log('DB Host:', dbUrl.hostname);
+  console.log('DB Port:', dbUrl.port);
+  console.log('DB Name:', dbUrl.pathname.replace(/^\/+/, ''));
 
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        },
-        supportBigNumbers: true,
-        bigNumberStrings: true
+  // Remove query parameters such as ssl-mode=REQUIRED
+  dbUrl.search = '';
+
+  sequelize = new Sequelize(dbUrl.toString(), {
+    dialect: 'mysql',
+    dialectModule: mysql2,
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
       },
+      supportBigNumbers: true,
+      bigNumberStrings: true
+    },
 
-      logging: false,
+    logging: false,
 
-      pool: {
-        max: 5,
-        min: 0,
-        idle: 10000,
-        acquire: 30000
-      }
-    });
-
-  } else {
-    console.log('📍 Using individual DB variables');
-
-    sequelize = new Sequelize(
-      process.env.DB_NAME || 'defaultdb',
-      process.env.DB_USER || 'avnadmin',
-      process.env.DB_PASSWORD || '',
-      {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 3306,
-        dialect: 'mysql',
-        dialectModule: mysql2,
-
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: false
-          },
-          supportBigNumbers: true,
-          bigNumberStrings: true
-        },
-
-        logging: false,
-
-        pool: {
-          max: 5,
-          min: 0,
-          idle: 10000,
-          acquire: 30000
-        }
-      }
-    );
-  }
+    pool: {
+      max: 5,
+      min: 0,
+      idle: 10000,
+      acquire: 30000
+    }
+  });
 
   console.log('✅ Sequelize configured successfully');
 
 } catch (err) {
-  console.error('❌ Database configuration error:', err.message);
+  console.error('❌ DATABASE CONFIG ERROR');
+  console.error(err.message);
   throw err;
 }
 
