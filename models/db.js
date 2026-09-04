@@ -3,11 +3,14 @@ import { Sequelize } from 'sequelize';
 // Log environment for debugging
 console.log('🔍 DB Config Check:');
 console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✓ Set' : '✗ Not set');
-console.log('   DB_HOST:', process.env.DB_HOST || 'localhost');
-console.log('   DB_NAME:', process.env.DB_NAME || 'guidance');
+console.log('   NODE_ENV:', process.env.NODE_ENV || 'development');
 
-export const sequelize = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
+let sequelize;
+
+try {
+  if (process.env.DATABASE_URL) {
+    console.log('📍 Using DATABASE_URL connection');
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
       dialect: 'mysql',
       dialectOptions: { 
         ssl: { require: true, rejectUnauthorized: false },
@@ -16,10 +19,12 @@ export const sequelize = process.env.DATABASE_URL
       },
       logging: false,
       pool: { max: 5, min: 0, idle: 10000 }
-    })
-  : new Sequelize(
-      process.env.DB_NAME || 'guidance',
-      process.env.DB_USER || 'root',
+    });
+  } else {
+    console.log('📍 Using individual DB variables');
+    sequelize = new Sequelize(
+      process.env.DB_NAME || 'defaultdb',
+      process.env.DB_USER || 'avnadmin',
       process.env.DB_PASSWORD || '',
       {
         host: process.env.DB_HOST || 'localhost',
@@ -29,7 +34,15 @@ export const sequelize = process.env.DATABASE_URL
         pool: { max: 5, min: 0, idle: 10000 },
         dialectOptions: {
           supportBigNumbers: true,
-          bigNumberStrings: true
+          bigNumberStrings: true,
+          ssl: { require: true, rejectUnauthorized: false }
         }
       }
     );
+  }
+} catch (err) {
+  console.error('❌ Database configuration error:', err.message);
+  throw err;
+}
+
+export { sequelize };
