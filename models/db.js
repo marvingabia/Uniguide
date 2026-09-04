@@ -1,10 +1,22 @@
 import { Sequelize } from 'sequelize';
 import { createRequire } from 'module';
 
-// Load mysql2 using CommonJS require.
-// This helps ensure Sequelize can access mysql2 in Vercel.
 const require = createRequire(import.meta.url);
-const mysql2 = require('mysql2');
+
+// Test mysql2 loading
+let mysql2;
+
+try {
+  mysql2 = require('mysql2');
+
+  console.log('✅ mysql2 loaded successfully');
+  console.log('📦 mysql2 path:', require.resolve('mysql2'));
+
+} catch (err) {
+  console.error('❌ MYSQL2 LOAD FAILED');
+  console.error(err);
+  throw err;
+}
 
 console.log('🔍 DB Config Check:');
 console.log(
@@ -82,11 +94,7 @@ try {
   console.log('✅ Sequelize configured successfully');
 
 } catch (err) {
-  console.error(
-    '❌ Database configuration error:',
-    err.message
-  );
-
+  console.error('❌ Database configuration error:', err.message);
   throw err;
 }
 
