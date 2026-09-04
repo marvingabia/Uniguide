@@ -8,8 +8,7 @@
     "start": "node --env-file=.env index.js",
     "predev": "node -e \"const{execSync}=require('child_process');try{const p=execSync('netstat -ano | findstr :3000 | findstr LISTENING').toString().trim().split(/\\s+/).pop();if(p)execSync(`taskkill /PID ${p} /F`,{stdio:'ignore'})}catch(e){}\"",
     "dev": "nodemon --env-file=.env index.js",
-    "seed": "node --env-file=.env seeders/createStaffAccounts.js",
-    "postinstall": "npm rebuild mysql2 || true"
+    "seed": "node --env-file=.env seeders/createStaffAccounts.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
