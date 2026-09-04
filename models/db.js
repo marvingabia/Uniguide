@@ -1,10 +1,13 @@
 import { Sequelize } from 'sequelize';
+import mysql2 from 'mysql2';
 
 console.log('🔍 DB Config Check:');
+
 console.log(
   '   DATABASE_URL:',
   process.env.DATABASE_URL ? '✓ Set' : '✗ Not set'
 );
+
 console.log(
   '   NODE_ENV:',
   process.env.NODE_ENV || 'development'
@@ -18,6 +21,7 @@ try {
 
     sequelize = new Sequelize(process.env.DATABASE_URL, {
       dialect: 'mysql',
+      dialectModule: mysql2,
 
       dialectOptions: {
         ssl: {
@@ -48,6 +52,7 @@ try {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 3306,
         dialect: 'mysql',
+        dialectModule: mysql2,
 
         dialectOptions: {
           ssl: {
