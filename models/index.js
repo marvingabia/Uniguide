@@ -46,18 +46,35 @@ Appointment.belongsTo(TimeSlot, { foreignKey: 'timeSlotId', as: 'assignedSlot' }
 
 export const syncDB = async () => {
   try {
+    console.log('🔄 Attempting database connection...');
+    
     // Test connection first
     await sequelize.authenticate();
     console.log('✅ Database connection successful');
     
+    console.log('🔄 Syncing database models...');
     // Then sync models
     await sequelize.sync({ alter: { drop: false } });
     console.log('✅ Database synced successfully');
+    
+    return true;
   } catch (err) {
-    console.error('❌ Database error:', err.message);
-    console.error('   Full error:', err);
-    // Don't exit - let the app start anyway so we can debug
-    // In production, you may want to fail here
+    console.error('❌ Database Error Details:');
+    console.error('   Message:', err.message);
+    console.error('   Code:', err.code);
+    console.error('   Errno:', err.errno);
+    if (err.sql) console.error('   SQL:', err.sql);
+    
+    // Try to provide helpful debugging info
+    if (err.message.includes('ECONNREFUSED')) {
+      console.error('   → Cannot connect to database host - check DATABASE_URL and network');
+    } else if (err.message.includes('ENOTFOUND')) {
+      console.error('   → Cannot resolve database hostname - check DATABASE_URL format');
+    } else if (err.message.includes('Access denied')) {
+      console.error('   → Authentication failed - check username and password in DATABASE_URL');
+    }
+    
+    return false;
   }
 };
 

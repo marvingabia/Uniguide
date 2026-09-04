@@ -140,7 +140,11 @@ app.set('view engine', 'xian');
 app.use('/', router);
 app.use((req, res) => res.status(404).render('404', { title: '404 — GuidanceConnect' }));
 
-syncDB().then(() => {
+syncDB().then((success) => {
+  if (!success) {
+    console.warn('⚠️  Database sync had issues, but app starting anyway');
+  }
+  
   const server = app.listen(PORT, () => {
     console.log(`🎓 MinSU GuidanceConnect running → http://localhost:${PORT}`);
   });
@@ -169,6 +173,9 @@ syncDB().then(() => {
     console.error('Server error:', err);
     process.exit(1);
   });
+}).catch((err) => {
+  console.error('Fatal error during startup:', err);
+  process.exit(1);
 });
 
 export default app;
