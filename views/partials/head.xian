@@ -72,7 +72,6 @@
     html {
       width: 100%;
       min-height: 100%;
-
       overflow-x: hidden;
     }
 
@@ -95,15 +94,17 @@
         sans-serif;
 
       overflow-x: hidden;
-
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
-
       overscroll-behavior-y: auto;
     }
 
 
+    /*
+     * Kapag bukas ang sidebar,
+     * hindi gagalaw ang background page.
+     */
     body.menu-open {
       overflow: hidden;
     }
@@ -129,7 +130,6 @@
       flex: 1 1 auto;
 
       min-width: 0;
-
       width: 100%;
 
       min-height: 100vh;
@@ -137,7 +137,6 @@
       background: #f0f4f8;
 
       overflow-x: hidden;
-
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -150,9 +149,7 @@
 
     .page-content {
       width: 100%;
-
       min-width: 0;
-
       padding: 20px;
     }
 
@@ -175,7 +172,6 @@
       display: flex;
 
       align-items: center;
-
       justify-content: space-between;
 
       min-height: 58px;
@@ -184,7 +180,6 @@
         0 1px 3px rgba(0,0,0,.05);
 
       position: relative;
-
       z-index: 50;
 
       flex-shrink: 0;
@@ -421,7 +416,6 @@
 
     .btn-outline:hover {
       background: #1b5e38;
-
       color: #fff;
     }
 
@@ -536,7 +530,8 @@
       overscroll-behavior-y: contain;
 
       transition:
-        transform .3s ease;
+        transform .3s ease,
+        box-shadow .3s ease;
     }
 
 
@@ -601,12 +596,186 @@
 
 
     /* =========================================================
+       NEW SIDEBAR TOGGLE
+       - hidden on login
+       - fixed sa left edge
+       - hindi sumasakop ng page habang sarado
+    ========================================================= */
+
+    #sidebar-toggle {
+      position: fixed;
+
+      left: 0;
+      top: 16px;
+
+      width: 42px;
+      height: 48px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      background: #1b5e38;
+
+      color: #fff;
+
+      border: none;
+
+      border-radius:
+        0 12px 12px 0;
+
+      cursor: pointer;
+
+      z-index: 1100;
+
+      box-shadow:
+        2px 3px 12px rgba(0,0,0,.22);
+
+      transition:
+        width .2s ease,
+        background .2s ease,
+        transform .2s ease;
+
+      touch-action: manipulation;
+
+      -webkit-tap-highlight-color:
+        transparent;
+    }
+
+
+    #sidebar-toggle:hover {
+      width: 46px;
+
+      background: #154d2f;
+    }
+
+
+    #sidebar-toggle:active {
+      transform: scale(.96);
+    }
+
+
+    #sidebar-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+
+    /*
+     * Kapag walang sidebar sa page,
+     * automatic na itatago ng JS ang button.
+     */
+    body.login-page #sidebar-toggle {
+      display: none !important;
+    }
+
+
+    /* =========================================================
+       SIDEBAR OVERLAY
+    ========================================================= */
+
+    #sidebar-overlay {
+      position: fixed;
+
+      inset: 0;
+
+      background:
+        rgba(0,0,0,.42);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      z-index: 1000;
+
+      transition:
+        opacity .25s ease,
+        visibility .25s ease;
+    }
+
+
+    #sidebar-overlay.active {
+      opacity: 1;
+
+      visibility: visible;
+
+      pointer-events: auto;
+    }
+
+
+    /* =========================================================
+       SIDEBAR DRAWER
+    ========================================================= */
+
+    .app-sidebar {
+      position: fixed !important;
+
+      left: 0;
+      top: 0;
+
+      width: 280px !important;
+
+      height: 100vh !important;
+
+      max-height: 100vh;
+
+      z-index: 1050;
+
+      transform:
+        translate3d(-100%,0,0);
+
+      transition:
+        transform .3s ease;
+
+      overflow-y: auto;
+
+      overflow-x: hidden;
+
+      -webkit-overflow-scrolling: touch;
+
+      box-shadow:
+        4px 0 18px rgba(0,0,0,.20);
+
+      touch-action: pan-y;
+
+      overscroll-behavior-y: contain;
+    }
+
+
+    .app-sidebar.sidebar-open {
+      transform:
+        translate3d(0,0,0);
+    }
+
+
+    /*
+     * Kapag bukas ang sidebar,
+     * ilipat ang toggle sa loob/kanang edge ng sidebar.
+     */
+    body.menu-open #sidebar-toggle {
+      left: 280px;
+
+      top: 16px;
+
+      border-radius:
+        0 10px 10px 0;
+
+      width: 38px;
+
+      box-shadow:
+        3px 3px 10px rgba(0,0,0,.18);
+    }
+
+
+    /* =========================================================
        TABLE
     ========================================================= */
 
     table {
       width: 100%;
-
       border-collapse: collapse;
     }
 
@@ -895,61 +1064,7 @@
 
 
     /* =========================================================
-       MOBILE MENU
-    ========================================================= */
-
-    #mobile-menu-toggle {
-      display: none;
-
-      position: fixed;
-
-      top: 12px;
-
-      left: 12px;
-
-      z-index: 100;
-
-      background: #1b5e38;
-
-      color: #fff;
-
-      border: none;
-
-      padding:
-        10px 14px;
-
-      border-radius: 8px;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 2px 8px rgba(0,0,0,.15);
-
-      touch-action: manipulation;
-
-      -webkit-tap-highlight-color:
-        transparent;
-    }
-
-
-    #mobile-menu-overlay {
-      display: none;
-
-      position: fixed;
-
-      inset: 0;
-
-      background:
-        rgba(0,0,0,.5);
-
-      z-index: 98;
-
-      touch-action: none;
-    }
-
-
-    /* =========================================================
-       MOBILE — 640px DOWN
+       MOBILE
     ========================================================= */
 
     @media (max-width: 640px) {
@@ -959,56 +1074,26 @@
       }
 
 
-      #mobile-menu-toggle {
-        display: flex;
+      #sidebar-toggle {
+        top: 12px;
 
-        align-items: center;
+        width: 40px;
+        height: 46px;
 
-        justify-content: center;
+        border-radius:
+          0 10px 10px 0;
       }
 
 
-      #mobile-menu-overlay.active {
-        display: block;
-      }
-
-
-      aside {
-        position: fixed !important;
-
-        left: 0;
-
-        top: 0;
-
+      .app-sidebar {
         width: 280px !important;
-
-        height: 100vh !important;
-
-        max-height: 100vh;
-
-        z-index: 99;
-
-        transform:
-          translate3d(-100%,0,0);
-
-        box-shadow:
-          2px 0 10px rgba(0,0,0,.2);
-
-        overflow-y: auto;
-
-        overflow-x: hidden;
-
-        -webkit-overflow-scrolling: touch;
-
-        touch-action: pan-y;
-
-        overscroll-behavior-y: contain;
       }
 
 
-      aside.mobile-active {
-        transform:
-          translate3d(0,0,0);
+      body.menu-open #sidebar-toggle {
+        left: 280px;
+
+        width: 38px;
       }
 
 
@@ -1041,12 +1126,6 @@
         -webkit-overflow-scrolling: touch;
       }
 
-
-      /*
-       * IMPORTANT:
-       * Do not force h-screen flex containers
-       * into a conflicting scrolling structure.
-       */
 
       .flex.h-screen {
         display: block !important;
@@ -1327,8 +1406,6 @@
       }
 
 
-      /* IMAGES */
-
       img {
         max-width:
           100%;
@@ -1342,8 +1419,6 @@
       }
 
 
-      /* EMPTY */
-
       .empty-applications {
         padding-top:
           50px;
@@ -1356,64 +1431,21 @@
 
 
     /* =========================================================
-       TABLET — 641px TO 768px
+       TABLET
     ========================================================= */
 
     @media
       (min-width: 641px)
       and
-      (max-width: 768px) {
+      (max-width: 1024px) {
 
-      #mobile-menu-toggle {
+      #sidebar-toggle {
         display: flex;
-
-        align-items: center;
-
-        justify-content: center;
       }
 
 
-      #mobile-menu-overlay.active {
-        display: block;
-      }
-
-
-      aside {
-        position: fixed !important;
-
-        left: 0;
-
-        top: 0;
-
+      .app-sidebar {
         width: 280px !important;
-
-        height: 100vh !important;
-
-        z-index: 99;
-
-        transform:
-          translate3d(-100%,0,0);
-
-        overflow-y: auto;
-
-        overflow-x: hidden;
-
-        -webkit-overflow-scrolling: touch;
-
-        touch-action: pan-y;
-      }
-
-
-      aside.mobile-active {
-        transform:
-          translate3d(0,0,0);
-      }
-
-
-      .app-shell {
-        display: block;
-
-        min-height: 100vh;
       }
 
 
@@ -1488,71 +1520,13 @@
 
 
     /* =========================================================
-       TABLET LANDSCAPE
-    ========================================================= */
-
-    @media
-      (min-width: 769px)
-      and
-      (max-width: 1024px) {
-
-      aside {
-        width: 200px !important;
-      }
-
-
-      .page-content {
-        padding: 18px;
-      }
-
-
-      .nav-top {
-        padding:
-          12px 20px;
-      }
-
-
-      .application-filters {
-        flex-wrap: wrap;
-      }
-
-
-      .filter-search {
-        max-width: 280px;
-      }
-
-
-      .applications-table {
-        min-width: 980px;
-      }
-
-    }
-
-
-    /* =========================================================
        DESKTOP
     ========================================================= */
 
     @media (min-width: 1025px) {
 
-      #mobile-menu-toggle,
-      #mobile-menu-overlay {
-        display: none !important;
-      }
-
-
-      aside {
-        position: sticky !important;
-
-        top: 0;
-
-        height: 100vh;
-
-        transform: none !important;
-
-        overflow-y: auto;
-
-        overflow-x: hidden;
+      .app-sidebar {
+        width: 280px !important;
       }
 
 
@@ -1608,7 +1582,7 @@
       and
       (orientation: landscape) {
 
-      aside {
+      .app-sidebar {
         overflow-y: auto;
 
         -webkit-overflow-scrolling:
@@ -1631,8 +1605,8 @@
 
     @media print {
 
-      #mobile-menu-toggle,
-      #mobile-menu-overlay,
+      #sidebar-toggle,
+      #sidebar-overlay,
       .sidebar-link,
       .nav-top,
       button {
@@ -1680,282 +1654,250 @@
 
 <body>
 
+<script>
 
-  <!-- =======================================================
-       MOBILE MENU BUTTON
-  ======================================================== -->
-
-  <button
-    id="mobile-menu-toggle"
-    onclick="toggleMobileMenu()"
-    aria-label="Toggle Menu"
-    type="button"
-  >
-
-    <svg
-      width="24"
-      height="24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-
-      <line
-        x1="3"
-        y1="12"
-        x2="21"
-        y2="12"
-      ></line>
-
-      <line
-        x1="3"
-        y1="6"
-        x2="21"
-        y2="6"
-      ></line>
-
-      <line
-        x1="3"
-        y1="18"
-        x2="21"
-        y2="18"
-      ></line>
-
-    </svg>
-
-  </button>
-
-
-
-  <!-- =======================================================
-       MOBILE MENU OVERLAY
-  ======================================================== -->
-
-  <div
-    id="mobile-menu-overlay"
-    onclick="closeMobileMenu()"
-  ></div>
-
-
-
-  <!-- =======================================================
-       MOBILE MENU SCRIPT
-  ======================================================== -->
-
-  <script>
-
-    function toggleMobileMenu() {
+  /*
+   * Mark login pages automatically.
+   *
+   * Dahil walang <aside> sa login page,
+   * hindi lalabas ang sidebar button doon.
+   */
+  document.addEventListener(
+    'DOMContentLoaded',
+    function () {
 
       const sidebar =
-        document.querySelector('aside');
+        document.querySelector('.app-sidebar');
 
-      const overlay =
-        document.getElementById(
-          'mobile-menu-overlay'
+      const toggle =
+        document.getElementById('sidebar-toggle');
+
+      if (!sidebar && toggle) {
+        toggle.style.display = 'none';
+      }
+
+    }
+  );
+
+
+  /*
+   * OPEN / CLOSE SIDEBAR
+   */
+  function toggleSidebar() {
+
+    const sidebar =
+      document.querySelector('.app-sidebar');
+
+    const overlay =
+      document.getElementById('sidebar-overlay');
+
+    const toggle =
+      document.getElementById('sidebar-toggle');
+
+    if (!sidebar) return;
+
+
+    const isOpen =
+      sidebar.classList.contains('sidebar-open');
+
+
+    if (isOpen) {
+
+      closeSidebar();
+
+    } else {
+
+      sidebar.classList.add('sidebar-open');
+
+      if (overlay) {
+        overlay.classList.add('active');
+      }
+
+      document.body.classList.add('menu-open');
+
+
+      if (toggle) {
+        toggle.setAttribute(
+          'aria-expanded',
+          'true'
         );
-
-      const body =
-        document.body;
-
-      if (!sidebar) return;
-
-
-      const isOpen =
-        sidebar.classList.contains(
-          'mobile-active'
-        );
-
-
-      if (isOpen) {
-
-        closeMobileMenu();
-
-      } else {
-
-        sidebar.classList.add(
-          'mobile-active'
-        );
-
-
-        if (overlay) {
-
-          overlay.classList.add(
-            'active'
-          );
-
-        }
-
-
-        body.classList.add(
-          'menu-open'
-        );
-
       }
 
     }
 
+  }
 
 
-    function closeMobileMenu() {
+  /*
+   * CLOSE SIDEBAR
+   */
+  function closeSidebar() {
 
-      const sidebar =
-        document.querySelector('aside');
+    const sidebar =
+      document.querySelector('.app-sidebar');
 
-      const overlay =
-        document.getElementById(
-          'mobile-menu-overlay'
-        );
+    const overlay =
+      document.getElementById('sidebar-overlay');
 
-      const body =
-        document.body;
-
-
-      if (sidebar) {
-
-        sidebar.classList.remove(
-          'mobile-active'
-        );
-
-      }
+    const toggle =
+      document.getElementById('sidebar-toggle');
 
 
-      if (overlay) {
+    if (sidebar) {
 
-        overlay.classList.remove(
-          'active'
-        );
-
-      }
-
-
-      body.classList.remove(
-        'menu-open'
+      sidebar.classList.remove(
+        'sidebar-open'
       );
 
     }
 
 
+    if (overlay) {
 
-    document.addEventListener(
-      'DOMContentLoaded',
-      function () {
+      overlay.classList.remove(
+        'active'
+      );
 
-
-        /* ===================================================
-           SIDEBAR LINKS
-        =================================================== */
-
-        const sidebarLinks =
-          document.querySelectorAll(
-            '.sidebar-link'
-          );
+    }
 
 
-        sidebarLinks.forEach(
-          function (link) {
+    document.body.classList.remove(
+      'menu-open'
+    );
 
-            link.addEventListener(
-              'click',
-              function () {
 
-                if (
-                  window.innerWidth <= 1024
-                ) {
+    if (toggle) {
 
-                  closeMobileMenu();
+      toggle.setAttribute(
+        'aria-expanded',
+        'false'
+      );
 
-                }
+    }
 
-              }
-            );
+  }
 
-          }
+
+  /*
+   * BACKWARD COMPATIBILITY
+   *
+   * Kung may ibang page na tumatawag pa
+   * sa old function name.
+   */
+  function toggleMobileMenu() {
+    toggleSidebar();
+  }
+
+
+  function closeMobileMenu() {
+    closeSidebar();
+  }
+
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+      /*
+       * SIDEBAR LINKS
+       *
+       * Kapag pumili ng page,
+       * magsasara ang sidebar.
+       */
+      const sidebarLinks =
+        document.querySelectorAll(
+          '.app-sidebar .sidebar-link'
         );
 
 
+      sidebarLinks.forEach(
+        function (link) {
 
-        /* ===================================================
-           RESIZE
-        =================================================== */
-
-        let resizeTimer;
-
-
-        window.addEventListener(
-          'resize',
-          function () {
-
-            clearTimeout(
-              resizeTimer
-            );
-
-
-            resizeTimer =
-              setTimeout(
-                function () {
-
-                  if (
-                    window.innerWidth > 1024
-                  ) {
-
-                    closeMobileMenu();
-
-                  }
-
-                },
-                150
-              );
-
-          }
-        );
-
-
-        /* ===================================================
-           ESC KEY
-        =================================================== */
-
-        document.addEventListener(
-          'keydown',
-          function (event) {
-
-            if (
-              event.key === 'Escape'
-            ) {
-
-              closeMobileMenu();
-
-            }
-
-          }
-        );
-
-
-        /* ===================================================
-           CLOSE SIDEBAR WHEN CLICKING OVERLAY
-        =================================================== */
-
-        const overlay =
-          document.getElementById(
-            'mobile-menu-overlay'
-          );
-
-
-        if (overlay) {
-
-          overlay.addEventListener(
+          link.addEventListener(
             'click',
             function () {
 
-              closeMobileMenu();
+              closeSidebar();
 
             }
           );
 
         }
+      );
+
+
+      /*
+       * ESC KEY
+       */
+      document.addEventListener(
+        'keydown',
+        function (event) {
+
+          if (event.key === 'Escape') {
+
+            closeSidebar();
+
+          }
+
+        }
+      );
+
+
+      /*
+       * OVERLAY CLICK
+       */
+      const overlay =
+        document.getElementById(
+          'sidebar-overlay'
+        );
+
+
+      if (overlay) {
+
+        overlay.addEventListener(
+          'click',
+          function () {
+
+            closeSidebar();
+
+          }
+        );
 
       }
-    );
 
-  </script>
+
+      /*
+       * RESIZE
+       *
+       * Isara kapag nag-resize para
+       * walang naiwan na open state.
+       */
+      let resizeTimer;
+
+
+      window.addEventListener(
+        'resize',
+        function () {
+
+          clearTimeout(
+            resizeTimer
+          );
+
+
+          resizeTimer =
+            setTimeout(
+              function () {
+
+                closeSidebar();
+
+              },
+              150
+            );
+
+        }
+      );
+
+    }
+  );
+
+</script>

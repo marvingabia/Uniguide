@@ -1,96 +1,461 @@
 {{> head}}
 
-<!-- Full-screen background: MinSU campus image -->
-<div class="min-h-screen flex items-center justify-center relative overflow-hidden">
+<!-- =========================================================
+     FULL SCREEN LOGIN BACKGROUND
+========================================================= -->
+
+<div
+  class="min-h-screen flex items-center justify-center relative overflow-hidden"
+>
+
 
   <!-- Background Image -->
-  <img src="/uploads/MINSU.png" alt="MinSU Bongabong Campus"
-       class="absolute inset-0 w-full h-full object-cover">
 
-  <!-- Dark overlay on top of image -->
-  <div class="absolute inset-0" style="background:rgba(0,0,0,0.55);"></div>
+  <img
+    src="/uploads/MINSU.png"
+    alt="MinSU Bongabong Campus"
+    class="absolute inset-0 w-full h-full object-cover"
+  >
 
-  <!-- Centered Login Card (transparent / glassmorphism) -->
-  <div class="relative z-10 w-full max-w-md mx-4">
 
-    <!-- School branding above the card -->
-    <div class="text-center mb-6">
-      <div class="inline-flex items-center justify-center w-28 h-28 rounded-full border-2 border-green-400 mb-3"
-           style="background:rgba(0,80,0,0.45);">
-        <img src="/uploads/minsulogo.png" alt="MinSU Logo" class="w-24 h-24 object-contain rounded-full">
+  <!-- Dark Overlay -->
+
+  <div
+    class="absolute inset-0"
+    style="
+      background:rgba(0,0,0,0.55);
+    "
+  ></div>
+
+
+  <!-- =======================================================
+       LOGIN CARD
+  ======================================================== -->
+
+  <div
+    class="relative z-10 w-full max-w-md mx-4"
+  >
+
+
+    <!-- =====================================================
+         SCHOOL BRANDING
+    ====================================================== -->
+
+    <div
+      class="text-center mb-6"
+    >
+
+      <div
+        class="
+          inline-flex
+          items-center
+          justify-center
+          w-28
+          h-28
+          rounded-full
+          border-2
+          border-green-400
+          mb-3
+        "
+        style="
+          background:rgba(0,80,0,0.45);
+        "
+      >
+
+        <img
+          src="/uploads/minsulogo.png"
+          alt="MinSU Logo"
+          class="
+            w-24
+            h-24
+            object-contain
+            rounded-full
+          "
+        >
+
       </div>
-      <h1 class="text-green-700 font-bold text-2xl drop-shadow">Mindoro State University</h1>
-      <p class="text-green-700 font-semibold text-base drop-shadow">Bongabong Campus</p>
+
+
+      <h1
+        class="
+          text-green-700
+          font-bold
+          text-2xl
+          drop-shadow
+        "
+      >
+        Mindoro State University
+      </h1>
+
+
+      <p
+        class="
+          text-green-700
+          font-semibold
+          text-base
+          drop-shadow
+        "
+      >
+        Bongabong Campus
+      </p>
+
     </div>
 
-    <!-- Transparent form card -->
-    <div class="rounded-2xl px-8 py-10 shadow-2xl"
-         style="background:rgba(255,255,255,0.10);
-                backdrop-filter:blur(14px);
-                -webkit-backdrop-filter:blur(14px);
-                border:1px solid rgba(255,255,255,0.20);">
 
-      <h2 class="text-2xl font-bold text-white mb-1">Welcome back</h2>
-      <p class="text-gray-300 text-sm font-bold mb-6">Sign in to your account to continue</p>
+    <!-- =====================================================
+         FORM CARD
+    ====================================================== -->
+
+    <div
+      class="
+        rounded-2xl
+        px-8
+        py-10
+        shadow-2xl
+      "
+      style="
+        background:rgba(255,255,255,0.10);
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
+        border:1px solid rgba(255,255,255,0.20);
+      "
+    >
+
+
+      <h2
+        class="
+          text-2xl
+          font-bold
+          text-white
+          mb-1
+        "
+      >
+        Welcome back
+      </h2>
+
+
+      <p
+        class="
+          text-gray-300
+          text-sm
+          font-bold
+          mb-6
+        "
+      >
+        Sign in to your account to continue
+      </p>
+
 
       {{> flash}}
 
-      <form action="/login" method="POST" class="space-y-4" autocomplete="off">
+
+      <!-- ===================================================
+           LOGIN FORM
+      ==================================================== -->
+
+      <form
+        action="/login"
+        method="POST"
+        class="space-y-4"
+        autocomplete="off"
+      >
+
+
+        <!-- Email -->
+
         <div>
-          <label class="block text-gray-200 text-sm font-bold mb-1">Email Address</label>
-          <input type="email" name="email" autocomplete="username"
-                 class="w-full rounded-lg px-4 py-2.5 text-white text-sm outline-none
-                        focus:ring-2 focus:ring-green-400 placeholder-gray-400"
-                 style="background:rgba(0,0,0,0.40); border:1px solid rgba(255,255,255,0.25);"
-                 placeholder="yourname@minsu.edu.ph" required autofocus>
+
+          <label
+            class="
+              block
+              text-gray-200
+              text-sm
+              font-bold
+              mb-1
+            "
+          >
+            Email Address
+          </label>
+
+
+          <input
+            type="email"
+            name="email"
+            autocomplete="username"
+            class="
+              w-full
+              rounded-lg
+              px-4
+              py-2.5
+              text-white
+              text-sm
+              outline-none
+              focus:ring-2
+              focus:ring-green-400
+              placeholder-gray-400
+            "
+            style="
+              background:rgba(0,0,0,0.40);
+              border:1px solid rgba(255,255,255,0.25);
+            "
+            placeholder="yourname@minsu.edu.ph"
+            required
+            autofocus
+          >
+
         </div>
+
+
+        <!-- Password -->
+
         <div>
-          <label class="block text-gray-200 text-sm font-bold mb-1">Password</label>
-          <input type="password" name="password" autocomplete="current-password"
-                 class="w-full rounded-lg px-4 py-2.5 text-white text-sm outline-none
-                        focus:ring-2 focus:ring-green-400 placeholder-gray-400"
-                 style="background:rgba(0,0,0,0.40); border:1px solid rgba(255,255,255,0.25);"
-                 placeholder="••••••••" required>
+
+          <label
+            class="
+              block
+              text-gray-200
+              text-sm
+              font-bold
+              mb-1
+            "
+          >
+            Password
+          </label>
+
+
+          <input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            class="
+              w-full
+              rounded-lg
+              px-4
+              py-2.5
+              text-white
+              text-sm
+              outline-none
+              focus:ring-2
+              focus:ring-green-400
+              placeholder-gray-400
+            "
+            style="
+              background:rgba(0,0,0,0.40);
+              border:1px solid rgba(255,255,255,0.25);
+            "
+            placeholder="••••••••"
+            required
+          >
+
         </div>
-        <button type="submit"
-                class="w-full py-3 rounded-lg font-bold text-white text-base mt-2 transition-all
-                       hover:opacity-90 active:scale-95"
-                style="background:linear-gradient(135deg,#166534,#15803d);">
+
+
+        <!-- Sign In -->
+
+        <button
+          type="submit"
+          class="
+            w-full
+            py-3
+            rounded-lg
+            font-bold
+            text-white
+            text-base
+            mt-2
+            transition-all
+            hover:opacity-90
+            active:scale-95
+          "
+          style="
+            background:
+              linear-gradient(
+                135deg,
+                #166534,
+                #15803d
+              );
+          "
+        >
           Sign In
         </button>
+
       </form>
 
-      <!-- Divider -->
-      <div class="flex items-center my-5">
-        <div class="flex-1 border-t" style="border-color:rgba(255,255,255,0.2);"></div>
-        <span class="mx-3 text-gray-400 text-xs font-bold uppercase tracking-widest">or</span>
-        <div class="flex-1 border-t" style="border-color:rgba(255,255,255,0.2);"></div>
+
+      <!-- ===================================================
+           DIVIDER
+      ==================================================== -->
+
+      <div
+        class="flex items-center my-5"
+      >
+
+        <div
+          class="flex-1 border-t"
+          style="
+            border-color:
+              rgba(255,255,255,0.2);
+          "
+        ></div>
+
+
+        <span
+          class="
+            mx-3
+            text-gray-400
+            text-xs
+            font-bold
+            uppercase
+            tracking-widest
+          "
+        >
+          or
+        </span>
+
+
+        <div
+          class="flex-1 border-t"
+          style="
+            border-color:
+              rgba(255,255,255,0.2);
+          "
+        ></div>
+
       </div>
 
-      <!-- Continue with Google -->
-      <a href="/auth/google"
-         class="flex items-center justify-center gap-3 w-full py-2.5 rounded-lg font-semibold text-sm transition-all hover:opacity-90 active:scale-95"
-         style="background:rgba(255,255,255,0.92); color:#1f2937;">
-        <!-- Google SVG icon -->
-        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 48 48">
-          <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.1c-.6 3-2.3 5.5-4.8 7.2v6h7.7c4.5-4.2 7.5-10.3 7.5-17.5z"/>
-          <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.1 1.4-4.9 2.3-8.2 2.3-6.3 0-11.6-4.2-13.5-10H2.5v6.2C6.5 42.8 14.7 48 24 48z"/>
-          <path fill="#FBBC05" d="M10.5 28.5c-.5-1.4-.8-3-.8-4.5s.3-3.1.8-4.5v-6.2H2.5C.9 16.6 0 20.2 0 24s.9 7.4 2.5 10.7l8-6.2z"/>
-          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.7 0 6.5 5.2 2.5 13.3l8 6.2C12.4 13.7 17.7 9.5 24 9.5z"/>
+
+      <!-- ===================================================
+           GOOGLE LOGIN
+      ==================================================== -->
+
+      <a
+        href="/auth/google"
+        class="
+          flex
+          items-center
+          justify-center
+          gap-3
+          w-full
+          py-2.5
+          rounded-lg
+          font-semibold
+          text-sm
+          transition-all
+          hover:opacity-90
+          active:scale-95
+        "
+        style="
+          background:rgba(255,255,255,0.92);
+          color:#1f2937;
+        "
+      >
+
+        <svg
+          class="w-5 h-5 flex-shrink-0"
+          viewBox="0 0 48 48"
+        >
+
+          <path
+            fill="#4285F4"
+            d="
+              M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.1
+              c-.6 3-2.3 5.5-4.8 7.2v6h7.7
+              c4.5-4.2 7.5-10.3 7.5-17.5z
+            "
+          />
+
+          <path
+            fill="#34A853"
+            d="
+              M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6
+              c-2.1 1.4-4.9 2.3-8.2 2.3
+              -6.3 0-11.6-4.2-13.5-10H2.5v6.2
+              C6.5 42.8 14.7 48 24 48z
+            "
+          />
+
+          <path
+            fill="#FBBC05"
+            d="
+              M10.5 28.5c-.5-1.4-.8-3-.8-4.5
+              s.3-3.1.8-4.5v-6.2H2.5
+              C.9 16.6 0 20.2 0 24
+              s.9 7.4 2.5 10.7l8-6.2z
+            "
+          />
+
+          <path
+            fill="#EA4335"
+            d="
+              M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8
+              C35.9 2.4 30.4 0 24 0
+              14.7 0 6.5 5.2 2.5 13.3l8 6.2
+              C12.4 13.7 17.7 9.5 24 9.5z
+            "
+          />
+
         </svg>
+
+
         Continue with Google
+
       </a>
 
-      <p class="text-center text-gray-300 text-sm font-bold mt-5">
+
+      <!-- ===================================================
+           REGISTER
+      ==================================================== -->
+
+      <p
+        class="
+          text-center
+          text-gray-300
+          text-sm
+          font-bold
+          mt-5
+        "
+      >
+
         No account yet?
-        <a href="/register" class="text-green-700 hover:text-green-200 font-bold">Register as Student</a>
+
+        <a
+          href="/register"
+          class="
+            text-green-700
+            hover:text-green-200
+            font-bold
+          "
+        >
+          Register as Student
+        </a>
+
       </p>
 
-      <p class="text-center text-gray-400 text-xs font-bold mt-6">
-        Mindoro State University — Bongabong Campus<br>Guidance Office Management System
+
+      <!-- ===================================================
+           FOOTER
+      ==================================================== -->
+
+      <p
+        class="
+          text-center
+          text-gray-400
+          text-xs
+          font-bold
+          mt-6
+        "
+      >
+
+        Mindoro State University — Bongabong Campus<br>
+        Guidance Office Management System
+
       </p>
+
+
     </div>
+
   </div>
 
 </div>
-</body></html>
+
+</body>
+</html>

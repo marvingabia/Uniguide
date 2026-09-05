@@ -1,59 +1,357 @@
 {{> head}}
+
 <div class="flex h-screen overflow-hidden">
-  {{> sidebar-student activePage="Home"}}
+
+  {{> sidebar-student activePage="home"}}
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
+
+    <!-- Top Navigation -->
     <div class="nav-top">
+
       <div>
-        <h1 class="text-base font-bold text-slate-800">UniGuid Student Home</h1>
-        <p class="text-gray-600 text-xs">Good Moral Certificate Application Portal</p>
+
+        <h1 class="text-base font-bold text-slate-800">
+          UniGuid Student Home
+        </h1>
+
+        <p class="text-gray-600 text-xs">
+          Good Moral Certificate Application Portal
+        </p>
+
       </div>
+
+      <div class="flex items-center gap-3">
+
+        {{#if unreadNotifCount}}
+          <span class="badge badge-submitted">
+            {{unreadNotifCount}} new
+          </span>
+        {{/if}}
+
+        <span class="text-teal-700 text-sm font-medium">
+          👤 {{user.firstName}} {{user.lastName}}
+        </span>
+
+      </div>
+
     </div>
 
     <div class="px-6 py-5">
+
       {{> flash}}
 
       <!-- Welcome Banner -->
-      <div class="card mb-5 flex items-center gap-4" style="background:linear-gradient(135deg,#e8f5ee,#f0fdf4);border-color:#86efac">
-        <div class="w-14 h-14 rounded-full bg-green-800 flex items-center justify-center text-2xl shrink-0">🎓</div>
-        <div>
-          <h2 class="text-slate-800 font-bold text-lg">Welcome, {{user.firstName}}!</h2>
-          <p class="text-teal-700 text-sm font-medium">Track your Good Moral Certificate requests below.</p>
-          {{#if user.course}}<p class="text-gray-500 text-xs mt-0.5">{{user.course}} {{user.yearLevel}} — {{user.studentId}}</p>{{/if}}
+      <div
+        class="card mb-5 flex items-center gap-4"
+        style="
+          background:linear-gradient(135deg,#e8f5ee,#f0fdf4);
+          border-color:#86efac;
+        "
+      >
+
+        <div class="
+          w-14
+          h-14
+          rounded-full
+          bg-green-800
+          flex
+          items-center
+          justify-center
+          text-2xl
+          shrink-0
+        ">
+          🎓
         </div>
+
+        <div>
+
+          <h2 class="text-slate-800 font-bold text-lg">
+            Welcome, {{user.firstName}}!
+          </h2>
+
+          <p class="text-teal-700 text-sm font-medium">
+            Track your Good Moral Certificate requests below.
+          </p>
+
+          {{#if user.course}}
+
+          <p class="text-gray-500 text-xs mt-0.5">
+            {{user.course}}
+            {{user.yearLevel}}
+            —
+            {{user.studentId}}
+          </p>
+
+          {{/if}}
+
+        </div>
+
       </div>
 
-      <!-- Stat Cards -->
+      <!-- Statistics -->
       <div class="grid grid-cols-3 gap-4 mb-6">
+
+        <!-- Total -->
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+
+          <div class="
+            w-11
+            h-11
+            rounded-xl
+            bg-green-100
+            flex
+            items-center
+            justify-center
+            shrink-0
+          ">
+
+            <svg
+              class="w-5 h-5 text-green-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+
           </div>
+
           <div>
-            <p class="text-xl font-bold text-slate-800">{{applications.length}}</p>
-            <p class="text-slate-700 text-sm font-semibold">Total Requests</p>
+
+            <p class="text-xl font-bold text-slate-800">
+              {{applications.length}}
+            </p>
+
+            <p class="text-slate-700 text-sm font-semibold">
+              Total Requests
+            </p>
+
           </div>
+
         </div>
+
+        <!-- In Progress -->
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+
+          <div class="
+            w-11
+            h-11
+            rounded-xl
+            bg-yellow-100
+            flex
+            items-center
+            justify-center
+            shrink-0
+          ">
+
+            <svg
+              class="w-5 h-5 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+
           </div>
+
           <div>
-            <p class="text-xl font-bold text-yellow-600">{{activeCount}}</p>
-            <p class="text-slate-700 text-sm font-semibold">In Progress</p>
+
+            <p class="text-xl font-bold text-yellow-600">
+              {{activeCount}}
+            </p>
+
+            <p class="text-slate-700 text-sm font-semibold">
+              In Progress
+            </p>
+
           </div>
+
         </div>
+
+        <!-- Released -->
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+
+          <div class="
+            w-11
+            h-11
+            rounded-xl
+            bg-green-100
+            flex
+            items-center
+            justify-center
+            shrink-0
+          ">
+
+            <svg
+              class="w-5 h-5 text-green-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+
           </div>
+
           <div>
-            <p class="text-xl font-bold text-green-700">{{releasedCount}}</p>
-            <p class="text-slate-700 text-sm font-semibold">Released</p>
+
+            <p class="text-xl font-bold text-green-700">
+              {{releasedCount}}
+            </p>
+
+            <p class="text-slate-700 text-sm font-semibold">
+              Released
+            </p>
+
           </div>
+
         </div>
+
       </div>
+
+      <!-- Recent Requests -->
+      <div class="card">
+
+        <div class="flex items-center justify-between mb-4">
+
+          <div>
+
+            <h2 class="font-bold text-slate-800">
+              📋 My Recent Requests
+            </h2>
+
+            <p class="text-gray-500 text-xs">
+              Monitor the status of your document requests.
+            </p>
+
+          </div>
+
+          <a
+            href="/student/history"
+            class="text-green-700 text-xs font-semibold hover:underline"
+          >
+            View All →
+          </a>
+
+        </div>
+
+        {{#if applications.length}}
+
+        <div class="overflow-x-auto">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>#</th>
+                <th>Request</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {{#each applications}}
+
+              <tr>
+
+                <td class="text-gray-500 text-xs">
+                  {{this.id}}
+                </td>
+
+                <td>
+
+                  <div class="text-slate-800 text-sm font-medium">
+                    Document Request
+                  </div>
+
+                  <div class="text-gray-500 text-xs">
+
+                    {{#if (gt this.qtyGoodMoral 0)}}
+                      Good Moral: {{this.qtyGoodMoral}}
+                    {{/if}}
+
+                    {{#if (gt this.qtyCTC 0)}}
+                      {{#if (gt this.qtyGoodMoral 0)}} · {{/if}}
+                      CTC/Auth: {{this.qtyCTC}}
+                    {{/if}}
+
+                  </div>
+
+                </td>
+
+                <td>
+
+                  <span class="badge">
+                    {{this.status}}
+                  </span>
+
+                </td>
+
+                <td class="text-gray-500 text-xs">
+                  {{formatDate this.createdAt}}
+                </td>
+
+              </tr>
+
+              {{/each}}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {{else}}
+
+        <div class="text-center py-10">
+
+          <div class="text-4xl mb-2">
+            📄
+          </div>
+
+          <p class="text-gray-500 text-sm">
+            You don't have any requests yet.
+          </p>
+
+          <a
+            href="/student/apply"
+            class="btn-green btn-sm inline-block mt-3"
+          >
+            Create Request
+          </a>
+
+        </div>
+
+        {{/if}}
+
+      </div>
+
     </div>
+
   </div>
+
 </div>
-</body></html>
+
+</body>
+</html>

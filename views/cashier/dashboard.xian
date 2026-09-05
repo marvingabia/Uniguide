@@ -1,134 +1,411 @@
 {{> head}}
+
 <div class="flex h-screen overflow-hidden">
-  {{> sidebar-cashier activePage="Home"}}
+
+  {{> sidebar-cashier activePage="home"}}
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
+
+    <!-- Top Navigation -->
     <div class="nav-top">
+
       <div>
-        <h1 class="text-base font-bold text-slate-800">UniGuid Cashier Home</h1>
-        <p class="text-gray-600 text-xs">Payment Verification & Receipt Management</p>
+
+        <h1 class="text-base font-bold text-slate-800">
+          UniGuid Cashier Home
+        </h1>
+
+        <p class="text-gray-600 text-xs">
+          Payment Verification & Receipt Management
+        </p>
+
       </div>
+
       <div class="flex items-center gap-3">
-        {{#if unreadNotifCount}}<span class="badge badge-submitted">{{unreadNotifCount}} new</span>{{/if}}
-        <span class="text-teal-700 text-sm font-medium">👤 {{user.firstName}} {{user.lastName}}</span>
+
+        {{#if unreadNotifCount}}
+          <span class="badge badge-submitted">
+            {{unreadNotifCount}} new
+          </span>
+        {{/if}}
+
+        <span class="text-teal-700 text-sm font-medium">
+          👤 {{user.firstName}} {{user.lastName}}
+        </span>
+
       </div>
+
     </div>
 
     <div class="px-5 py-5">
+
       {{> flash}}
 
-      <!-- Stat Cards -->
+      <!-- Statistics -->
       <div class="grid grid-cols-4 gap-4 mb-6">
+
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0">💳</div>
-          <div><p class="text-xl font-bold text-yellow-600">{{pendingCount}}</p><p class="text-gray-500 text-xs">Payment Submitted</p></div>
+
+          <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0">
+            💳
+          </div>
+
+          <div>
+            <p class="text-xl font-bold text-yellow-600">
+              {{pendingCount}}
+            </p>
+
+            <p class="text-gray-500 text-xs">
+              Payment Submitted
+            </p>
+          </div>
+
         </div>
+
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">🧾</div>
-          <div><p class="text-xl font-bold text-green-700">{{receiptedCount}}</p><p class="text-gray-500 text-xs">Receipt Issued</p></div>
+
+          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+            🧾
+          </div>
+
+          <div>
+            <p class="text-xl font-bold text-green-700">
+              {{receiptedCount}}
+            </p>
+
+            <p class="text-gray-500 text-xs">
+              Receipt Issued
+            </p>
+          </div>
+
         </div>
+
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">📑</div>
-          <div><p class="text-xl font-bold text-purple-600">{{pendingCount}}</p><p class="text-gray-500 text-xs">Awaiting Action</p></div>
+
+          <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+            📑
+          </div>
+
+          <div>
+            <p class="text-xl font-bold text-purple-600">
+              {{pendingCount}}
+            </p>
+
+            <p class="text-gray-500 text-xs">
+              Awaiting Action
+            </p>
+          </div>
+
         </div>
+
         <div class="card flex items-center gap-4">
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">💰</div>
-          <div><p class="text-xl font-bold text-slate-800">{{currency dailyTotal}}</p><p class="text-gray-500 text-xs">Today's Collection</p></div>
+
+          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+            💰
+          </div>
+
+          <div>
+            <p class="text-xl font-bold text-slate-800">
+              {{currency dailyTotal}}
+            </p>
+
+            <p class="text-gray-500 text-xs">
+              Today's Collection
+            </p>
+          </div>
+
         </div>
+
       </div>
 
       <!-- Tabs -->
       <div class="flex gap-1 mb-4 border-b border-slate-200">
-        <button onclick="showTab('pending')"   id="tab-pending"   class="tab-active   px-5 py-2 text-sm font-semibold rounded-t-lg">
-          Payment Submitted <span class="ml-1 badge badge-submitted">{{pending.length}}</span>
+
+        <button
+          onclick="showTab('pending')"
+          id="tab-pending"
+          class="tab-active px-5 py-2 text-sm font-semibold rounded-t-lg"
+        >
+          Payment Submitted
+          <span class="ml-1 badge badge-submitted">
+            {{pending.length}}
+          </span>
         </button>
-        <button onclick="showTab('receipted')" id="tab-receipted" class="tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg">
-          Receipt Issued <span class="ml-1 badge badge-receipted">{{receipted.length}}</span>
+
+        <button
+          onclick="showTab('receipted')"
+          id="tab-receipted"
+          class="tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg"
+        >
+          Receipt Issued
+          <span class="ml-1 badge badge-receipted">
+            {{receipted.length}}
+          </span>
         </button>
+
       </div>
 
-      <!-- Panel: Payment Submitted -->
+      <!-- Pending Payments -->
       <div id="panel-pending">
+
         {{#if pending.length}}
+
         <div class="card p-0 overflow-hidden">
+
           <table>
-            <thead><tr><th>#</th><th>Student</th><th>Year Level</th><th>Documents</th><th>Method</th><th>Reference No.</th><th>Submitted</th><th>Action</th></tr></thead>
-            <tbody>
-              {{#each pending}}
+
+            <thead>
               <tr>
-                <td class="text-gray-500 text-xs">{{this.id}}</td>
-                <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
-                <td class="text-slate-600 text-xs font-semibold">{{this.yearLevel}}</td>
-                <td class="text-gray-600 text-xs">
-                  <div class="space-y-1">
-                    {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}}</div>{{/if}}
-                    {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}}</div>{{/if}}
-                  </div>
-                </td>
-                <td><span class="badge badge-submitted text-xs">{{this.paymentMethod}}</span></td>
-                <td class="text-slate-600 text-xs font-mono">{{this.referenceNumber}}</td>
-                <td class="text-gray-500 text-xs">{{formatDateTime this.updatedAt}}</td>
-                <td><a href="/cashier/application/{{this.id}}" class="btn-green btn-sm">Review</a></td>
+                <th>#</th>
+                <th>Student</th>
+                <th>Year Level</th>
+                <th>Documents</th>
+                <th>Method</th>
+                <th>Reference No.</th>
+                <th>Submitted</th>
+                <th>Action</th>
               </tr>
+            </thead>
+
+            <tbody>
+
+              {{#each pending}}
+
+              <tr>
+
+                <td class="text-gray-500 text-xs">
+                  {{this.id}}
+                </td>
+
+                <td>
+
+                  <div class="text-slate-800 text-sm font-medium">
+                    {{this.surname}}, {{this.givenName}}
+                  </div>
+
+                  <div class="text-gray-600 text-xs">
+                    {{this.student.email}}
+                  </div>
+
+                </td>
+
+                <td class="text-slate-600 text-xs font-semibold">
+                  {{this.yearLevel}}
+                </td>
+
+                <td class="text-gray-600 text-xs">
+
+                  {{#if (gt this.qtyGoodMoral 0)}}
+                    <div>Good Moral: {{this.qtyGoodMoral}}</div>
+                  {{/if}}
+
+                  {{#if (gt this.qtyCTC 0)}}
+                    <div>CTC/Auth: {{this.qtyCTC}}</div>
+                  {{/if}}
+
+                </td>
+
+                <td>
+                  <span class="badge badge-submitted text-xs">
+                    {{this.paymentMethod}}
+                  </span>
+                </td>
+
+                <td class="text-slate-600 text-xs font-mono">
+                  {{this.referenceNumber}}
+                </td>
+
+                <td class="text-gray-500 text-xs">
+                  {{formatDateTime this.updatedAt}}
+                </td>
+
+                <td>
+
+                  <a
+                    href="/cashier/application/{{this.id}}"
+                    class="btn-green btn-sm"
+                  >
+                    Review
+                  </a>
+
+                </td>
+
+              </tr>
+
               {{/each}}
+
             </tbody>
+
           </table>
+
         </div>
+
         {{else}}
+
         <div class="card text-center py-12">
-          <div class="text-4xl mb-2">✅</div>
-          <p class="text-gray-500 text-sm">No pending payments to review.</p>
+
+          <div class="text-4xl mb-2">
+            ✅
+          </div>
+
+          <p class="text-gray-500 text-sm">
+            No pending payments to review.
+          </p>
+
         </div>
+
         {{/if}}
+
       </div>
 
-      <!-- Panel: Receipted -->
+      <!-- Receipted -->
       <div id="panel-receipted" style="display:none">
+
         {{#if receipted.length}}
+
         <div class="card p-0 overflow-hidden">
+
           <table>
-            <thead><tr><th>#</th><th>Student</th><th>Year Level</th><th>Documents</th><th>OR Number</th><th>Amount</th><th>Action</th></tr></thead>
-            <tbody>
-              {{#each receipted}}
+
+            <thead>
               <tr>
-                <td class="text-gray-500 text-xs">{{this.id}}</td>
-                <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
-                <td class="text-slate-600 text-xs font-semibold">{{this.yearLevel}}</td>
-                <td class="text-gray-600 text-xs">
-                  <div class="space-y-1">
-                    {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}}</div>{{/if}}
-                    {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}}</div>{{/if}}
-                  </div>
-                </td>
-                <td class="text-slate-600 text-xs font-mono">{{this.orNumber}}</td>
-                <td class="text-green-700 font-bold">{{currency this.totalAmount}}</td>
-                <td><a href="/cashier/application/{{this.id}}" class="text-green-700 text-xs hover:underline">View →</a></td>
+                <th>#</th>
+                <th>Student</th>
+                <th>Year Level</th>
+                <th>Documents</th>
+                <th>OR Number</th>
+                <th>Amount</th>
+                <th>Action</th>
               </tr>
+            </thead>
+
+            <tbody>
+
+              {{#each receipted}}
+
+              <tr>
+
+                <td class="text-gray-500 text-xs">
+                  {{this.id}}
+                </td>
+
+                <td>
+
+                  <div class="text-slate-800 text-sm font-medium">
+                    {{this.surname}}, {{this.givenName}}
+                  </div>
+
+                  <div class="text-gray-600 text-xs">
+                    {{this.student.email}}
+                  </div>
+
+                </td>
+
+                <td class="text-slate-600 text-xs font-semibold">
+                  {{this.yearLevel}}
+                </td>
+
+                <td class="text-gray-600 text-xs">
+
+                  {{#if (gt this.qtyGoodMoral 0)}}
+                    <div>Good Moral: {{this.qtyGoodMoral}}</div>
+                  {{/if}}
+
+                  {{#if (gt this.qtyCTC 0)}}
+                    <div>CTC/Auth: {{this.qtyCTC}}</div>
+                  {{/if}}
+
+                </td>
+
+                <td class="text-slate-600 text-xs font-mono">
+                  {{this.orNumber}}
+                </td>
+
+                <td class="text-green-700 font-bold">
+                  {{currency this.totalAmount}}
+                </td>
+
+                <td>
+
+                  <a
+                    href="/cashier/application/{{this.id}}"
+                    class="text-green-700 text-xs hover:underline"
+                  >
+                    View →
+                  </a>
+
+                </td>
+
+              </tr>
+
               {{/each}}
+
             </tbody>
+
           </table>
+
         </div>
+
         {{else}}
-        <div class="card text-center py-12"><p class="text-gray-500 text-sm">No receipts issued yet.</p></div>
+
+        <div class="card text-center py-12">
+
+          <p class="text-gray-500 text-sm">
+            No receipts issued yet.
+          </p>
+
+        </div>
+
         {{/if}}
+
       </div>
+
     </div>
+
   </div>
+
 </div>
 
 <style>
-  .tab-active   { color:#1b5e38; border-bottom:2px solid #1b5e38; background:transparent; }
-  .tab-inactive { color:#64748b; border-bottom:2px solid transparent; background:transparent; cursor:pointer; }
-  .tab-inactive:hover { color:#1b5e38; }
-</style>
-<script>
-function showTab(name) {
-  ['pending','receipted'].forEach(t => {
-    document.getElementById('panel-'+t).style.display = t===name ? '' : 'none';
-    document.getElementById('tab-'+t).className = t===name
-      ? 'tab-active px-5 py-2 text-sm font-semibold rounded-t-lg'
-      : 'tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg';
-  });
+
+.tab-active {
+  color:#1b5e38;
+  border-bottom:2px solid #1b5e38;
+  background:transparent;
 }
+
+.tab-inactive {
+  color:#64748b;
+  border-bottom:2px solid transparent;
+  background:transparent;
+  cursor:pointer;
+}
+
+.tab-inactive:hover {
+  color:#1b5e38;
+}
+
+</style>
+
+<script>
+
+function showTab(name) {
+
+  ['pending', 'receipted'].forEach(function(tab) {
+
+    document.getElementById('panel-' + tab).style.display =
+      tab === name ? '' : 'none';
+
+    document.getElementById('tab-' + tab).className =
+      tab === name
+        ? 'tab-active px-5 py-2 text-sm font-semibold rounded-t-lg'
+        : 'tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg';
+
+  });
+
+}
+
 </script>
-</body></html>
+
+</body>
+</html>

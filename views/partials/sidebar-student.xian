@@ -1,52 +1,245 @@
-<aside style="width:240px;background:linear-gradient(180deg,#1b5e38 0%,#154d2f 100%);border-right:none;flex-shrink:0;height:100vh;position:sticky;top:0;display:flex;flex-direction:column;padding:0;">
+<aside style="
+  width:240px;
+  background:linear-gradient(180deg,#1b5e38 0%,#154d2f 100%);
+  border-right:none;
+  flex-shrink:0;
+  height:100vh;
+  position:sticky;
+  top:0;
+  display:flex;
+  flex-direction:column;
+  padding:0;
+">
 
   <!-- Logo + Branding -->
   <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.1);">
     <div style="display:flex;align-items:center;gap:12px;">
-      <img src="/uploads/minsulogo.png" alt="MinSU Logo"
-           style="width:48px;height:48px;object-fit:contain;border-radius:50%;background:#fff;padding:3px;flex-shrink:0;">
+
+      <img
+        src="/uploads/minsulogo.png"
+        alt="MinSU Logo"
+        style="
+          width:48px;
+          height:48px;
+          object-fit:contain;
+          border-radius:50%;
+          background:#fff;
+          padding:3px;
+          flex-shrink:0;
+        "
+      >
+
       <div>
-        <p style="color:#fff;font-weight:700;font-size:.95rem;line-height:1.2;margin:0;">UniGuide</p>
-        <p style="color:#a7d4b8;font-size:.72rem;margin:2px 0 0;">MinSU — Bongabong Campus</p>
+        <p style="
+          color:#fff;
+          font-weight:700;
+          font-size:.95rem;
+          line-height:1.2;
+          margin:0;
+        ">
+          UniGuide
+        </p>
+
+        <p style="
+          color:#a7d4b8;
+          font-size:.72rem;
+          margin:2px 0 0;
+        ">
+          MinSU — Bongabong Campus
+        </p>
       </div>
+
     </div>
   </div>
 
-  <!-- Nav Links -->
-  <div style="flex:1;padding:12px 10px;overflow-y:auto;">
-    
-    <a href="/student/home"     class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}">🏠 Home</a>
-    <a href="/student/apply"         class="sidebar-link {{#if (eq activePage 'apply')}}active{{/if}}">📝 Request for Good Moral & CTC/Authentication</a>
-    <a href="/student/history"       class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}">📋 Track My Request</a>
-    <a href="/student/appointments"  class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}">📅 Request For Counselling</a>
-    <a href="/student/notifications" class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}">
+  <!-- Navigation -->
+  <div style="
+    flex:1;
+    padding:12px 10px;
+    overflow-y:auto;
+  ">
+
+    <a
+      href="/student/home"
+      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
+    >
+      🏠 Home
+    </a>
+
+    <a
+      href="/student/apply"
+      class="sidebar-link {{#if (eq activePage 'apply')}}active{{/if}}"
+    >
+      📝 Request for Good Moral & CTC/Authentication
+    </a>
+
+    <a
+      href="/student/history"
+      class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}"
+    >
+      📋 Track My Request
+    </a>
+
+    <a
+      href="/student/appointments"
+      class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}"
+    >
+      📅 Request For Counselling
+    </a>
+
+    <a
+      href="/student/notifications"
+      class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
+      style="display:flex;align-items:center;"
+    >
       🔔 Notifications
+
       {{#if unreadNotifCount}}
-      <span class="badge badge-submitted" style="margin-left:auto;">{{unreadNotifCount}}</span>
+        <span
+          class="badge badge-submitted"
+          style="margin-left:auto;"
+        >
+          {{unreadNotifCount}}
+        </span>
       {{/if}}
     </a>
-    <a href="/student/announcements" class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}">📢 Announcements</a>
-    <a href="/student/profile"       class="sidebar-link {{#if (eq activePage 'profile')}}active{{/if}}">👤 My Profile</a>
+
+    <a
+      href="/student/announcements"
+      class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}"
+    >
+      📢 Announcements
+    </a>
+
+    <a
+      href="/student/profile"
+      class="sidebar-link {{#if (eq activePage 'profile')}}active{{/if}}"
+    >
+      👤 My Profile
+    </a>
+
   </div>
 
   <!-- User + Logout -->
-  <div style="padding:14px 10px;border-top:1px solid rgba(255,255,255,.1);">
-    <a href="/student/profile" style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;text-decoration:none;margin-bottom:8px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='transparent'">
+  <div style="
+    padding:14px 10px;
+    border-top:1px solid rgba(255,255,255,.1);
+  ">
+
+    <a
+      href="/student/profile"
+      style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:6px;
+        border-radius:8px;
+        text-decoration:none;
+        margin-bottom:8px;
+        transition:background .15s;
+      "
+      onmouseover="this.style.background='rgba(255,255,255,.08)'"
+      onmouseout="this.style.background='transparent'"
+    >
+
       {{#if user.profileImage}}
-        <img src="{{user.profileImage}}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.3);flex-shrink:0;" alt="avatar">
+
+        <img
+          src="{{user.profileImage}}"
+          style="
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            object-fit:cover;
+            border:2px solid rgba(255,255,255,.3);
+            flex-shrink:0;
+          "
+          alt="avatar"
+        >
+
       {{else if user.avatar}}
-        <img src="{{user.avatar}}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.3);flex-shrink:0;" alt="avatar">
+
+        <img
+          src="{{user.avatar}}"
+          style="
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            object-fit:cover;
+            border:2px solid rgba(255,255,255,.3);
+            flex-shrink:0;
+          "
+          alt="avatar"
+        >
+
       {{else}}
-        <div style="width:36px;height:36px;border-radius:50%;background:#2d7a52;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;border:2px solid rgba(255,255,255,.3);">{{user.firstName.[0]}}</div>
+
+        <div style="
+          width:36px;
+          height:36px;
+          border-radius:50%;
+          background:#2d7a52;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          color:#fff;
+          font-weight:700;
+          font-size:.9rem;
+          flex-shrink:0;
+          border:2px solid rgba(255,255,255,.3);
+        ">
+          {{user.firstName.[0]}}
+        </div>
+
       {{/if}}
+
       <div style="min-width:0;">
-        <p style="color:#fff;font-size:.82rem;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{user.firstName}} {{user.lastName}}</p>
-        <p style="color:#a7d4b8;font-size:.7rem;margin:1px 0 0;">Student · Edit profile</p>
+
+        <p style="
+          color:#fff;
+          font-size:.82rem;
+          font-weight:600;
+          margin:0;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        ">
+          {{user.firstName}} {{user.lastName}}
+        </p>
+
+        <p style="
+          color:#a7d4b8;
+          font-size:.7rem;
+          margin:1px 0 0;
+        ">
+          Student · Edit profile
+        </p>
+
       </div>
+
     </a>
+
     <form action="/logout" method="POST">
-      <button class="sidebar-link" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;color:#fca5a5;" onmouseover="this.style.background='rgba(239,68,68,.15)'" onmouseout="this.style.background='transparent'">🚪 Logout</button>
+
+      <button
+        type="submit"
+        class="sidebar-link"
+        style="
+          width:100%;
+          text-align:left;
+          border:none;
+          background:transparent;
+          cursor:pointer;
+          color:#fca5a5;
+        "
+        onmouseover="this.style.background='rgba(239,68,68,.15)'"
+        onmouseout="this.style.background='transparent'"
+      >
+        🚪 Logout
+      </button>
+
     </form>
+
   </div>
 
 </aside>
