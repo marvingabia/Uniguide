@@ -1,43 +1,37 @@
 <!-- Sidebar Toggle -->
-
 <button
   type="button"
   class="sidebar-toggle"
   onclick="toggleSidebar()"
   aria-label="Toggle sidebar"
-  title="Open navigation">
-
+  title="Open navigation"
+>
   &rsaquo;
-
 </button>
 
-
 <!-- Dark Overlay -->
-
 <div
   class="sidebar-overlay"
-  onclick="closeSidebar()">
-</div>
-
+  onclick="closeSidebar()"
+></div>
 
 <!-- Guidance Sidebar -->
-
 <aside class="app-sidebar">
 
   <!-- Logo + Branding -->
-
   <div
     style="
       padding:20px 16px 16px;
       border-bottom:1px solid rgba(255,255,255,.1);
-    ">
-
+    "
+  >
     <div
       style="
         display:flex;
         align-items:center;
         gap:12px;
-      ">
+      "
+    >
 
       <img
         src="/uploads/minsulogo.png"
@@ -80,12 +74,9 @@
       </div>
 
     </div>
-
   </div>
 
-
   <!-- Navigation -->
-
   <div
     style="
       flex:1;
@@ -101,14 +92,12 @@
       🏠 Home
     </a>
 
-
     <a
       href="/guidance/applications"
       class="sidebar-link {{#if (eq activePage 'applications')}}active{{/if}}"
     >
       📋 Student Request Form
     </a>
-
 
     <a
       href="/guidance/appointments"
@@ -117,14 +106,12 @@
       📅 My Appointments
     </a>
 
-
     <a
       href="/guidance/profiling"
       class="sidebar-link {{#if (eq activePage 'profiling')}}active{{/if}}"
     >
       👥 Student Profile
     </a>
-
 
     <a
       href="/guidance/announcements/new"
@@ -133,14 +120,12 @@
       📢 Announcements
     </a>
 
-
     <a
       href="/guidance/reports"
       class="sidebar-link {{#if (eq activePage 'reports')}}active{{/if}}"
     >
       📊 Reports
     </a>
-
 
     <a
       href="/guidance/users"
@@ -149,33 +134,26 @@
       👤 Manage Users
     </a>
 
-
     <a
       href="/guidance/notifications"
       class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
       style="display:flex;align-items:center;"
     >
-
       🔔 Notifications
 
       {{#if (gt unreadNotifCount 0)}}
-
         <span
           class="badge badge-submitted"
           style="margin-left:auto;"
         >
           {{unreadNotifCount}}
         </span>
-
       {{/if}}
-
     </a>
 
   </div>
 
-
   <!-- User + Logout -->
-
   <div
     style="
       padding:14px 10px;
@@ -215,7 +193,6 @@
       </p>
 
     </div>
-
 
     <form action="/logout" method="POST">
 

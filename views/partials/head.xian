@@ -35,8 +35,10 @@
       position: fixed;
       top: 0;
       left: 0;
+
       width: 240px;
       height: 100vh;
+
       z-index: 9999;
 
       background: linear-gradient(
@@ -60,26 +62,28 @@
       transform: translateX(0);
     }
 
+
     /* =========================================================
-       SIDEBAR TOGGLE
+       SIDEBAR TOGGLE BUTTON
        ========================================================= */
 
     .sidebar-toggle {
       position: fixed;
-      top: 50%;
+
+      /* Upper-left position */
+      top: 80px;
       left: 0;
-      transform: translateY(-50%);
 
       width: 34px;
-      height: 64px;
+      height: 48px;
 
       z-index: 10000;
 
       border: none;
-      border-radius: 0 12px 12px 0;
+      border-radius: 0 10px 10px 0;
 
       background: #1b5e38;
-      color: white;
+      color: #ffffff;
 
       display: flex;
       align-items: center;
@@ -87,13 +91,18 @@
 
       cursor: pointer;
 
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
+      line-height: 1;
+
+      padding: 0;
+      margin: 0;
 
       box-shadow: 4px 0 15px rgba(0, 0, 0, 0.20);
 
       transition:
         left 0.25s ease,
+        top 0.25s ease,
         background 0.2s ease,
         transform 0.2s ease;
     }
@@ -102,9 +111,15 @@
       background: #166534;
     }
 
+    .sidebar-toggle:active {
+      transform: scale(0.96);
+    }
+
+    /* Sidebar open */
     .sidebar-toggle.open {
       left: 240px;
     }
+
 
     /* =========================================================
        SIDEBAR LINKS
@@ -147,6 +162,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
+
     /* =========================================================
        OVERLAY
        ========================================================= */
@@ -172,6 +188,7 @@
       visibility: visible;
     }
 
+
     /* =========================================================
        MAIN
        ========================================================= */
@@ -180,6 +197,7 @@
       width: 100%;
       min-height: 100vh;
     }
+
 
     /* =========================================================
        TOP NAV
@@ -204,6 +222,7 @@
       z-index: 100;
     }
 
+
     /* =========================================================
        CARD
        ========================================================= */
@@ -220,6 +239,7 @@
       box-shadow:
         0 1px 3px rgba(15, 23, 42, 0.06);
     }
+
 
     /* =========================================================
        TABLE
@@ -262,6 +282,7 @@
     tbody tr:hover {
       background: #f8fafc;
     }
+
 
     /* =========================================================
        INPUTS
@@ -307,6 +328,7 @@
 
       font-weight: 600;
     }
+
 
     /* =========================================================
        BUTTONS
@@ -404,6 +426,7 @@
       padding: 6px 10px !important;
     }
 
+
     /* =========================================================
        BADGES
        ========================================================= */
@@ -460,6 +483,7 @@
       color: #3730a3;
     }
 
+
     /* =========================================================
        RESPONSIVE
        ========================================================= */
@@ -468,6 +492,12 @@
 
       .app-sidebar {
         width: 260px;
+      }
+
+      .sidebar-toggle {
+        top: 70px;
+        width: 30px;
+        height: 46px;
       }
 
       .sidebar-toggle.open {
@@ -492,88 +522,177 @@
     }
   </style>
 
+
   <script>
+
+    /* =========================================================
+       OPEN SIDEBAR
+       ========================================================= */
+
     function openSidebar() {
-      const sidebar = document.querySelector('.app-sidebar');
-      const toggle = document.querySelector('.sidebar-toggle');
-      const overlay = document.querySelector('.sidebar-overlay');
+
+      const sidebar =
+        document.querySelector('.app-sidebar');
+
+      const toggle =
+        document.querySelector('.sidebar-toggle');
+
+      const overlay =
+        document.querySelector('.sidebar-overlay');
 
       if (!sidebar || !toggle) return;
 
       sidebar.classList.add('open');
+
       toggle.classList.add('open');
 
       toggle.innerHTML = '&lsaquo;';
+
+      toggle.setAttribute(
+        'aria-label',
+        'Close navigation'
+      );
+
+      toggle.setAttribute(
+        'title',
+        'Close navigation'
+      );
 
       if (overlay) {
         overlay.classList.add('show');
       }
     }
 
+
+    /* =========================================================
+       CLOSE SIDEBAR
+       ========================================================= */
+
     function closeSidebar() {
-      const sidebar = document.querySelector('.app-sidebar');
-      const toggle = document.querySelector('.sidebar-toggle');
-      const overlay = document.querySelector('.sidebar-overlay');
+
+      const sidebar =
+        document.querySelector('.app-sidebar');
+
+      const toggle =
+        document.querySelector('.sidebar-toggle');
+
+      const overlay =
+        document.querySelector('.sidebar-overlay');
 
       if (!sidebar || !toggle) return;
 
       sidebar.classList.remove('open');
+
       toggle.classList.remove('open');
 
       toggle.innerHTML = '&rsaquo;';
+
+      toggle.setAttribute(
+        'aria-label',
+        'Open navigation'
+      );
+
+      toggle.setAttribute(
+        'title',
+        'Open navigation'
+      );
 
       if (overlay) {
         overlay.classList.remove('show');
       }
     }
 
+
+    /* =========================================================
+       TOGGLE SIDEBAR
+       ========================================================= */
+
     function toggleSidebar() {
-      const sidebar = document.querySelector('.app-sidebar');
+
+      const sidebar =
+        document.querySelector('.app-sidebar');
 
       if (!sidebar) return;
 
-      if (sidebar.classList.contains('open')) {
+      if (
+        sidebar.classList.contains('open')
+      ) {
+
         closeSidebar();
+
       } else {
+
         openSidebar();
+
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
 
-      document
-        .querySelectorAll('.app-sidebar a.sidebar-link')
-        .forEach(function (link) {
+    /* =========================================================
+       PAGE LOAD
+       ========================================================= */
 
-          link.addEventListener('click', function () {
+    document.addEventListener(
+      'DOMContentLoaded',
+      function () {
 
-            setTimeout(function () {
-              closeSidebar();
-            }, 120);
+        /* Close sidebar after clicking navigation */
+        document
+          .querySelectorAll(
+            '.app-sidebar a.sidebar-link'
+          )
+          .forEach(function (link) {
+
+            link.addEventListener(
+              'click',
+              function () {
+
+                setTimeout(
+                  function () {
+                    closeSidebar();
+                  },
+                  120
+                );
+
+              }
+            );
 
           });
 
-        });
 
-      const overlay = document.querySelector('.sidebar-overlay');
+        /* Overlay click */
+        const overlay =
+          document.querySelector(
+            '.sidebar-overlay'
+          );
 
-      if (overlay) {
+        if (overlay) {
 
-        overlay.addEventListener('click', function () {
-          closeSidebar();
-        });
+          overlay.addEventListener(
+            'click',
+            function () {
+              closeSidebar();
+            }
+          );
 
-      }
-
-      document.addEventListener('keydown', function (event) {
-
-        if (event.key === 'Escape') {
-          closeSidebar();
         }
 
-      });
 
-    });
+        /* ESC key */
+        document.addEventListener(
+          'keydown',
+          function (event) {
+
+            if (event.key === 'Escape') {
+              closeSidebar();
+            }
+
+          }
+        );
+
+      }
+    );
+
   </script>
 </head>
 
