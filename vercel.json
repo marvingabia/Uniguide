@@ -13,12 +13,21 @@
           "config/**",
           "utils/**",
           "public/**",
-          "views/**"
+          "views/**",
+          ".env.example"
         ]
       }
     }
   ],
   "routes": [
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/public/uploads/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "index.js"

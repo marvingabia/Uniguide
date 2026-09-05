@@ -1,8 +1,4 @@
 import { Sequelize } from 'sequelize';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const mysql2 = require('mysql2');
 
 console.log('========================================');
 console.log('DATABASE CONFIG');
@@ -37,7 +33,6 @@ try {
 
   sequelize = new Sequelize(dbUrl.toString(), {
     dialect: 'mysql',
-    dialectModule: mysql2,
 
     dialectOptions: {
       ssl: {
@@ -45,14 +40,15 @@ try {
         rejectUnauthorized: false
       },
       supportBigNumbers: true,
-      bigNumberStrings: true
+      bigNumberStrings: true,
+      connectTimeout: 10000
     },
 
     logging: false,
 
     pool: {
-      max: 5,
-      min: 0,
+      max: 3,
+      min: 1,
       idle: 10000,
       acquire: 30000
     }
