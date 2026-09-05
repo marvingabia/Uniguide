@@ -1,25 +1,43 @@
 <!-- Sidebar Toggle -->
+
 <button
   type="button"
   class="sidebar-toggle"
   onclick="toggleSidebar()"
-  aria-label="Toggle sidebar">
-  &gt;
+  aria-label="Toggle sidebar"
+  title="Open navigation">
+
+  &rsaquo;
+
 </button>
 
-<!-- Dark overlay -->
+
+<!-- Dark Overlay -->
+
 <div
   class="sidebar-overlay"
   onclick="closeSidebar()">
 </div>
 
+
 <!-- Guidance Sidebar -->
+
 <aside class="app-sidebar">
 
   <!-- Logo + Branding -->
-  <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.1);">
 
-    <div style="display:flex;align-items:center;gap:12px;">
+  <div
+    style="
+      padding:20px 16px 16px;
+      border-bottom:1px solid rgba(255,255,255,.1);
+    ">
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:12px;
+      ">
 
       <img
         src="/uploads/minsulogo.png"
@@ -32,26 +50,33 @@
           background:#fff;
           padding:3px;
           flex-shrink:0;
-        ">
+        "
+      >
 
       <div>
-        <p style="
-          color:#fff;
-          font-weight:700;
-          font-size:.95rem;
-          line-height:1.2;
-          margin:0;
-        ">
+
+        <p
+          style="
+            color:#fff;
+            font-weight:700;
+            font-size:.95rem;
+            line-height:1.2;
+            margin:0;
+          "
+        >
           UniGuide
         </p>
 
-        <p style="
-          color:#a7d4b8;
-          font-size:.72rem;
-          margin:2px 0 0;
-        ">
+        <p
+          style="
+            color:#a7d4b8;
+            font-size:.72rem;
+            margin:2px 0 0;
+          "
+        >
           MinSU — Bongabong Campus
         </p>
+
       </div>
 
     </div>
@@ -60,68 +85,87 @@
 
 
   <!-- Navigation -->
-  <div style="
-    flex:1;
-    padding:12px 10px;
-    overflow-y:auto;
-  ">
+
+  <div
+    style="
+      flex:1;
+      padding:12px 10px;
+      overflow-y:auto;
+    "
+  >
 
     <a
       href="/guidance/home"
-      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
+    >
       🏠 Home
     </a>
 
+
     <a
       href="/guidance/applications"
-      class="sidebar-link {{#if (eq activePage 'applications')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'applications')}}active{{/if}}"
+    >
       📋 Student Request Form
     </a>
 
+
     <a
       href="/guidance/appointments"
-      class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}"
+    >
       📅 My Appointments
     </a>
 
+
     <a
       href="/guidance/profiling"
-      class="sidebar-link {{#if (eq activePage 'profiling')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'profiling')}}active{{/if}}"
+    >
       👥 Student Profile
     </a>
 
+
     <a
       href="/guidance/announcements/new"
-      class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}"
+    >
       📢 Announcements
     </a>
 
+
     <a
       href="/guidance/reports"
-      class="sidebar-link {{#if (eq activePage 'reports')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'reports')}}active{{/if}}"
+    >
       📊 Reports
     </a>
 
+
     <a
       href="/guidance/users"
-      class="sidebar-link {{#if (eq activePage 'users')}}active{{/if}}">
+      class="sidebar-link {{#if (eq activePage 'users')}}active{{/if}}"
+    >
       👤 Manage Users
     </a>
+
 
     <a
       href="/guidance/notifications"
       class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
-      style="display:flex;align-items:center;">
+      style="display:flex;align-items:center;"
+    >
 
       🔔 Notifications
 
-      {{#if unreadNotifCount}}
+      {{#if (gt unreadNotifCount 0)}}
 
-      <span
-        class="badge badge-submitted"
-        style="margin-left:auto;">
-        {{unreadNotifCount}}
-      </span>
+        <span
+          class="badge badge-submitted"
+          style="margin-left:auto;"
+        >
+          {{unreadNotifCount}}
+        </span>
 
       {{/if}}
 
@@ -131,37 +175,47 @@
 
 
   <!-- User + Logout -->
-  <div style="
-    padding:14px 10px;
-    border-top:1px solid rgba(255,255,255,.1);
-  ">
 
-    <div style="
-      padding:0 6px;
-      margin-bottom:8px;
-    ">
+  <div
+    style="
+      padding:14px 10px;
+      border-top:1px solid rgba(255,255,255,.1);
+    "
+  >
 
-      <p style="
-        color:#fff;
-        font-size:.85rem;
-        font-weight:600;
-        margin:0;
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-      ">
+    <div
+      style="
+        padding:0 6px;
+        margin-bottom:8px;
+      "
+    >
+
+      <p
+        style="
+          color:#fff;
+          font-size:.85rem;
+          font-weight:600;
+          margin:0;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        "
+      >
         {{user.firstName}} {{user.lastName}}
       </p>
 
-      <p style="
-        color:#a7d4b8;
-        font-size:.72rem;
-        margin:2px 0 0;
-      ">
+      <p
+        style="
+          color:#a7d4b8;
+          font-size:.72rem;
+          margin:2px 0 0;
+        "
+      >
         Guidance Administrator
       </p>
 
     </div>
+
 
     <form action="/logout" method="POST">
 
@@ -177,10 +231,9 @@
           color:#fca5a5;
         "
         onmouseover="this.style.background='rgba(239,68,68,.15)'"
-        onmouseout="this.style.background='transparent'">
-
+        onmouseout="this.style.background='transparent'"
+      >
         🚪 Logout
-
       </button>
 
     </form>

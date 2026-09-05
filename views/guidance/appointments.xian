@@ -1,308 +1,1064 @@
 {{> head}}
+
 <div class="flex h-screen overflow-hidden">
+
   {{> sidebar-guidance activePage="appointments"}}
+
+
   <div class="flex-1 overflow-y-auto bg-slate-100">
+
     <div class="nav-top">
-      <h1 class="text-base font-bold text-slate-800">📅 My Appointments</h1>
-      <span class="text-slate-600 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+
+      <div>
+
+        <h1 class="text-base font-bold text-slate-800">
+          📅 My Appointments
+        </h1>
+
+        <p class="text-slate-500 text-xs">
+          Manage student appointments and availability
+        </p>
+
+      </div>
+
+
+      <span class="text-slate-600 text-sm font-medium">
+        {{user.firstName}} {{user.lastName}}
+      </span>
+
     </div>
+
+
     <div class="px-5 py-5 space-y-6">
+
       {{> flash}}
 
-      <!-- Tab Navigation -->
+
+      <!-- Tabs -->
+
       <div class="flex gap-2 border-b border-gray-200">
-        <button onclick="switchTab('appointments')" id="tab-appointments" class="tab-btn active">
-          📅 Current Appointment ({{appointments.length}})
+
+        <button
+          onclick="switchTab('appointments')"
+          id="tab-appointments"
+          class="tab-btn active"
+        >
+          📅 Current Appointments
+          ({{appointments.length}})
         </button>
-        <button onclick="switchTab('timeslots')" id="tab-timeslots" class="tab-btn">
-          ⏰ Manage Availability time
+
+
+        <button
+          onclick="switchTab('timeslots')"
+          id="tab-timeslots"
+          class="tab-btn"
+        >
+          ⏰ Manage Availability
         </button>
+
       </div>
 
-      <!-- Appointments Tab -->
-      <div id="content-appointments" class="tab-content active">
+
+      <!-- =====================================================
+           APPOINTMENTS
+           ===================================================== -->
+
+      <div
+        id="content-appointments"
+        class="tab-content active"
+      >
+
         {{#if appointments.length}}
-        <div class="card p-0 overflow-hidden">
-          <table>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Purpose</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Notes</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each appointments}}
-              <tr>
-                <td>
-                  <div class="text-slate-800 text-sm font-medium">{{this.student.firstName}} {{this.student.lastName}}</div>
-                  <div class="text-slate-500 text-xs">{{this.student.email}}</div>
-                </td>
-                <td class="text-slate-600 text-sm">{{this.purpose}}</td>
-                <td class="text-slate-500 text-xs">{{formatDate this.date}}</td>
-                <td class="text-slate-500 text-xs">{{this.timeSlot}}</td>
-                <td class="text-slate-500 text-xs" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{this.notes}}</td>
-                <td><span class="badge {{apptStatusClass this.status}}">{{this.status}}</span></td>
-                <td>
-                  <div class="flex gap-1 flex-wrap">
-                    {{#if (eq this.status 'pending')}}
-                    <form action="/guidance/appointments/{{this.id}}/update" method="POST" class="flex gap-1">
-                      <button name="status" value="approved" class="btn-green btn-sm" onclick="return confirm('Approve this appointment?')">✓ Approve</button>
-                      <button name="status" value="cancelled" class="btn-red btn-sm" onclick="return confirm('Cancel this appointment?')">✕</button>
-                    </form>
-                    {{else if (eq this.status 'approved')}}
-                    <form action="/guidance/appointments/{{this.id}}/update" method="POST">
-                      <button name="status" value="done" class="btn-outline btn-sm">Mark Done</button>
-                    </form>
-                    {{else}}
-                    <span class="text-slate-400 text-xs">—</span>
-                    {{/if}}
 
-                    {{#if (ne this.status 'done')}}
-                    {{#if (ne this.status 'cancelled')}}
-                    <button
-                      class="btn-sm"
-                      style="background:#f0fdf4;color:#1b5e38;border:1.5px solid #1b5e38;border-radius:8px;font-weight:600;cursor:pointer;padding:5px 10px;font-size:.75rem;"
-                      onclick="openReschedule({{this.id}}, '{{this.date}}', '{{this.timeSlot}}', '{{this.student.firstName}} {{this.student.lastName}}')">
-                      ✏️ Edit
-                    </button>
-                    {{/if}}
-                    {{/if}}
-                  </div>
-                </td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </div>
+          <div class="card p-0 overflow-x-auto">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Student</th>
+                  <th>Purpose</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Notes</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {{#each appointments}}
+
+                  <tr>
+
+                    <td>
+
+                      <div class="text-slate-800 text-sm font-medium">
+                        {{this.student.firstName}}
+                        {{this.student.lastName}}
+                      </div>
+
+                      <div class="text-slate-500 text-xs">
+                        {{this.student.email}}
+                      </div>
+
+                    </td>
+
+
+                    <td class="text-slate-600 text-sm">
+                      {{this.purpose}}
+                    </td>
+
+
+                    <td class="text-slate-500 text-xs">
+                      {{formatDate this.date}}
+                    </td>
+
+
+                    <td class="text-slate-500 text-xs">
+                      {{this.timeSlot}}
+                    </td>
+
+
+                    <td
+                      class="text-slate-500 text-xs"
+                      style="
+                        max-width:160px;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                        white-space:nowrap;
+                      "
+                    >
+                      {{this.notes}}
+                    </td>
+
+
+                    <td>
+
+                      <span class="badge {{apptStatusClass this.status}}">
+                        {{this.status}}
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <div class="flex gap-1 flex-wrap">
+
+                        {{#if (eq this.status 'pending')}}
+
+                          <form
+                            action="/guidance/appointments/{{this.id}}/update"
+                            method="POST"
+                            class="flex gap-1"
+                          >
+
+                            <button
+                              type="submit"
+                              name="status"
+                              value="approved"
+                              class="btn-green btn-sm"
+                              onclick="return confirm('Approve this appointment?')"
+                            >
+                              ✓ Approve
+                            </button>
+
+
+                            <button
+                              type="submit"
+                              name="status"
+                              value="cancelled"
+                              class="btn-red btn-sm"
+                              onclick="return confirm('Cancel this appointment?')"
+                            >
+                              ✕
+                            </button>
+
+                          </form>
+
+                        {{else if (eq this.status 'approved')}}
+
+                          <form
+                            action="/guidance/appointments/{{this.id}}/update"
+                            method="POST"
+                          >
+
+                            <button
+                              type="submit"
+                              name="status"
+                              value="done"
+                              class="btn-outline btn-sm"
+                            >
+                              Mark Done
+                            </button>
+
+                          </form>
+
+                        {{else}}
+
+                          <span class="text-slate-400 text-xs">
+                            —
+                          </span>
+
+                        {{/if}}
+
+
+                        {{#if (ne this.status 'done')}}
+
+                          {{#if (ne this.status 'cancelled')}}
+
+                            <button
+                              type="button"
+                              class="btn-sm"
+                              style="
+                                background:#f0fdf4;
+                                color:#1b5e38;
+                                border:1.5px solid #1b5e38;
+                                border-radius:8px;
+                                font-weight:600;
+                                cursor:pointer;
+                                padding:5px 10px;
+                                font-size:.75rem;
+                              "
+                              data-id="{{this.id}}"
+                              data-date="{{this.date}}"
+                              data-time="{{this.timeSlot}}"
+                              data-student="{{this.student.firstName}} {{this.student.lastName}}"
+                              onclick="openRescheduleFromButton(this)"
+                            >
+                              ✏️ Edit
+                            </button>
+
+                          {{/if}}
+
+                        {{/if}}
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                {{/each}}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
         {{else}}
-        <div class="card text-center py-16">
-          <div class="text-5xl mb-3">📅</div>
-          <p class="text-slate-500">No appointments yet.</p>
-        </div>
+
+          <div class="card text-center py-16">
+
+            <div class="text-5xl mb-3">
+              📅
+            </div>
+
+            <p class="text-slate-500">
+              No appointments yet.
+            </p>
+
+          </div>
+
         {{/if}}
+
       </div>
 
-      <!-- Time Slots Tab -->
-      <div id="content-timeslots" class="tab-content">
-        <!-- Create New Time Slots -->
+
+      <!-- =====================================================
+           TIME SLOTS
+           ===================================================== -->
+
+      <div
+        id="content-timeslots"
+        class="tab-content"
+      >
+
+        <!-- Create Time Slots -->
+
         <div class="card mb-5">
-          <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">➕ Create New Time Slots</h3>
-          <form action="/guidance/time-slots" method="POST" class="space-y-4">
-            <div class="grid grid-cols-3 gap-4">
+
+          <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">
+            ➕ Create New Time Slots
+          </h3>
+
+
+          <form
+            action="/guidance/time-slots"
+            method="POST"
+            class="space-y-4"
+          >
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
               <div>
-                <label class="label">Date(s) *</label>
-                <input type="date" name="dates" class="input" required>
-                <p class="text-gray-500 text-xs mt-1">Select date for available slots</p>
+
+                <label class="label">
+                  Date *
+                </label>
+
+                <input
+                  type="date"
+                  name="dates"
+                  class="input"
+                  required
+                >
+
+                <p class="text-gray-500 text-xs mt-1">
+                  Select date for available slots
+                </p>
+
               </div>
+
+
               <div>
-                <label class="label">Time Slot(s) *</label>
-                <select name="timeSlots" class="input" multiple size="5" required>
-                  <option value="8:00 AM - 9:00 AM">8:00 AM - 9:00 AM</option>
-                  <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
-                  <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
-                  <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
-                  <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
-                  <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
-                  <option value="3:00 PM - 4:00 PM">3:00 PM - 4:00 PM</option>
-                  <option value="4:00 PM - 5:00 PM">4:00 PM - 5:00 PM</option>
+
+                <label class="label">
+                  Time Slot(s) *
+                </label>
+
+                <select
+                  name="timeSlots"
+                  class="input"
+                  multiple
+                  size="5"
+                  required
+                >
+
+                  <option value="8:00 AM - 9:00 AM">
+                    8:00 AM - 9:00 AM
+                  </option>
+
+                  <option value="9:00 AM - 10:00 AM">
+                    9:00 AM - 10:00 AM
+                  </option>
+
+                  <option value="10:00 AM - 11:00 AM">
+                    10:00 AM - 11:00 AM
+                  </option>
+
+                  <option value="11:00 AM - 12:00 PM">
+                    11:00 AM - 12:00 PM
+                  </option>
+
+                  <option value="1:00 PM - 2:00 PM">
+                    1:00 PM - 2:00 PM
+                  </option>
+
+                  <option value="2:00 PM - 3:00 PM">
+                    2:00 PM - 3:00 PM
+                  </option>
+
+                  <option value="3:00 PM - 4:00 PM">
+                    3:00 PM - 4:00 PM
+                  </option>
+
+                  <option value="4:00 PM - 5:00 PM">
+                    4:00 PM - 5:00 PM
+                  </option>
+
                 </select>
-                <p class="text-gray-500 text-xs mt-1">Hold Ctrl/Cmd to select multiple</p>
+
+                <p class="text-gray-500 text-xs mt-1">
+                  Hold Ctrl/Cmd to select multiple
+                </p>
+
               </div>
+
+
               <div>
-                <label class="label">Purpose *</label>
-                <select name="purpose" class="input" required>
-                  <option value="General">General (All purposes)</option>
-                  <option value="Counseling">Counseling Only</option>
-                  <option value="Good Moral Pickup">Good Moral Pickup Only</option>
-                  <option value="Document Submission">Document Submission</option>
-                  <option value="Consultation">Consultation</option>
+
+                <label class="label">
+                  Purpose *
+                </label>
+
+                <select
+                  name="purpose"
+                  class="input"
+                  required
+                >
+
+                  <option value="General">
+                    General (All purposes)
+                  </option>
+
+                  <option value="Counseling">
+                    Counseling Only
+                  </option>
+
+                  <option value="Good Moral Pickup">
+                    Good Moral Pickup Only
+                  </option>
+
+                  <option value="Document Submission">
+                    Document Submission
+                  </option>
+
+                  <option value="Consultation">
+                    Consultation
+                  </option>
+
                 </select>
-                <p class="text-gray-500 text-xs mt-1">Students will be notified based on purpose match</p>
+
+                <p class="text-gray-500 text-xs mt-1">
+                  Students will be notified based on purpose match
+                </p>
+
               </div>
+
             </div>
-            <div class="grid grid-cols-2 gap-4">
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
-                <label class="label">Max Students per Slot *</label>
-                <input type="number" name="maxSlots" value="1" min="1" max="10" class="input" required>
+
+                <label class="label">
+                  Max Students per Slot *
+                </label>
+
+                <input
+                  type="number"
+                  name="maxSlots"
+                  value="1"
+                  min="1"
+                  max="10"
+                  class="input"
+                  required
+                >
+
               </div>
+
+
               <div>
-                <label class="label">Notes (optional)</label>
-                <input type="text" name="notes" class="input" placeholder="e.g., Academic counseling only">
+
+                <label class="label">
+                  Notes (optional)
+                </label>
+
+                <input
+                  type="text"
+                  name="notes"
+                  class="input"
+                  placeholder="e.g., Academic counseling only"
+                >
+
               </div>
+
             </div>
-            <button type="submit" class="btn-green">✅ Create Time Slot(s) & Notify Students</button>
+
+
+            <button
+              type="submit"
+              class="btn-green"
+            >
+              ✅ Create Time Slot(s) & Notify Students
+            </button>
+
           </form>
+
         </div>
+
 
         <!-- Existing Time Slots -->
+
         <div class="card">
-          <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">📅 Available Time Slots</h3>
-          
+
+          <h3 class="text-green-700 font-semibold mb-4 text-sm uppercase">
+            📅 Available Time Slots
+          </h3>
+
+
           {{#if timeSlots.length}}
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr style="background:#f1f5f9;border-bottom:2px solid #e2e8f0;">
-                  <th class="px-3 py-2 text-left">Date</th>
-                  <th class="px-3 py-2 text-left">Time</th>
-                  <th class="px-3 py-2 text-left">Purpose</th>
-                  <th class="px-3 py-2 text-left">Counselor</th>
-                  <th class="px-3 py-2 text-center">Capacity</th>
-                  <th class="px-3 py-2 text-center">Status</th>
-                  <th class="px-3 py-2 text-left">Notes</th>
-                  <th class="px-3 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{#each timeSlots}}
-                <tr class="border-b border-slate-200 hover:bg-slate-50">
-                  <td class="px-3 py-3 font-medium">{{formatDate date}}</td>
-                  <td class="px-3 py-3">{{timeSlot}}</td>
-                  <td class="px-3 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold
-                      {{#if (eq purpose 'Counseling')}}bg-blue-100 text-blue-700
-                      {{else if (eq purpose 'Good Moral Pickup')}}bg-green-100 text-green-700
-                      {{else}}bg-gray-100 text-gray-700{{/if}}">
-                      {{purpose}}
-                    </span>
-                  </td>
-                  <td class="px-3 py-3 text-xs">{{counselor.firstName}} {{counselor.lastName}}</td>
-                  <td class="px-3 py-3 text-center">
-                    <span class="{{#if (eq bookedCount maxSlots)}}text-red-600{{else}}text-green-600{{/if}} font-bold">
-                      {{bookedCount}}/{{maxSlots}}
-                    </span>
-                  </td>
-                  <td class="px-3 py-3 text-center">
-                    {{#if isAvailable}}
-                    <span class="badge badge-verified">Available</span>
-                    {{else}}
-                    <span class="badge badge-pending">Disabled</span>
-                    {{/if}}
-                  </td>
-                  <td class="px-3 py-3 text-xs text-gray-600">{{notes}}</td>
-                  <td class="px-3 py-3">
-                    <div class="flex gap-2 justify-center">
-                      <form action="/guidance/time-slots/{{id}}/toggle" method="POST" class="inline">
-                        <button type="submit" class="text-xs px-2 py-1 rounded {{#if isAvailable}}bg-yellow-100 text-yellow-700{{else}}bg-green-100 text-green-700{{/if}}">
-                          {{#if isAvailable}}Disable{{else}}Enable{{/if}}
-                        </button>
-                      </form>
-                      <form action="/guidance/time-slots/{{id}}/delete" method="POST" class="inline" onsubmit="return confirm('Delete this time slot?')">
-                        <button type="submit" class="text-xs px-2 py-1 rounded bg-red-100 text-red-700">Delete</button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-                {{/each}}
-              </tbody>
-            </table>
-          </div>
+
+            <div class="overflow-x-auto">
+
+              <table class="w-full text-sm">
+
+                <thead>
+
+                  <tr>
+
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Purpose</th>
+                    <th>Counselor</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+
+                  </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  {{#each timeSlots}}
+
+                    <tr>
+
+                      <td class="font-medium">
+                        {{formatDate this.date}}
+                      </td>
+
+
+                      <td>
+                        {{this.timeSlot}}
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          class="px-2 py-1 rounded-full text-xs font-semibold
+                          {{#if (eq this.purpose 'Counseling')}}
+                            bg-blue-100 text-blue-700
+                          {{else if (eq this.purpose 'Good Moral Pickup')}}
+                            bg-green-100 text-green-700
+                          {{else}}
+                            bg-gray-100 text-gray-700
+                          {{/if}}"
+                        >
+                          {{this.purpose}}
+                        </span>
+
+                      </td>
+
+
+                      <td class="text-xs">
+                        {{this.counselor.firstName}}
+                        {{this.counselor.lastName}}
+                      </td>
+
+
+                      <td class="text-center">
+
+                        <span
+                          class="{{#if (eq this.bookedCount this.maxSlots)}}text-red-600{{else}}text-green-600{{/if}} font-bold"
+                        >
+                          {{this.bookedCount}}/{{this.maxSlots}}
+                        </span>
+
+                      </td>
+
+
+                      <td class="text-center">
+
+                        {{#if this.isAvailable}}
+
+                          <span class="badge badge-verified">
+                            Available
+                          </span>
+
+                        {{else}}
+
+                          <span class="badge badge-pending">
+                            Disabled
+                          </span>
+
+                        {{/if}}
+
+                      </td>
+
+
+                      <td class="text-xs text-gray-600">
+                        {{this.notes}}
+                      </td>
+
+
+                      <td>
+
+                        <div class="flex gap-2 justify-center">
+
+                          <form
+                            action="/guidance/time-slots/{{this.id}}/toggle"
+                            method="POST"
+                            class="inline"
+                          >
+
+                            <button
+                              type="submit"
+                              class="text-xs px-2 py-1 rounded
+                              {{#if this.isAvailable}}
+                                bg-yellow-100 text-yellow-700
+                              {{else}}
+                                bg-green-100 text-green-700
+                              {{/if}}"
+                            >
+                              {{#if this.isAvailable}}
+                                Disable
+                              {{else}}
+                                Enable
+                              {{/if}}
+                            </button>
+
+                          </form>
+
+
+                          <form
+                            action="/guidance/time-slots/{{this.id}}/delete"
+                            method="POST"
+                            class="inline"
+                            onsubmit="return confirm('Delete this time slot?')"
+                          >
+
+                            <button
+                              type="submit"
+                              class="text-xs px-2 py-1 rounded bg-red-100 text-red-700"
+                            >
+                              Delete
+                            </button>
+
+                          </form>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  {{/each}}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
           {{else}}
-          <p class="text-gray-500 text-sm text-center py-8">No time slots created yet. Create some above to allow students to book appointments.</p>
+
+            <p class="text-gray-500 text-sm text-center py-8">
+              No time slots created yet.
+              Create some above to allow students to book appointments.
+            </p>
+
           {{/if}}
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- Reschedule Modal -->
-<div id="rescheduleModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.45);align-items:center;justify-content:center;" class="hidden">
-  <div style="background:#fff;border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <h2 style="font-size:1.1rem;font-weight:700;color:#1b5e38;margin:0;">✏️ Edit Appointment Schedule</h2>
-      <button onclick="closeReschedule()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;">✕</button>
+
+<!-- =========================================================
+     RESCHEDULE MODAL
+     ========================================================= -->
+
+<div
+  id="rescheduleModal"
+  class="hidden"
+  style="
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:rgba(0,0,0,.45);
+    align-items:center;
+    justify-content:center;
+  "
+>
+
+  <div
+    style="
+      background:#fff;
+      border-radius:16px;
+      padding:32px;
+      width:calc(100% - 32px);
+      max-width:440px;
+      box-shadow:0 8px 32px rgba(0,0,0,.18);
+    "
+  >
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:20px;
+      "
+    >
+
+      <h2
+        style="
+          font-size:1.1rem;
+          font-weight:700;
+          color:#1b5e38;
+          margin:0;
+        "
+      >
+        ✏️ Edit Appointment Schedule
+      </h2>
+
+
+      <button
+        type="button"
+        onclick="closeReschedule()"
+        style="
+          background:none;
+          border:none;
+          font-size:1.3rem;
+          cursor:pointer;
+          color:#94a3b8;
+        "
+      >
+        ✕
+      </button>
+
     </div>
-    <p style="font-size:.85rem;color:#64748b;margin-bottom:20px;">
-      Rescheduling for: <strong id="modalStudentName" style="color:#1e293b;"></strong>
+
+
+    <p
+      style="
+        font-size:.85rem;
+        color:#64748b;
+        margin-bottom:20px;
+      "
+    >
+      Rescheduling for:
+
+      <strong
+        id="modalStudentName"
+        style="color:#1e293b;"
+      ></strong>
     </p>
-    <form id="rescheduleForm" method="POST">
+
+
+    <form
+      id="rescheduleForm"
+      method="POST"
+    >
+
       <div style="margin-bottom:16px;">
-        <label class="label">New Date</label>
-        <input type="date" name="newDate" id="modalDate" class="input" required>
+
+        <label class="label">
+          New Date
+        </label>
+
+        <input
+          type="date"
+          name="newDate"
+          id="modalDate"
+          class="input"
+          required
+        >
+
       </div>
+
+
       <div style="margin-bottom:24px;">
-        <label class="label">New Time Slot</label>
-        <select name="newTimeSlot" id="modalTimeSlot" class="input" required>
-          <option value="">— Select time slot —</option>
-          <option value="8:00 AM - 9:00 AM">8:00 AM – 9:00 AM</option>
-          <option value="9:00 AM - 10:00 AM">9:00 AM – 10:00 AM</option>
-          <option value="10:00 AM - 11:00 AM">10:00 AM – 11:00 AM</option>
-          <option value="11:00 AM - 12:00 PM">11:00 AM – 12:00 PM</option>
-          <option value="1:00 PM - 2:00 PM">1:00 PM – 2:00 PM</option>
-          <option value="2:00 PM - 3:00 PM">2:00 PM – 3:00 PM</option>
-          <option value="3:00 PM - 4:00 PM">3:00 PM – 4:00 PM</option>
-          <option value="4:00 PM - 5:00 PM">4:00 PM – 5:00 PM</option>
+
+        <label class="label">
+          New Time Slot
+        </label>
+
+        <select
+          name="newTimeSlot"
+          id="modalTimeSlot"
+          class="input"
+          required
+        >
+
+          <option value="">
+            — Select time slot —
+          </option>
+
+          <option value="8:00 AM - 9:00 AM">
+            8:00 AM – 9:00 AM
+          </option>
+
+          <option value="9:00 AM - 10:00 AM">
+            9:00 AM – 10:00 AM
+          </option>
+
+          <option value="10:00 AM - 11:00 AM">
+            10:00 AM – 11:00 AM
+          </option>
+
+          <option value="11:00 AM - 12:00 PM">
+            11:00 AM – 12:00 PM
+          </option>
+
+          <option value="1:00 PM - 2:00 PM">
+            1:00 PM – 2:00 PM
+          </option>
+
+          <option value="2:00 PM - 3:00 PM">
+            2:00 PM – 3:00 PM
+          </option>
+
+          <option value="3:00 PM - 4:00 PM">
+            3:00 PM – 4:00 PM
+          </option>
+
+          <option value="4:00 PM - 5:00 PM">
+            4:00 PM – 5:00 PM
+          </option>
+
         </select>
+
       </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button type="button" onclick="closeReschedule()" style="background:#f1f5f9;color:#475569;border:none;padding:9px 20px;border-radius:8px;font-weight:600;cursor:pointer;">Cancel</button>
-        <button type="submit" style="background:#1b5e38;color:#fff;border:none;padding:9px 22px;border-radius:8px;font-weight:600;cursor:pointer;">Save & Notify</button>
+
+
+      <div
+        style="
+          display:flex;
+          gap:10px;
+          justify-content:flex-end;
+        "
+      >
+
+        <button
+          type="button"
+          onclick="closeReschedule()"
+          style="
+            background:#f1f5f9;
+            color:#475569;
+            border:none;
+            padding:9px 20px;
+            border-radius:8px;
+            font-weight:600;
+            cursor:pointer;
+          "
+        >
+          Cancel
+        </button>
+
+
+        <button
+          type="submit"
+          style="
+            background:#1b5e38;
+            color:#fff;
+            border:none;
+            padding:9px 22px;
+            border-radius:8px;
+            font-weight:600;
+            cursor:pointer;
+          "
+        >
+          Save & Notify
+        </button>
+
       </div>
+
     </form>
+
   </div>
+
 </div>
+
 
 <style>
-.tab-btn {
-  padding: 10px 20px;
-  border: none;
-  background: transparent;
-  border-bottom: 3px solid transparent;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.tab-btn.active {
-  color: #1b5e38;
-  border-bottom-color: #1b5e38;
-}
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-}
+
+  .tab-btn {
+    padding: 10px 20px;
+
+    border: none;
+
+    background: transparent;
+
+    border-bottom: 3px solid transparent;
+
+    font-weight: 600;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    color: #1b5e38;
+
+    border-bottom-color: #1b5e38;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
 </style>
 
+
 <script>
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-  
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('content-' + tab).classList.add('active');
-}
 
-function openReschedule(id, date, timeSlot, studentName) {
-  document.getElementById('rescheduleForm').action = '/guidance/appointments/' + id + '/reschedule';
-  document.getElementById('modalDate').value = date;
-  document.getElementById('modalStudentName').textContent = studentName;
-  
-  const sel = document.getElementById('modalTimeSlot');
-  for (let i = 0; i < sel.options.length; i++) {
-    if (sel.options[i].value === timeSlot) { sel.selectedIndex = i; break; }
+  function switchTab(tab) {
+
+    document
+      .querySelectorAll('.tab-btn')
+      .forEach(function (btn) {
+        btn.classList.remove('active');
+      });
+
+
+    document
+      .querySelectorAll('.tab-content')
+      .forEach(function (content) {
+        content.classList.remove('active');
+      });
+
+
+    const tabButton =
+      document.getElementById('tab-' + tab);
+
+    const tabContent =
+      document.getElementById('content-' + tab);
+
+
+    if (tabButton) {
+      tabButton.classList.add('active');
+    }
+
+    if (tabContent) {
+      tabContent.classList.add('active');
+    }
+
   }
-  
-  const modal = document.getElementById('rescheduleModal');
-  modal.style.display = 'flex';
-  modal.classList.remove('hidden');
-}
 
-function closeReschedule() {
-  const modal = document.getElementById('rescheduleModal');
-  modal.style.display = 'none';
-  modal.classList.add('hidden');
-}
 
-document.getElementById('rescheduleModal').addEventListener('click', function(e) {
-  if (e.target === this) closeReschedule();
-});
+  function openReschedule(
+    id,
+    date,
+    timeSlot,
+    studentName
+  ) {
+
+    const form =
+      document.getElementById('rescheduleForm');
+
+    const dateInput =
+      document.getElementById('modalDate');
+
+    const studentNameElement =
+      document.getElementById('modalStudentName');
+
+    const timeSelect =
+      document.getElementById('modalTimeSlot');
+
+    const modal =
+      document.getElementById('rescheduleModal');
+
+
+    if (!form || !modal) {
+      return;
+    }
+
+
+    form.action =
+      '/guidance/appointments/' +
+      encodeURIComponent(id) +
+      '/reschedule';
+
+
+    dateInput.value = date || '';
+
+    studentNameElement.textContent =
+      studentName || '';
+
+
+    timeSelect.value =
+      timeSlot || '';
+
+
+    modal.style.display = 'flex';
+
+    modal.classList.remove('hidden');
+
+  }
+
+
+  function openRescheduleFromButton(button) {
+
+    if (!button) {
+      return;
+    }
+
+
+    openReschedule(
+      button.dataset.id,
+      button.dataset.date,
+      button.dataset.time,
+      button.dataset.student
+    );
+
+  }
+
+
+  function closeReschedule() {
+
+    const modal =
+      document.getElementById('rescheduleModal');
+
+
+    if (!modal) {
+      return;
+    }
+
+
+    modal.style.display = 'none';
+
+    modal.classList.add('hidden');
+
+  }
+
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+      const modal =
+        document.getElementById('rescheduleModal');
+
+
+      if (modal) {
+
+        modal.addEventListener(
+          'click',
+          function (event) {
+
+            if (event.target === modal) {
+              closeReschedule();
+            }
+
+          }
+        );
+
+      }
+
+
+      document.addEventListener(
+        'keydown',
+        function (event) {
+
+          if (event.key === 'Escape') {
+            closeReschedule();
+          }
+
+        }
+      );
+
+    }
+  );
+
 </script>
-</body></html>
+
+
+</body>
+</html>

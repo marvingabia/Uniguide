@@ -4,9 +4,11 @@
 
   {{> sidebar-cashier activePage="home"}}
 
+
   <div class="w-full min-h-screen overflow-y-auto bg-slate-100">
 
     <!-- Top Navigation -->
+
     <div class="nav-top">
 
       <div>
@@ -24,11 +26,11 @@
 
       <div class="flex items-center gap-3">
 
-        {{#if unreadNotifCount}}
+        {{#if (gt unreadNotifCount 0)}}
 
-        <span class="badge badge-submitted">
-          {{unreadNotifCount}} new
-        </span>
+          <span class="badge badge-submitted">
+            {{unreadNotifCount}} new
+          </span>
 
         {{/if}}
 
@@ -47,12 +49,17 @@
       {{> flash}}
 
 
-      <!-- Stat Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <!-- Statistics -->
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6"
+      >
 
         <div class="card flex items-center gap-4">
 
-          <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0">
+          <div
+            class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0"
+          >
             💳
           </div>
 
@@ -73,7 +80,9 @@
 
         <div class="card flex items-center gap-4">
 
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+          <div
+            class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
+          >
             🧾
           </div>
 
@@ -94,14 +103,16 @@
 
         <div class="card flex items-center gap-4">
 
-          <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+          <div
+            class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center shrink-0"
+          >
             📑
           </div>
 
           <div>
 
             <p class="text-xl font-bold text-purple-600">
-              {{pendingCount}}
+              {{awaitingActionCount}}
             </p>
 
             <p class="text-gray-500 text-xs">
@@ -115,7 +126,9 @@
 
         <div class="card flex items-center gap-4">
 
-          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+          <div
+            class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
+          >
             💰
           </div>
 
@@ -137,12 +150,14 @@
 
 
       <!-- Tabs -->
+
       <div class="flex gap-1 mb-4 border-b border-slate-200">
 
         <button
           onclick="showTab('pending')"
           id="tab-pending"
-          class="tab-active px-5 py-2 text-sm font-semibold rounded-t-lg">
+          class="tab-active px-5 py-2 text-sm font-semibold rounded-t-lg"
+        >
 
           Payment Submitted
 
@@ -156,7 +171,8 @@
         <button
           onclick="showTab('receipted')"
           id="tab-receipted"
-          class="tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg">
+          class="tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg"
+        >
 
           Receipt Issued
 
@@ -170,132 +186,130 @@
 
 
       <!-- Payment Submitted -->
+
       <div id="panel-pending">
 
         {{#if pending.length}}
 
-        <div class="card p-0 overflow-hidden">
+          <div class="card p-0 overflow-x-auto">
 
-          <table>
+            <table>
 
-            <thead>
+              <thead>
 
-              <tr>
-                <th>#</th>
-                <th>Student</th>
-                <th>Year Level</th>
-                <th>Documents</th>
-                <th>Method</th>
-                <th>Reference No.</th>
-                <th>Submitted</th>
-                <th>Action</th>
-              </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Year Level</th>
+                  <th>Documents</th>
+                  <th>Method</th>
+                  <th>Reference No.</th>
+                  <th>Submitted</th>
+                  <th>Action</th>
+                </tr>
 
-            </thead>
-
-
-            <tbody>
-
-              {{#each pending}}
-
-              <tr>
-
-                <td class="text-gray-500 text-xs">
-                  {{this.id}}
-                </td>
+              </thead>
 
 
-                <td>
+              <tbody>
 
-                  <div class="text-slate-800 text-sm font-medium">
-                    {{this.surname}}, {{this.givenName}}
-                  </div>
+                {{#each pending}}
 
-                  <div class="text-gray-600 text-xs">
-                    {{this.student.email}}
-                  </div>
+                  <tr>
 
-                </td>
+                    <td class="text-gray-500 text-xs">
+                      {{this.id}}
+                    </td>
 
 
-                <td class="text-slate-600 text-xs font-semibold">
-                  {{this.yearLevel}}
-                </td>
+                    <td>
+
+                      <div class="text-slate-800 text-sm font-medium">
+                        {{this.surname}}, {{this.givenName}}
+                      </div>
+
+                      <div class="text-gray-600 text-xs">
+                        {{this.student.email}}
+                      </div>
+
+                    </td>
 
 
-                <td class="text-gray-600 text-xs">
-
-                  <div class="space-y-1">
-
-                    {{#if (gt this.qtyGoodMoral 0)}}
-                    <div>
-                      Good Moral: {{this.qtyGoodMoral}}
-                    </div>
-                    {{/if}}
-
-                    {{#if (gt this.qtyCTC 0)}}
-                    <div>
-                      CTC/Auth: {{this.qtyCTC}}
-                    </div>
-                    {{/if}}
-
-                  </div>
-
-                </td>
+                    <td class="text-slate-600 text-xs font-semibold">
+                      {{this.yearLevel}}
+                    </td>
 
 
-                <td>
+                    <td class="text-gray-600 text-xs">
 
-                  <span class="badge badge-submitted text-xs">
-                    {{this.paymentMethod}}
-                  </span>
+                      {{#if (gt this.qtyGoodMoral 0)}}
+                        <div>
+                          Good Moral: {{this.qtyGoodMoral}}
+                        </div>
+                      {{/if}}
 
-                </td>
+                      {{#if (gt this.qtyCTC 0)}}
+                        <div>
+                          CTC/Auth: {{this.qtyCTC}}
+                        </div>
+                      {{/if}}
 
-
-                <td class="text-slate-600 text-xs font-mono">
-                  {{this.referenceNumber}}
-                </td>
-
-
-                <td class="text-gray-500 text-xs">
-                  {{formatDateTime this.updatedAt}}
-                </td>
+                    </td>
 
 
-                <td>
+                    <td>
 
-                  <a
-                    href="/cashier/application/{{this.id}}"
-                    class="btn-green btn-sm">
-                    Review
-                  </a>
+                      <span class="badge badge-submitted">
+                        {{this.paymentMethod}}
+                      </span>
 
-                </td>
+                    </td>
 
-              </tr>
 
-              {{/each}}
+                    <td class="text-slate-600 text-xs font-mono">
+                      {{this.referenceNumber}}
+                    </td>
 
-            </tbody>
 
-          </table>
+                    <td class="text-gray-500 text-xs">
+                      {{formatDateTime this.updatedAt}}
+                    </td>
 
-        </div>
+
+                    <td>
+
+                      <a
+                        href="/cashier/application/{{this.id}}"
+                        class="btn-green btn-sm"
+                      >
+                        Review
+                      </a>
+
+                    </td>
+
+                  </tr>
+
+                {{/each}}
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         {{else}}
 
-        <div class="card text-center py-12">
+          <div class="card text-center py-12">
 
-          <div class="text-4xl mb-2">
-            ✅
+            <div class="text-4xl mb-2">
+              ✅
+            </div>
+
+            <p class="text-gray-500 text-sm">
+              No pending payments to review.
+            </p>
+
           </div>
-
-          <p class="text-gray-500 text-sm">
-            No pending payments to review.
-          </p>
-
-        </div>
 
         {{/if}}
 
@@ -303,120 +317,119 @@
 
 
       <!-- Receipted -->
+
       <div
         id="panel-receipted"
-        style="display:none">
+        style="display:none;"
+      >
 
         {{#if receipted.length}}
 
-        <div class="card p-0 overflow-hidden">
+          <div class="card p-0 overflow-x-auto">
 
-          <table>
+            <table>
 
-            <thead>
+              <thead>
 
-              <tr>
-                <th>#</th>
-                <th>Student</th>
-                <th>Year Level</th>
-                <th>Documents</th>
-                <th>OR Number</th>
-                <th>Amount</th>
-                <th>Action</th>
-              </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Year Level</th>
+                  <th>Documents</th>
+                  <th>OR Number</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
 
-            </thead>
-
-
-            <tbody>
-
-              {{#each receipted}}
-
-              <tr>
-
-                <td class="text-gray-500 text-xs">
-                  {{this.id}}
-                </td>
+              </thead>
 
 
-                <td>
+              <tbody>
 
-                  <div class="text-slate-800 text-sm font-medium">
-                    {{this.surname}}, {{this.givenName}}
-                  </div>
+                {{#each receipted}}
 
-                  <div class="text-gray-600 text-xs">
-                    {{this.student.email}}
-                  </div>
+                  <tr>
 
-                </td>
+                    <td class="text-gray-500 text-xs">
+                      {{this.id}}
+                    </td>
 
 
-                <td class="text-slate-600 text-xs font-semibold">
-                  {{this.yearLevel}}
-                </td>
+                    <td>
+
+                      <div class="text-slate-800 text-sm font-medium">
+                        {{this.surname}}, {{this.givenName}}
+                      </div>
+
+                      <div class="text-gray-600 text-xs">
+                        {{this.student.email}}
+                      </div>
+
+                    </td>
 
 
-                <td class="text-gray-600 text-xs">
-
-                  <div class="space-y-1">
-
-                    {{#if (gt this.qtyGoodMoral 0)}}
-                    <div>
-                      Good Moral: {{this.qtyGoodMoral}}
-                    </div>
-                    {{/if}}
-
-                    {{#if (gt this.qtyCTC 0)}}
-                    <div>
-                      CTC/Auth: {{this.qtyCTC}}
-                    </div>
-                    {{/if}}
-
-                  </div>
-
-                </td>
+                    <td class="text-slate-600 text-xs font-semibold">
+                      {{this.yearLevel}}
+                    </td>
 
 
-                <td class="text-slate-600 text-xs font-mono">
-                  {{this.orNumber}}
-                </td>
+                    <td class="text-gray-600 text-xs">
+
+                      {{#if (gt this.qtyGoodMoral 0)}}
+                        <div>
+                          Good Moral: {{this.qtyGoodMoral}}
+                        </div>
+                      {{/if}}
+
+                      {{#if (gt this.qtyCTC 0)}}
+                        <div>
+                          CTC/Auth: {{this.qtyCTC}}
+                        </div>
+                      {{/if}}
+
+                    </td>
 
 
-                <td class="text-green-700 font-bold">
-                  {{currency this.totalAmount}}
-                </td>
+                    <td class="text-slate-600 text-xs font-mono">
+                      {{this.orNumber}}
+                    </td>
 
 
-                <td>
+                    <td class="text-green-700 font-bold">
+                      {{currency this.totalAmount}}
+                    </td>
 
-                  <a
-                    href="/cashier/application/{{this.id}}"
-                    class="text-green-700 text-xs hover:underline">
-                    View →
-                  </a>
 
-                </td>
+                    <td>
 
-              </tr>
+                      <a
+                        href="/cashier/application/{{this.id}}"
+                        class="text-green-700 text-xs hover:underline"
+                      >
+                        View →
+                      </a>
 
-              {{/each}}
+                    </td>
 
-            </tbody>
+                  </tr>
 
-          </table>
+                {{/each}}
 
-        </div>
+              </tbody>
+
+            </table>
+
+          </div>
 
         {{else}}
 
-        <div class="card text-center py-12">
+          <div class="card text-center py-12">
 
-          <p class="text-gray-500 text-sm">
-            No receipts issued yet.
-          </p>
+            <p class="text-gray-500 text-sm">
+              No receipts issued yet.
+            </p>
 
-        </div>
+          </div>
 
         {{/if}}
 
@@ -432,20 +445,29 @@
 <style>
 
   .tab-active {
-    color:#1b5e38;
-    border-bottom:2px solid #1b5e38;
-    background:transparent;
+    color: #1b5e38;
+
+    border: none;
+    border-bottom: 2px solid #1b5e38;
+
+    background: transparent;
+
+    cursor: pointer;
   }
 
   .tab-inactive {
-    color:#64748b;
-    border-bottom:2px solid transparent;
-    background:transparent;
-    cursor:pointer;
+    color: #64748b;
+
+    border: none;
+    border-bottom: 2px solid transparent;
+
+    background: transparent;
+
+    cursor: pointer;
   }
 
   .tab-inactive:hover {
-    color:#1b5e38;
+    color: #1b5e38;
   }
 
 </style>
@@ -453,23 +475,31 @@
 
 <script>
 
-function showTab(name) {
+  function showTab(name) {
 
-  ['pending','receipted'].forEach(function(t) {
+    ['pending', 'receipted'].forEach(function (tab) {
 
-    document.getElementById('panel-' + t).style.display =
-      t === name ? '' : 'none';
+      const panel = document.getElementById('panel-' + tab);
+      const button = document.getElementById('tab-' + tab);
 
-    document.getElementById('tab-' + t).className =
-      t === name
-        ? 'tab-active px-5 py-2 text-sm font-semibold rounded-t-lg'
-        : 'tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg';
+      if (!panel || !button) {
+        return;
+      }
 
-  });
+      panel.style.display =
+        tab === name ? '' : 'none';
 
-}
+      button.className =
+        tab === name
+          ? 'tab-active px-5 py-2 text-sm font-semibold rounded-t-lg'
+          : 'tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg';
+
+    });
+
+  }
 
 </script>
+
 
 </body>
 </html>
