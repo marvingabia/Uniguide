@@ -35,7 +35,6 @@
     content="MinSU Bongabong Campus Good Moral Certificate Online Application System"
   >
 
-  <!-- PWA -->
   <link
     rel="manifest"
     href="/manifest.json"
@@ -54,7 +53,6 @@
 
   <title>{{title}}</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
 
@@ -70,15 +68,19 @@
       box-sizing: border-box;
     }
 
+
     html {
       width: 100%;
       min-height: 100%;
+
       overflow-x: hidden;
     }
+
 
     body {
       width: 100%;
       min-height: 100vh;
+
       margin: 0;
       padding: 0;
 
@@ -93,6 +95,17 @@
         sans-serif;
 
       overflow-x: hidden;
+
+      overflow-y: auto;
+
+      -webkit-overflow-scrolling: touch;
+
+      overscroll-behavior-y: auto;
+    }
+
+
+    body.menu-open {
+      overflow: hidden;
     }
 
 
@@ -102,20 +115,32 @@
 
     .app-shell {
       display: flex;
+
       width: 100%;
       min-height: 100vh;
+
       align-items: stretch;
+
+      min-width: 0;
     }
+
 
     .main-content {
       flex: 1 1 auto;
+
       min-width: 0;
+
       width: 100%;
+
       min-height: 100vh;
 
       background: #f0f4f8;
 
       overflow-x: hidden;
+
+      overflow-y: auto;
+
+      -webkit-overflow-scrolling: touch;
     }
 
 
@@ -125,8 +150,10 @@
 
     .page-content {
       width: 100%;
-      padding: 20px;
+
       min-width: 0;
+
+      padding: 20px;
     }
 
 
@@ -138,22 +165,31 @@
       width: 100%;
 
       background: #fff;
-      border-bottom: 1px solid #e2e8f0;
 
-      padding: 12px 24px;
+      border-bottom:
+        1px solid #e2e8f0;
+
+      padding:
+        12px 24px;
 
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
 
       min-height: 58px;
 
       box-shadow:
-        0 1px 3px rgba(0, 0, 0, .05);
+        0 1px 3px rgba(0,0,0,.05);
 
       position: relative;
 
       z-index: 50;
+
+      flex-shrink: 0;
+
+      min-width: 0;
 
       transition:
         transform .25s ease,
@@ -161,16 +197,16 @@
         box-shadow .25s ease;
     }
 
-    /*
-     * Used by the All Applications page.
-     * It disappears while scrolling down
-     * and comes back when scrolling up.
-     */
+
     .nav-top.nav-hidden {
-      transform: translateY(-100%);
+      transform:
+        translateY(-100%);
+
       opacity: 0;
+
       pointer-events: none;
     }
+
 
     .nav-title {
       min-width: 0;
@@ -184,45 +220,54 @@
     .badge {
       display: inline-block;
 
-      padding: 3px 12px;
+      padding:
+        3px 12px;
 
       border-radius: 9999px;
 
       font-size: .72rem;
+
       font-weight: 700;
 
       white-space: nowrap;
     }
+
 
     .badge-pending {
       background: #fef9c3;
       color: #854d0e;
     }
 
+
     .badge-submitted {
       background: #dbeafe;
       color: #1e40af;
     }
+
 
     .badge-verified {
       background: #dcfce7;
       color: #166534;
     }
 
+
     .badge-receipted {
       background: #e0e7ff;
       color: #3730a3;
     }
+
 
     .badge-approved {
       background: #f3e8ff;
       color: #6b21a8;
     }
 
+
     .badge-released {
       background: #d1fae5;
       color: #065f46;
     }
+
 
     .badge-rejected {
       background: #fee2e2;
@@ -236,16 +281,20 @@
 
     .btn-green {
       background: #1b5e38;
+
       color: #fff;
 
-      padding: 8px 20px;
+      padding:
+        8px 20px;
 
       border-radius: 8px;
+
       border: none;
 
       cursor: pointer;
 
       font-weight: 600;
+
       font-size: .88rem;
 
       transition:
@@ -259,11 +308,16 @@
       text-align: center;
 
       touch-action: manipulation;
+
+      -webkit-tap-highlight-color:
+        transparent;
     }
+
 
     .btn-green:hover {
       background: #154d2f;
     }
+
 
     .btn-green:active {
       transform: scale(.98);
@@ -272,19 +326,24 @@
 
     .btn-blue {
       background: #1d4ed8;
+
       color: #fff;
 
-      padding: 8px 20px;
+      padding:
+        8px 20px;
 
       border-radius: 8px;
+
       border: none;
 
       cursor: pointer;
 
       font-weight: 600;
+
       font-size: .88rem;
 
-      transition: background .2s;
+      transition:
+        background .2s;
 
       text-decoration: none;
 
@@ -294,6 +353,7 @@
 
       touch-action: manipulation;
     }
+
 
     .btn-blue:hover {
       background: #1e40af;
@@ -302,20 +362,25 @@
 
     .btn-red {
       background: #dc2626;
+
       color: #fff;
 
-      padding: 8px 20px;
+      padding:
+        8px 20px;
 
       border-radius: 8px;
+
       border: none;
 
       cursor: pointer;
 
       font-weight: 600;
+
       font-size: .88rem;
 
       touch-action: manipulation;
     }
+
 
     .btn-red:hover {
       background: #b91c1c;
@@ -324,17 +389,21 @@
 
     .btn-outline {
       background: transparent;
+
       color: #1b5e38;
 
-      border: 1.5px solid #1b5e38;
+      border:
+        1.5px solid #1b5e38;
 
-      padding: 7px 18px;
+      padding:
+        7px 18px;
 
       border-radius: 8px;
 
       cursor: pointer;
 
       font-weight: 600;
+
       font-size: .88rem;
 
       text-decoration: none;
@@ -344,16 +413,23 @@
       text-align: center;
 
       touch-action: manipulation;
+
+      -webkit-tap-highlight-color:
+        transparent;
     }
+
 
     .btn-outline:hover {
       background: #1b5e38;
+
       color: #fff;
     }
 
 
     .btn-sm {
-      padding: 5px 12px;
+      padding:
+        5px 12px;
+
       font-size: .78rem;
     }
 
@@ -365,27 +441,32 @@
     .card {
       background: #fff;
 
-      border: 1px solid #e2e8f0;
+      border:
+        1px solid #e2e8f0;
 
       border-radius: 12px;
 
       padding: 20px;
 
       box-shadow:
-        0 1px 4px rgba(0, 0, 0, .07);
+        0 1px 4px rgba(0,0,0,.07);
+
+      min-width: 0;
     }
+
 
     .card-sm {
       background: #fff;
 
-      border: 1px solid #e2e8f0;
+      border:
+        1px solid #e2e8f0;
 
       border-radius: 10px;
 
       padding: 14px;
 
       box-shadow:
-        0 1px 2px rgba(0, 0, 0, .05);
+        0 1px 2px rgba(0,0,0,.05);
     }
 
 
@@ -396,11 +477,13 @@
     .input {
       background: #fff;
 
-      border: 1px solid #cbd5e1;
+      border:
+        1px solid #cbd5e1;
 
       border-radius: 8px;
 
-      padding: 10px 14px;
+      padding:
+        10px 14px;
 
       color: #1e293b;
 
@@ -415,11 +498,14 @@
       touch-action: manipulation;
     }
 
+
     .input:focus {
-      border-color: #1b5e38;
+      border-color:
+        #1b5e38;
 
       box-shadow:
-        0 0 0 3px rgba(27, 94, 56, .13);
+        0 0 0 3px
+        rgba(27,94,56,.13);
     }
 
 
@@ -440,6 +526,20 @@
        SIDEBAR
     ========================================================= */
 
+    aside {
+      flex-shrink: 0;
+
+      touch-action: pan-y;
+
+      -webkit-overflow-scrolling: touch;
+
+      overscroll-behavior-y: contain;
+
+      transition:
+        transform .3s ease;
+    }
+
+
     .sidebar-link {
       display: flex;
 
@@ -447,7 +547,8 @@
 
       gap: 10px;
 
-      padding: 9px 14px;
+      padding:
+        9px 14px;
 
       border-radius: 8px;
 
@@ -459,17 +560,25 @@
 
       font-weight: 500;
 
-      transition: all .18s;
+      transition:
+        all .18s;
 
       touch-action: manipulation;
 
       min-height: 44px;
+
+      -webkit-tap-highlight-color:
+        transparent;
     }
 
+
     .sidebar-link:hover {
-      background: rgba(255,255,255,.13);
+      background:
+        rgba(255,255,255,.13);
+
       color: #fff;
     }
+
 
     .sidebar-link.active {
       background: #fff;
@@ -482,27 +591,33 @@
         0 2px 8px rgba(0,0,0,.13);
     }
 
+
     .sidebar-link .badge {
       font-size: .65rem;
-      padding: 2px 6px;
+
+      padding:
+        2px 6px;
     }
 
 
     /* =========================================================
-       TABLE — GENERAL
+       TABLE
     ========================================================= */
 
     table {
       width: 100%;
+
       border-collapse: collapse;
     }
+
 
     th {
       background: #f8fafc;
 
       color: #1b5e38;
 
-      padding: 10px 14px;
+      padding:
+        10px 14px;
 
       text-align: left;
 
@@ -518,8 +633,10 @@
         2px solid #e2e8f0;
     }
 
+
     td {
-      padding: 10px 14px;
+      padding:
+        10px 14px;
 
       border-bottom:
         1px solid #f1f5f9;
@@ -531,9 +648,11 @@
       vertical-align: middle;
     }
 
+
     tr:last-child td {
       border-bottom: none;
     }
+
 
     tr:hover td {
       background: #f6fbf8;
@@ -541,7 +660,201 @@
 
 
     /* =========================================================
-       GUIDANCE APPLICATIONS PAGE
+       APPLICATION TABLE
+    ========================================================= */
+
+    .applications-card {
+      width: 100%;
+
+      padding: 0;
+
+      overflow: hidden;
+
+      min-width: 0;
+    }
+
+
+    .applications-table-scroll {
+      width: 100%;
+
+      max-width: 100%;
+
+      overflow-x: auto;
+
+      overflow-y: hidden;
+
+      -webkit-overflow-scrolling: touch;
+
+      overscroll-behavior-x: contain;
+
+      touch-action:
+        pan-x pan-y;
+
+      scrollbar-width: thin;
+    }
+
+
+    .applications-table {
+      width: max-content;
+
+      min-width: 980px;
+
+      table-layout: auto;
+    }
+
+
+    .applications-table th,
+    .applications-table td {
+      white-space: nowrap;
+    }
+
+
+    .applications-table th:nth-child(1) {
+      width: 55px;
+    }
+
+
+    .applications-table th:nth-child(2) {
+      min-width: 190px;
+    }
+
+
+    .applications-table th:nth-child(3) {
+      min-width: 130px;
+    }
+
+
+    .applications-table th:nth-child(4) {
+      min-width: 160px;
+    }
+
+
+    .applications-table th:nth-child(5) {
+      min-width: 100px;
+    }
+
+
+    .applications-table th:nth-child(6) {
+      min-width: 150px;
+    }
+
+
+    .applications-table th:nth-child(7) {
+      min-width: 110px;
+    }
+
+
+    .applications-table th:nth-child(8) {
+      min-width: 80px;
+    }
+
+
+    .student-name {
+      color: #1e293b;
+
+      font-size: .875rem;
+
+      font-weight: 600;
+
+      white-space: nowrap;
+    }
+
+
+    .student-email {
+      color: #64748b;
+
+      font-size: .75rem;
+
+      margin-top: 2px;
+
+      white-space: nowrap;
+    }
+
+
+    .course-cell {
+      color: #64748b;
+
+      font-size: .875rem;
+
+      white-space: nowrap;
+    }
+
+
+    .documents-cell {
+      color: #4b5563;
+
+      font-size: .75rem;
+    }
+
+
+    .document-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+    }
+
+
+    .amount-cell {
+      color: #15803d;
+
+      font-size: .875rem;
+
+      font-weight: 600;
+
+      white-space: nowrap;
+    }
+
+
+    .date-cell {
+      color: #64748b;
+
+      font-size: .75rem;
+
+      white-space: nowrap;
+    }
+
+
+    .view-link {
+      color: #15803d;
+
+      font-size: .75rem;
+
+      font-weight: 600;
+
+      text-decoration: none;
+
+      white-space: nowrap;
+    }
+
+
+    .view-link:hover {
+      text-decoration: underline;
+    }
+
+
+    .mobile-scroll-hint {
+      display: none;
+
+      text-align: center;
+
+      color: #64748b;
+
+      font-size: .7rem;
+
+      padding:
+        7px 10px;
+
+      border-top:
+        1px solid #e2e8f0;
+
+      background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       FILTERS
     ========================================================= */
 
     .application-filters {
@@ -556,292 +869,28 @@
       margin-bottom: 16px;
 
       min-width: 0;
+
+      flex-wrap: wrap;
     }
+
 
     .filter-search {
       max-width: 260px;
     }
 
+
     .filter-status {
       width: auto;
+
       min-width: 170px;
     }
+
 
     .filter-button,
     .clear-button {
       flex: 0 0 auto;
-      white-space: nowrap;
-    }
-
-
-    /* =========================================================
-       APPLICATION TABLE
-    ========================================================= */
-
-    .applications-card {
-      width: 100%;
-
-      padding: 0;
-
-      overflow: hidden;
-    }
-
-    .applications-table-scroll {
-      width: 100%;
-
-      overflow-x: auto;
-      overflow-y: hidden;
-
-      -webkit-overflow-scrolling: touch;
-
-      overscroll-behavior-x: contain;
-
-      scrollbar-width: thin;
-    }
-
-    .applications-table {
-      width: 100%;
-
-      min-width: 980px;
-
-      table-layout: auto;
-    }
-
-    .applications-table th,
-    .applications-table td {
-      white-space: nowrap;
-    }
-
-    .applications-table th:nth-child(1) {
-      width: 55px;
-    }
-
-    .applications-table th:nth-child(2) {
-      min-width: 190px;
-    }
-
-    .applications-table th:nth-child(3) {
-      min-width: 130px;
-    }
-
-    .applications-table th:nth-child(4) {
-      min-width: 160px;
-    }
-
-    .applications-table th:nth-child(5) {
-      min-width: 100px;
-    }
-
-    .applications-table th:nth-child(6) {
-      min-width: 150px;
-    }
-
-    .applications-table th:nth-child(7) {
-      min-width: 110px;
-    }
-
-    .applications-table th:nth-child(8) {
-      min-width: 80px;
-    }
-
-
-    /* =========================================================
-       TABLE CONTENT
-    ========================================================= */
-
-    .student-name {
-      color: #1e293b;
-
-      font-size: .875rem;
-
-      font-weight: 600;
 
       white-space: nowrap;
-    }
-
-    .student-email {
-      color: #64748b;
-
-      font-size: .75rem;
-
-      margin-top: 2px;
-
-      white-space: nowrap;
-    }
-
-    .course-cell {
-      color: #64748b;
-
-      font-size: .875rem;
-
-      white-space: nowrap;
-    }
-
-    .documents-cell {
-      color: #4b5563;
-
-      font-size: .75rem;
-    }
-
-    .document-list {
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 4px;
-    }
-
-    .amount-cell {
-      color: #15803d;
-
-      font-size: .875rem;
-
-      font-weight: 600;
-
-      white-space: nowrap;
-    }
-
-    .date-cell {
-      color: #64748b;
-
-      font-size: .75rem;
-
-      white-space: nowrap;
-    }
-
-    .view-link {
-      color: #15803d;
-
-      font-size: .75rem;
-
-      font-weight: 600;
-
-      text-decoration: none;
-
-      white-space: nowrap;
-    }
-
-    .view-link:hover {
-      text-decoration: underline;
-    }
-
-    .mobile-scroll-hint {
-      display: none;
-
-      text-align: center;
-
-      color: #64748b;
-
-      font-size: .7rem;
-
-      padding: 7px 10px;
-
-      border-top: 1px solid #e2e8f0;
-
-      background: #f8fafc;
-    }
-
-
-    /* =========================================================
-       EMPTY STATE
-    ========================================================= */
-
-    .empty-applications {
-      text-align: center;
-
-      padding-top: 64px;
-      padding-bottom: 64px;
-    }
-
-    .empty-icon {
-      font-size: 3rem;
-
-      margin-bottom: 12px;
-    }
-
-
-    /* =========================================================
-       NOTIFICATIONS
-    ========================================================= */
-
-    .notif-info {
-      background: #eff6ff;
-      border-left: 3px solid #3b82f6;
-    }
-
-    .notif-success {
-      background: #f0fdf4;
-      border-left: 3px solid #22c55e;
-    }
-
-    .notif-warning {
-      background: #fffbeb;
-      border-left: 3px solid #f59e0b;
-    }
-
-    .notif-danger {
-      background: #fef2f2;
-      border-left: 3px solid #ef4444;
-    }
-
-
-    /* =========================================================
-       STEPS
-    ========================================================= */
-
-    .step-done {
-      background: #1b5e38;
-      color: #fff;
-    }
-
-    .step-active {
-      background: #2d7a52;
-
-      color: #fff;
-
-      box-shadow:
-        0 0 0 3px rgba(27,94,56,.22);
-    }
-
-    .step-pending {
-      background: #e2e8f0;
-      color: #94a3b8;
-    }
-
-
-    /* =========================================================
-       MISC
-    ========================================================= */
-
-    .divider {
-      border: none;
-
-      border-top:
-        1px solid #e2e8f0;
-
-      margin: 16px 0;
-    }
-
-    .text-muted {
-      color: #94a3b8;
-    }
-
-    .truncate {
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-
-      white-space: nowrap;
-    }
-
-    .line-clamp-2 {
-      display: -webkit-box;
-
-      -webkit-line-clamp: 2;
-
-      -webkit-box-orient: vertical;
-
-      overflow: hidden;
     }
 
 
@@ -855,6 +904,7 @@
       position: fixed;
 
       top: 12px;
+
       left: 12px;
 
       z-index: 100;
@@ -865,7 +915,8 @@
 
       border: none;
 
-      padding: 10px 14px;
+      padding:
+        10px 14px;
 
       border-radius: 8px;
 
@@ -875,7 +926,11 @@
         0 2px 8px rgba(0,0,0,.15);
 
       touch-action: manipulation;
+
+      -webkit-tap-highlight-color:
+        transparent;
     }
+
 
     #mobile-menu-overlay {
       display: none;
@@ -884,19 +939,12 @@
 
       inset: 0;
 
-      background: rgba(0,0,0,.5);
+      background:
+        rgba(0,0,0,.5);
 
       z-index: 98;
-    }
 
-
-    /* =========================================================
-       SIDEBAR TRANSITION
-    ========================================================= */
-
-    aside {
-      transition:
-        transform .3s ease;
+      touch-action: none;
     }
 
 
@@ -911,12 +959,11 @@
       }
 
 
-      /* Mobile menu */
-
       #mobile-menu-toggle {
         display: flex;
 
         align-items: center;
+
         justify-content: center;
       }
 
@@ -930,15 +977,19 @@
         position: fixed !important;
 
         left: 0;
+
         top: 0;
 
         width: 280px !important;
 
         height: 100vh !important;
 
+        max-height: 100vh;
+
         z-index: 99;
 
-        transform: translateX(-100%);
+        transform:
+          translate3d(-100%,0,0);
 
         box-shadow:
           2px 0 10px rgba(0,0,0,.2);
@@ -946,14 +997,20 @@
         overflow-y: auto;
 
         overflow-x: hidden;
+
+        -webkit-overflow-scrolling: touch;
+
+        touch-action: pan-y;
+
+        overscroll-behavior-y: contain;
       }
+
 
       aside.mobile-active {
-        transform: translateX(0);
+        transform:
+          translate3d(0,0,0);
       }
 
-
-      /* App shell */
 
       .app-shell {
         display: block;
@@ -965,47 +1022,66 @@
 
 
       .main-content {
+        display: block;
+
         width: 100%;
 
         min-width: 0;
 
+        min-height: 100vh;
+
         margin: 0 !important;
 
         padding: 0 !important;
+
+        overflow-x: hidden;
+
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
       }
 
 
       /*
-       * Do NOT use global flex-wrap here.
-       * It was causing layout problems on phones.
+       * IMPORTANT:
+       * Do not force h-screen flex containers
+       * into a conflicting scrolling structure.
        */
 
       .flex.h-screen {
         display: block !important;
+
+        height: auto !important;
+
+        min-height: 100vh;
+
+        overflow: visible !important;
       }
 
 
-      /* Top nav */
+      /* TOP NAV */
 
       .nav-top {
         min-height: 58px;
 
         padding:
-          10px 16px
-          10px 56px;
+          10px
+          14px
+          10px
+          56px;
 
         gap: 8px;
 
-        align-items: flex-start;
+        align-items: center;
 
-        justify-content: space-between;
+        justify-content:
+          space-between;
 
         flex-wrap: nowrap;
 
-        transition:
-          transform .25s ease,
-          opacity .25s ease;
+        width: 100%;
       }
+
 
       .nav-top h1 {
         font-size: .95rem !important;
@@ -1013,7 +1089,14 @@
         line-height: 1.3;
 
         white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        min-width: 0;
       }
+
 
       .nav-top span {
         font-size: .72rem;
@@ -1028,16 +1111,18 @@
       }
 
 
-      /* Page content */
+      /* PAGE */
 
       .page-content {
         width: 100%;
+
+        min-width: 0;
 
         padding: 14px;
       }
 
 
-      /* Filters become stacked */
+      /* FILTERS */
 
       .application-filters {
         display: grid;
@@ -1048,6 +1133,7 @@
 
         margin-bottom: 14px;
       }
+
 
       .filter-search,
       .filter-status {
@@ -1067,7 +1153,7 @@
       }
 
 
-      /* Cards */
+      /* CARDS */
 
       .card {
         padding: 16px;
@@ -1080,13 +1166,12 @@
         padding: 0;
 
         border-radius: 10px;
+
+        overflow: hidden;
       }
 
 
-      /*
-       * TABLE:
-       * Keep it wide and let the user swipe horizontally.
-       */
+      /* APPLICATION TABLE */
 
       .applications-table-scroll {
         width: 100%;
@@ -1098,21 +1183,33 @@
         overflow-y: hidden;
 
         -webkit-overflow-scrolling: touch;
+
+        touch-action:
+          pan-x pan-y;
+
+        overscroll-behavior-x:
+          contain;
       }
 
+
       .applications-table {
+        width: max-content;
+
         min-width: 980px;
       }
 
 
       .applications-table th {
-        padding: 9px 10px;
+        padding:
+          9px 10px;
 
         font-size: .68rem;
       }
 
+
       .applications-table td {
-        padding: 10px;
+        padding:
+          10px;
 
         font-size: .78rem;
       }
@@ -1122,6 +1219,7 @@
         font-size: .78rem;
       }
 
+
       .student-email {
         font-size: .68rem;
       }
@@ -1130,7 +1228,8 @@
       .badge {
         font-size: .68rem;
 
-        padding: 4px 9px;
+        padding:
+          4px 9px;
       }
 
 
@@ -1139,22 +1238,27 @@
       }
 
 
-      /* Text */
+      /* TEXT */
 
       h1 {
-        font-size: 1.3rem !important;
+        font-size:
+          1.3rem !important;
       }
+
 
       h2 {
-        font-size: 1.15rem !important;
+        font-size:
+          1.15rem !important;
       }
+
 
       h3 {
-        font-size: 1rem !important;
+        font-size:
+          1rem !important;
       }
 
 
-      /* Buttons */
+      /* BUTTONS */
 
       .btn-green,
       .btn-blue,
@@ -1162,7 +1266,8 @@
       .btn-outline {
         min-height: 46px;
 
-        padding: 11px 16px;
+        padding:
+          11px 16px;
 
         font-size: .9rem;
       }
@@ -1171,11 +1276,12 @@
       .btn-sm {
         min-height: 46px;
 
-        padding: 10px 14px;
+        padding:
+          10px 14px;
       }
 
 
-      /* Inputs */
+      /* INPUTS */
 
       .input {
         width: 100%;
@@ -1184,42 +1290,48 @@
 
         font-size: 16px;
 
-        padding: 12px 14px;
+        padding:
+          12px 14px;
       }
+
 
       select.input {
         font-size: 16px;
       }
 
 
-      /* Grid */
+      /* GRID */
 
       .grid {
         display: grid !important;
       }
 
+
       .grid-cols-2,
       .grid-cols-3,
       .grid-cols-4 {
-        grid-template-columns: 1fr !important;
+        grid-template-columns:
+          1fr !important;
       }
 
 
-      /* Width */
+      /* WIDTH */
 
       .max-w-2xl,
       .max-w-3xl,
       .max-w-4xl,
       .max-w-5xl,
       .max-w-6xl {
-        max-width: 100% !important;
+        max-width:
+          100% !important;
       }
 
 
-      /* Images */
+      /* IMAGES */
 
       img {
-        max-width: 100%;
+        max-width:
+          100%;
 
         height: auto;
       }
@@ -1230,12 +1342,14 @@
       }
 
 
-      /* Empty */
+      /* EMPTY */
 
       .empty-applications {
-        padding-top: 50px;
+        padding-top:
+          50px;
 
-        padding-bottom: 50px;
+        padding-bottom:
+          50px;
       }
 
     }
@@ -1254,8 +1368,10 @@
         display: flex;
 
         align-items: center;
+
         justify-content: center;
       }
+
 
       #mobile-menu-overlay.active {
         display: block;
@@ -1266,6 +1382,7 @@
         position: fixed !important;
 
         left: 0;
+
         top: 0;
 
         width: 280px !important;
@@ -1274,25 +1391,57 @@
 
         z-index: 99;
 
-        transform: translateX(-100%);
+        transform:
+          translate3d(-100%,0,0);
 
         overflow-y: auto;
+
+        overflow-x: hidden;
+
+        -webkit-overflow-scrolling: touch;
+
+        touch-action: pan-y;
       }
 
+
       aside.mobile-active {
-        transform: translateX(0);
+        transform:
+          translate3d(0,0,0);
       }
 
 
       .app-shell {
         display: block;
+
+        min-height: 100vh;
       }
 
 
       .main-content {
         width: 100%;
 
+        min-width: 0;
+
+        min-height: 100vh;
+
         margin: 0 !important;
+
+        overflow-x: hidden;
+
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
+      }
+
+
+      .flex.h-screen {
+        display: block !important;
+
+        height: auto !important;
+
+        min-height: 100vh;
+
+        overflow: visible !important;
       }
 
 
@@ -1316,7 +1465,8 @@
       .filter-search {
         max-width: 100%;
 
-        flex: 1 1 100%;
+        flex:
+          1 1 100%;
       }
 
 
@@ -1338,7 +1488,7 @@
 
 
     /* =========================================================
-       TABLET LANDSCAPE — 769px TO 1024px
+       TABLET LANDSCAPE
     ========================================================= */
 
     @media
@@ -1357,7 +1507,8 @@
 
 
       .nav-top {
-        padding: 12px 20px;
+        padding:
+          12px 20px;
       }
 
 
@@ -1379,7 +1530,7 @@
 
 
     /* =========================================================
-       DESKTOP — 1025px UP
+       DESKTOP
     ========================================================= */
 
     @media (min-width: 1025px) {
@@ -1398,6 +1549,10 @@
         height: 100vh;
 
         transform: none !important;
+
+        overflow-y: auto;
+
+        overflow-x: hidden;
       }
 
 
@@ -1420,8 +1575,6 @@
       select,
       textarea {
         min-height: 44px;
-
-        touch-action: manipulation;
       }
 
 
@@ -1437,20 +1590,10 @@
       }
 
 
-      html {
-        scroll-behavior: smooth;
-      }
-
-
       img {
         max-width: 100%;
 
         height: auto;
-      }
-
-
-      body.menu-open {
-        overflow: hidden;
       }
 
     }
@@ -1467,6 +1610,9 @@
 
       aside {
         overflow-y: auto;
+
+        -webkit-overflow-scrolling:
+          touch;
       }
 
 
@@ -1500,11 +1646,13 @@
 
 
       .card {
-        border: 1px solid #000;
+        border:
+          1px solid #000;
 
         box-shadow: none;
 
-        page-break-inside: avoid;
+        page-break-inside:
+          avoid;
       }
 
 
@@ -1514,10 +1662,13 @@
 
 
       .main-content,
-      .flex-1 {
+      .flex-1,
+      .guidance-main {
         margin: 0 !important;
 
         padding: 0 !important;
+
+        overflow: visible !important;
       }
 
     }
@@ -1528,6 +1679,7 @@
 
 
 <body>
+
 
   <!-- =======================================================
        MOBILE MENU BUTTON
@@ -1576,6 +1728,7 @@
   </button>
 
 
+
   <!-- =======================================================
        MOBILE MENU OVERLAY
   ======================================================== -->
@@ -1584,6 +1737,7 @@
     id="mobile-menu-overlay"
     onclick="closeMobileMenu()"
   ></div>
+
 
 
   <!-- =======================================================
@@ -1607,20 +1761,41 @@
 
       if (!sidebar) return;
 
-      sidebar.classList.toggle(
-        'mobile-active'
-      );
 
-      if (overlay) {
-        overlay.classList.toggle(
-          'active'
+      const isOpen =
+        sidebar.classList.contains(
+          'mobile-active'
         );
+
+
+      if (isOpen) {
+
+        closeMobileMenu();
+
+      } else {
+
+        sidebar.classList.add(
+          'mobile-active'
+        );
+
+
+        if (overlay) {
+
+          overlay.classList.add(
+            'active'
+          );
+
+        }
+
+
+        body.classList.add(
+          'menu-open'
+        );
+
       }
 
-      body.classList.toggle(
-        'menu-open'
-      );
     }
+
 
 
     function closeMobileMenu() {
@@ -1636,37 +1811,47 @@
       const body =
         document.body;
 
+
       if (sidebar) {
+
         sidebar.classList.remove(
           'mobile-active'
         );
+
       }
 
+
       if (overlay) {
+
         overlay.classList.remove(
           'active'
         );
+
       }
+
 
       body.classList.remove(
         'menu-open'
       );
+
     }
+
 
 
     document.addEventListener(
       'DOMContentLoaded',
       function () {
 
-        /*
-         * Close sidebar after clicking
-         * a sidebar link on mobile.
-         */
+
+        /* ===================================================
+           SIDEBAR LINKS
+        =================================================== */
 
         const sidebarLinks =
           document.querySelectorAll(
             '.sidebar-link'
           );
+
 
         sidebarLinks.forEach(
           function (link) {
@@ -1678,7 +1863,9 @@
                 if (
                   window.innerWidth <= 1024
                 ) {
+
                   closeMobileMenu();
+
                 }
 
               }
@@ -1688,12 +1875,13 @@
         );
 
 
-        /*
-         * Close mobile sidebar when
-         * resizing back to desktop.
-         */
+
+        /* ===================================================
+           RESIZE
+        =================================================== */
 
         let resizeTimer;
+
 
         window.addEventListener(
           'resize',
@@ -1703,6 +1891,7 @@
               resizeTimer
             );
 
+
             resizeTimer =
               setTimeout(
                 function () {
@@ -1710,40 +1899,61 @@
                   if (
                     window.innerWidth > 1024
                   ) {
+
                     closeMobileMenu();
+
                   }
 
                 },
-                250
+                150
               );
 
           }
         );
 
 
-        /*
-         * Prevent accidental horizontal
-         * page movement outside tables.
-         */
+        /* ===================================================
+           ESC KEY
+        =================================================== */
 
         document.addEventListener(
-          'touchmove',
+          'keydown',
           function (event) {
 
-            const target =
-              event.target.closest(
-                '.applications-table-scroll'
-              );
+            if (
+              event.key === 'Escape'
+            ) {
 
-            if (target) {
-              return;
+              closeMobileMenu();
+
             }
 
-          },
-          {
-            passive: true
           }
         );
+
+
+        /* ===================================================
+           CLOSE SIDEBAR WHEN CLICKING OVERLAY
+        =================================================== */
+
+        const overlay =
+          document.getElementById(
+            'mobile-menu-overlay'
+          );
+
+
+        if (overlay) {
+
+          overlay.addEventListener(
+            'click',
+            function () {
+
+              closeMobileMenu();
+
+            }
+          );
+
+        }
 
       }
     );

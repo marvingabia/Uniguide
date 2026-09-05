@@ -1,114 +1,1022 @@
 {{> head}}
-<div class="flex h-screen overflow-hidden">
+
+<div class="guidance-layout">
+
   {{> sidebar-guidance activePage="reports"}}
-  <div class="flex-1 overflow-y-auto bg-slate-100">
-    <div class="nav-top">
-      <h1 class="text-base font-bold text-slate-800">📊 Reports</h1>
-      <div class="flex gap-2">
-        <button onclick="window.print()" class="btn-outline btn-sm">🖨 Print</button>
-        <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+
+  <main class="guidance-main">
+
+    <div class="nav-top reports-nav">
+      <h1 class="text-base font-bold text-slate-800">
+        📊 Reports
+      </h1>
+
+      <div class="reports-nav-right">
+        <button
+          onclick="window.print()"
+          class="btn-outline btn-sm"
+          type="button"
+        >
+          🖨 Print
+        </button>
+
+        <span class="text-teal-700 text-sm font-medium">
+          {{user.firstName}} {{user.lastName}}
+        </span>
       </div>
     </div>
-    <div class="px-5 py-5">
+
+
+    <div class="reports-content">
+
       {{> flash}}
 
-      <!-- Filters -->
-      <form method="GET" action="/guidance/reports" class="card mb-5 flex items-end gap-4">
-        <div>
-          <label class="label">Report Type</label>
-          <select name="type" class="input" style="width:auto">
-            <option value="daily"   {{#if (eq reportType 'daily')  }}selected{{/if}}>Daily</option>
-            <option value="monthly" {{#if (eq reportType 'monthly')}}selected{{/if}}>Monthly</option>
-            <option value="all"     {{#if (eq reportType 'all')    }}selected{{/if}}>All Time</option>
+
+      <!-- =====================================================
+           FILTERS
+      ====================================================== -->
+
+      <form
+        method="GET"
+        action="/guidance/reports"
+        class="card reports-filters"
+      >
+
+        <div class="report-filter-item">
+
+          <label class="label">
+            Report Type
+          </label>
+
+          <select
+            name="type"
+            class="input"
+          >
+
+            <option
+              value="daily"
+              {{#if (eq reportType 'daily')}}selected{{/if}}
+            >
+              Daily
+            </option>
+
+            <option
+              value="monthly"
+              {{#if (eq reportType 'monthly')}}selected{{/if}}
+            >
+              Monthly
+            </option>
+
+            <option
+              value="all"
+              {{#if (eq reportType 'all')}}selected{{/if}}
+            >
+              All Time
+            </option>
+
           </select>
+
         </div>
+
+
         {{#if (eq reportType 'monthly')}}
-        <div>
-          <label class="label">Month</label>
-          <select name="month" class="input" style="width:auto">
-            <option value="1"  {{#if (eq selectedMonth 1) }}selected{{/if}}>January</option>
-            <option value="2"  {{#if (eq selectedMonth 2) }}selected{{/if}}>February</option>
-            <option value="3"  {{#if (eq selectedMonth 3) }}selected{{/if}}>March</option>
-            <option value="4"  {{#if (eq selectedMonth 4) }}selected{{/if}}>April</option>
-            <option value="5"  {{#if (eq selectedMonth 5) }}selected{{/if}}>May</option>
-            <option value="6"  {{#if (eq selectedMonth 6) }}selected{{/if}}>June</option>
-            <option value="7"  {{#if (eq selectedMonth 7) }}selected{{/if}}>July</option>
-            <option value="8"  {{#if (eq selectedMonth 8) }}selected{{/if}}>August</option>
-            <option value="9"  {{#if (eq selectedMonth 9) }}selected{{/if}}>September</option>
-            <option value="10" {{#if (eq selectedMonth 10)}}selected{{/if}}>October</option>
-            <option value="11" {{#if (eq selectedMonth 11)}}selected{{/if}}>November</option>
-            <option value="12" {{#if (eq selectedMonth 12)}}selected{{/if}}>December</option>
+
+        <div class="report-filter-item">
+
+          <label class="label">
+            Month
+          </label>
+
+          <select
+            name="month"
+            class="input"
+          >
+
+            <option value="1" {{#if (eq selectedMonth 1)}}selected{{/if}}>
+              January
+            </option>
+
+            <option value="2" {{#if (eq selectedMonth 2)}}selected{{/if}}>
+              February
+            </option>
+
+            <option value="3" {{#if (eq selectedMonth 3)}}selected{{/if}}>
+              March
+            </option>
+
+            <option value="4" {{#if (eq selectedMonth 4)}}selected{{/if}}>
+              April
+            </option>
+
+            <option value="5" {{#if (eq selectedMonth 5)}}selected{{/if}}>
+              May
+            </option>
+
+            <option value="6" {{#if (eq selectedMonth 6)}}selected{{/if}}>
+              June
+            </option>
+
+            <option value="7" {{#if (eq selectedMonth 7)}}selected{{/if}}>
+              July
+            </option>
+
+            <option value="8" {{#if (eq selectedMonth 8)}}selected{{/if}}>
+              August
+            </option>
+
+            <option value="9" {{#if (eq selectedMonth 9)}}selected{{/if}}>
+              September
+            </option>
+
+            <option value="10" {{#if (eq selectedMonth 10)}}selected{{/if}}>
+              October
+            </option>
+
+            <option value="11" {{#if (eq selectedMonth 11)}}selected{{/if}}>
+              November
+            </option>
+
+            <option value="12" {{#if (eq selectedMonth 12)}}selected{{/if}}>
+              December
+            </option>
+
           </select>
+
         </div>
-        <div>
-          <label class="label">Year</label>
-          <input type="number" name="year" value="{{selectedYear}}" class="input" style="width:100px">
+
+
+        <div class="report-filter-item report-year">
+
+          <label class="label">
+            Year
+          </label>
+
+          <input
+            type="number"
+            name="year"
+            value="{{selectedYear}}"
+            class="input"
+          >
+
         </div>
+
         {{/if}}
-        <button type="submit" class="btn-green btn-sm">Generate</button>
+
+
+        <div class="report-generate">
+
+          <button
+            type="submit"
+            class="btn-green btn-sm"
+          >
+            Generate
+          </button>
+
+        </div>
+
       </form>
 
-      <!-- Summary -->
-      <div class="grid grid-cols-4 gap-4 mb-5">
-        <div class="card text-center">
-          <p class="text-2xl font-bold text-white">{{applications.length}}</p>
-          <p class="text-gray-500 text-xs">Total Requests</p>
-        </div>
-        <div class="card text-center">
-          <p class="text-2xl font-bold text-green-700">{{currency totalCollection}}</p>
-          <p class="text-gray-500 text-xs">Total Collection</p>
-        </div>
-        <div class="card text-center">
-          <p class="text-2xl font-bold text-yellow-600">
-            {{#each applications}}{{#if (eq this.status 'pending')}}{{!-- count --}}{{/if}}{{/each}}
+
+
+      <!-- =====================================================
+           SUMMARY
+      ====================================================== -->
+
+      <div class="reports-summary">
+
+        <div class="card report-summary-card">
+
+          <p class="report-summary-number">
+            {{applications.length}}
           </p>
-          <p class="text-gray-500 text-xs">Released</p>
-        </div>
-        <div class="card text-center">
-          <p class="text-2xl font-bold text-red-400">
+
+          <p class="text-gray-500 text-xs">
+            Total Requests
           </p>
-          <p class="text-gray-500 text-xs">Rejected</p>
+
         </div>
+
+
+        <div class="card report-summary-card">
+
+          <p class="report-summary-number text-green-700">
+            {{currency totalCollection}}
+          </p>
+
+          <p class="text-gray-500 text-xs">
+            Total Collection
+          </p>
+
+        </div>
+
+
+        <div class="card report-summary-card">
+
+          <p class="report-summary-number text-yellow-600">
+
+            {{#each applications}}
+              {{#if (eq this.status 'released')}}
+              {{/if}}
+            {{/each}}
+
+          </p>
+
+          <p class="text-gray-500 text-xs">
+            Released
+          </p>
+
+        </div>
+
+
+        <div class="card report-summary-card">
+
+          <p class="report-summary-number text-red-400">
+          </p>
+
+          <p class="text-gray-500 text-xs">
+            Rejected
+          </p>
+
+        </div>
+
       </div>
 
-      <!-- Table -->
+
+
+      <!-- =====================================================
+           TABLE
+      ====================================================== -->
+
       {{#if applications.length}}
-      <div class="card p-0 overflow-hidden">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Student</th><th>Course</th><th>Purpose</th><th>Status</th><th>Amount</th><th>OR No.</th><th>Date</th></tr>
-          </thead>
-          <tbody>
-            {{#each applications}}
-            <tr>
-              <td class="text-gray-500 text-xs">{{this.id}}</td>
-              <td><div class="text-slate-700 text-sm">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
-              <td class="text-slate-500 text-sm">{{this.course}}</td>
-              <td class="text-gray-500 text-xs max-w-xs truncate">{{this.purposes}}</td>
-              <td><span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span></td>
-              <td class="text-green-700 text-sm font-medium">{{#if this.totalAmount}}{{currency this.totalAmount}}{{else}}—{{/if}}</td>
-              <td class="text-gray-400 text-xs font-mono">{{this.orNumber}}</td>
-              <td class="text-gray-500 text-xs">{{formatDate this.createdAt}}</td>
-            </tr>
-            {{/each}}
-          </tbody>
-        </table>
+
+      <div class="card reports-table-card">
+
+        <div class="reports-table-scroll">
+
+          <table class="reports-table">
+
+            <thead>
+
+              <tr>
+
+                <th>#</th>
+
+                <th>
+                  Student
+                </th>
+
+                <th>
+                  Course
+                </th>
+
+                <th>
+                  Purpose
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Amount
+                </th>
+
+                <th>
+                  OR No.
+                </th>
+
+                <th>
+                  Date
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {{#each applications}}
+
+              <tr>
+
+                <td class="text-gray-500 text-xs">
+                  {{this.id}}
+                </td>
+
+
+                <td>
+
+                  <div class="text-slate-700 text-sm report-student-name">
+                    {{this.surname}}, {{this.givenName}}
+                  </div>
+
+                  <div class="text-gray-600 text-xs report-student-email">
+                    {{this.student.email}}
+                  </div>
+
+                </td>
+
+
+                <td class="text-slate-500 text-sm">
+                  {{this.course}}
+                </td>
+
+
+                <td class="text-gray-500 text-xs report-purpose">
+                  {{this.purposes}}
+                </td>
+
+
+                <td>
+
+                  <span class="badge {{statusClass this.status}}">
+                    {{statusLabel this.status}}
+                  </span>
+
+                </td>
+
+
+                <td class="text-green-700 text-sm font-medium">
+
+                  {{#if this.totalAmount}}
+
+                    {{currency this.totalAmount}}
+
+                  {{else}}
+
+                    —
+
+                  {{/if}}
+
+                </td>
+
+
+                <td class="text-gray-400 text-xs font-mono">
+                  {{this.orNumber}}
+                </td>
+
+
+                <td class="text-gray-500 text-xs">
+                  {{formatDate this.createdAt}}
+                </td>
+
+              </tr>
+
+              {{/each}}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div class="reports-scroll-hint">
+          ← Swipe table left/right →
+        </div>
+
       </div>
+
+
       {{else}}
+
       <div class="card text-center py-16">
-        <p class="text-gray-500">No data for the selected period.</p>
+
+        <p class="text-gray-500">
+          No data for the selected period.
+        </p>
+
       </div>
+
       {{/if}}
+
     </div>
-  </div>
+
+  </main>
+
 </div>
 
+
+
 <style>
-  @media print {
-    aside, .nav-top, button, form { display:none !important; }
-    body { background:#fff; color:#000; }
-    .card { border:1px solid #ccc; }
-    td, th { color:#000; }
+
+/* ============================================================
+   REPORTS PAGE
+============================================================ */
+
+.guidance-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  min-width: 0;
+}
+
+
+.guidance-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f0f4f8;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+
+.reports-content {
+  width: 100%;
+  min-width: 0;
+  padding: 20px;
+}
+
+
+.reports-nav {
+  flex-shrink: 0;
+}
+
+
+.reports-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+
+.reports-filters {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+
+.report-filter-item {
+  flex: 0 1 auto;
+  min-width: 150px;
+}
+
+
+.report-filter-item .input {
+  width: 100%;
+}
+
+
+.report-year {
+  min-width: 110px;
+}
+
+
+.report-generate {
+  flex: 0 0 auto;
+}
+
+
+.report-generate button {
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+.reports-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+
+  min-width: 0;
+}
+
+
+.report-summary-card {
+  min-width: 0;
+
+  text-align: center;
+
+  overflow: hidden;
+}
+
+
+.report-summary-number {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+
+  min-height: 29px;
+
+  color: #1e293b;
+}
+
+
+/* ============================================================
+   REPORT TABLE
+============================================================ */
+
+.reports-table-card {
+  width: 100%;
+
+  padding: 0;
+
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+
+.reports-table-scroll {
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+  overscroll-behavior-x: contain;
+
+  touch-action: pan-x pan-y;
+
+  scrollbar-width: thin;
+}
+
+
+.reports-table {
+  width: max-content;
+
+  min-width: 1000px;
+
+  border-collapse: collapse;
+}
+
+
+.reports-table th,
+.reports-table td {
+  white-space: nowrap;
+}
+
+
+.reports-table th {
+  padding: 10px 14px;
+}
+
+
+.reports-table td {
+  padding: 10px 14px;
+}
+
+
+.reports-table th:nth-child(1) {
+  width: 55px;
+}
+
+
+.reports-table th:nth-child(2) {
+  min-width: 210px;
+}
+
+
+.reports-table th:nth-child(3) {
+  min-width: 130px;
+}
+
+
+.reports-table th:nth-child(4) {
+  min-width: 180px;
+}
+
+
+.reports-table th:nth-child(5) {
+  min-width: 110px;
+}
+
+
+.reports-table th:nth-child(6) {
+  min-width: 130px;
+}
+
+
+.reports-table th:nth-child(7) {
+  min-width: 120px;
+}
+
+
+.reports-table th:nth-child(8) {
+  min-width: 120px;
+}
+
+
+.report-student-name {
+  white-space: nowrap;
+}
+
+
+.report-student-email {
+  white-space: nowrap;
+}
+
+
+.report-purpose {
+  max-width: 240px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.reports-scroll-hint {
+  display: none;
+
+  text-align: center;
+
+  padding: 8px;
+
+  background: #f8fafc;
+
+  border-top: 1px solid #e2e8f0;
+
+  color: #64748b;
+
+  font-size: .7rem;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 640px) {
+
+  .guidance-layout {
+    display: block;
+
+    width: 100%;
+    min-height: 100vh;
   }
+
+
+  .guidance-main {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  .reports-nav {
+    width: 100%;
+
+    padding:
+      10px
+      14px
+      10px
+      58px;
+
+    min-height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+  }
+
+
+  .reports-nav h1 {
+    font-size: .95rem !important;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    min-width: 0;
+  }
+
+
+  .reports-nav-right {
+    flex-shrink: 0;
+
+    gap: 6px;
+  }
+
+
+  .reports-nav-right .btn-outline {
+    min-height: 42px;
+
+    padding:
+      8px
+      10px;
+
+    font-size: .78rem;
+  }
+
+
+  .reports-nav-right span {
+    display: none;
+  }
+
+
+  .reports-content {
+    width: 100%;
+
+    padding: 12px;
+
+    min-width: 0;
+  }
+
+
+  /* FILTERS */
+
+  .reports-filters {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    width: 100%;
+
+    gap: 10px;
+
+    padding: 14px;
+
+    margin-bottom: 14px;
+  }
+
+
+  .report-filter-item {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  .report-filter-item .input {
+    width: 100% !important;
+
+    min-width: 0;
+  }
+
+
+  .report-year {
+    width: 100%;
+  }
+
+
+  .report-generate {
+    width: 100%;
+  }
+
+
+  .report-generate button {
+    width: 100%;
+
+    min-height: 46px;
+  }
+
+
+  /* SUMMARY */
+
+  .reports-summary {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 14px;
+  }
+
+
+  .report-summary-card {
+    width: 100%;
+
+    min-height: 74px;
+
+    padding: 14px;
+  }
+
+
+  .report-summary-number {
+    font-size: 1.4rem;
+  }
+
+
+  /* TABLE */
+
+  .reports-table-card {
+    width: 100%;
+
+    max-width: 100%;
+
+    padding: 0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+  }
+
+
+  .reports-table-scroll {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-x pan-y;
+
+    overscroll-behavior-x: contain;
+  }
+
+
+  .reports-table {
+    width: max-content;
+
+    min-width: 1000px;
+  }
+
+
+  .reports-table th {
+    padding: 9px 10px;
+
+    font-size: .68rem;
+  }
+
+
+  .reports-table td {
+    padding: 10px;
+
+    font-size: .76rem;
+  }
+
+
+  .report-student-name {
+    font-size: .78rem;
+  }
+
+
+  .report-student-email {
+    font-size: .68rem;
+  }
+
+
+  .report-purpose {
+    max-width: 180px;
+  }
+
+
+  .reports-scroll-hint {
+    display: block;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media
+  (min-width: 641px)
+  and
+  (max-width: 768px) {
+
+  .guidance-layout {
+    display: block;
+  }
+
+
+  .guidance-main {
+    width: 100%;
+
+    min-width: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  .reports-content {
+    padding: 16px;
+  }
+
+
+  .reports-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .reports-table-scroll {
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+
+    touch-action: pan-x pan-y;
+  }
+
+
+  .reports-scroll-hint {
+    display: block;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  aside,
+  .nav-top,
+  button,
+  form,
+  .reports-scroll-hint {
+    display: none !important;
+  }
+
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+
+  .guidance-layout {
+    display: block;
+  }
+
+
+  .guidance-main {
+    width: 100%;
+
+    overflow: visible !important;
+
+    min-height: auto;
+  }
+
+
+  .reports-content {
+    padding: 0;
+  }
+
+
+  .card {
+    border: 1px solid #ccc;
+
+    box-shadow: none;
+  }
+
+
+  .reports-table-scroll {
+    overflow: visible !important;
+  }
+
+
+  .reports-table {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  td,
+  th {
+    color: #000;
+  }
+
+}
+
 </style>
-</body></html>
+
+</body>
+</html>
