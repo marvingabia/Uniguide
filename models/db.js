@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import mysql2 from 'mysql2';
 
 console.log('========================================');
 console.log('DATABASE CONFIG');
@@ -33,6 +34,7 @@ try {
 
   sequelize = new Sequelize(dbUrl.toString(), {
     dialect: 'mysql',
+    dialectModule: mysql2,
 
     dialectOptions: {
       ssl: {
@@ -48,7 +50,7 @@ try {
 
     pool: {
       max: 3,
-      min: 1,
+      min: 0,
       idle: 10000,
       acquire: 30000
     }
