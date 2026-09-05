@@ -1,63 +1,346 @@
 {{> head}}
-<div class="flex h-screen overflow-hidden">
+
+<div class="app-shell">
+
   {{> sidebar-guidance activePage="applications"}}
-  <div class="flex-1 overflow-y-auto bg-slate-100">
-    <div class="nav-top">
-      <h1 class="text-base font-bold text-slate-800">📋 All Applications</h1>
-      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+
+  <main class="main-content">
+
+    <!-- Top Navigation -->
+    <div class="nav-top" id="guidance-top-nav">
+      <div class="nav-title">
+        <h1 class="text-base font-bold text-slate-800">
+          📋 All Student Request Form
+        </h1>
+      </div>
+
+      <span class="text-teal-700 text-sm font-medium">
+        {{user.firstName}} {{user.lastName}}
+      </span>
     </div>
-    <div class="px-5 py-5">
+
+    <div class="page-content">
+
       {{> flash}}
 
       <!-- Filters -->
-      <form method="GET" action="/guidance/applications" class="flex gap-3 mb-4">
-        <input type="text" name="search" value="{{search}}" placeholder="Search student name or course..." class="input" style="max-width:260px">
-        <select name="status" class="input" style="width:auto">
-          <option value="">All Statuses</option>
-          <option value="pending"           {{#if (eq filterStatus 'pending')          }}selected{{/if}}>Pending</option>
-          <option value="payment_submitted" {{#if (eq filterStatus 'payment_submitted')}}selected{{/if}}>Payment Submitted</option>
-          <option value="payment_verified"  {{#if (eq filterStatus 'payment_verified') }}selected{{/if}}>Payment Verified</option>
-          <option value="receipt_issued"    {{#if (eq filterStatus 'receipt_issued')   }}selected{{/if}}>Receipt Issued</option>
-          <option value="approved"          {{#if (eq filterStatus 'approved')         }}selected{{/if}}>Approved</option>
-          <option value="released"          {{#if (eq filterStatus 'released')         }}selected{{/if}}>Released</option>
-          <option value="rejected"          {{#if (eq filterStatus 'rejected')         }}selected{{/if}}>Rejected</option>
+      <form
+        method="GET"
+        action="/guidance/applications"
+        class="application-filters"
+      >
+
+        <input
+          type="text"
+          name="search"
+          value="{{search}}"
+          placeholder="Search student name or course..."
+          class="input filter-search"
+        >
+
+        <select
+          name="status"
+          class="input filter-status"
+        >
+          <option value="">
+            All Statuses
+          </option>
+
+          <option
+            value="pending"
+            {{#if (eq filterStatus 'pending')}}selected{{/if}}
+          >
+            Pending
+          </option>
+
+          <option
+            value="payment_submitted"
+            {{#if (eq filterStatus 'payment_submitted')}}selected{{/if}}
+          >
+            Payment Submitted
+          </option>
+
+          <option
+            value="payment_verified"
+            {{#if (eq filterStatus 'payment_verified')}}selected{{/if}}
+          >
+            Payment Verified
+          </option>
+
+          <option
+            value="receipt_issued"
+            {{#if (eq filterStatus 'receipt_issued')}}selected{{/if}}
+          >
+            Receipt Issued
+          </option>
+
+          <option
+            value="approved"
+            {{#if (eq filterStatus 'approved')}}selected{{/if}}
+          >
+            Approved
+          </option>
+
+          <option
+            value="released"
+            {{#if (eq filterStatus 'released')}}selected{{/if}}
+          >
+            Released
+          </option>
+
+          <option
+            value="rejected"
+            {{#if (eq filterStatus 'rejected')}}selected{{/if}}
+          >
+            Rejected
+          </option>
         </select>
-        <button type="submit" class="btn-green btn-sm">Filter</button>
-        <a href="/guidance/applications" class="btn-outline btn-sm">Clear</a>
+
+        <button
+          type="submit"
+          class="btn-green btn-sm filter-button"
+        >
+          Filter
+        </button>
+
+        <a
+          href="/guidance/applications"
+          class="btn-outline btn-sm clear-button"
+        >
+          Clear
+        </a>
+
       </form>
 
+
       {{#if applications.length}}
-      <div class="card p-0 overflow-hidden">
-        <table>
-          <thead><tr><th>#</th><th>Student</th><th>Course</th><th>Documents</th><th>Amount</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
-          <tbody>
-            {{#each applications}}
-            <tr>
-              <td class="text-gray-500 text-xs">{{this.id}}</td>
-              <td><div class="text-slate-800 text-sm font-medium">{{this.surname}}, {{this.givenName}}</div><div class="text-gray-600 text-xs">{{this.student.email}}</div></td>
-              <td class="text-slate-500 text-sm">{{this.course}}</td>
-              <td class="text-gray-600 text-xs">
-                <div class="space-y-1">
-                  {{#if (gt this.qtyGoodMoral 0)}}<div>Good Moral: {{this.qtyGoodMoral}} copies</div>{{/if}}
-                  {{#if (gt this.qtyCTC 0)}}<div>CTC/Auth: {{this.qtyCTC}} copies</div>{{/if}}
-                </div>
-              </td>
-              <td class="text-green-700 text-sm font-medium">{{#if this.totalAmount}}{{currency this.totalAmount}}{{else}}—{{/if}}</td>
-              <td><span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span></td>
-              <td class="text-gray-500 text-xs">{{formatDate this.createdAt}}</td>
-              <td><a href="/guidance/application/{{this.id}}" class="text-green-700 text-xs hover:underline">View →</a></td>
-            </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      </div>
+
+        <!-- TABLE CARD -->
+        <div class="card applications-card">
+
+          <!--
+            IMPORTANT:
+            Horizontal scrolling is intentional on small screens.
+            The table will NEVER squeeze all columns into a tiny phone.
+          -->
+          <div class="applications-table-scroll">
+
+            <table class="applications-table">
+
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Course</th>
+                  <th>Documents</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {{#each applications}}
+
+                  <tr>
+
+                    <!-- ID -->
+                    <td class="text-gray-500 text-xs">
+                      {{this.id}}
+                    </td>
+
+                    <!-- STUDENT -->
+                    <td>
+
+                      <div class="student-name">
+                        {{this.surname}}, {{this.givenName}}
+                      </div>
+
+                      <div class="student-email">
+                        {{this.student.email}}
+                      </div>
+
+                    </td>
+
+                    <!-- COURSE -->
+                    <td class="course-cell">
+                      {{this.course}}
+                    </td>
+
+                    <!-- DOCUMENTS -->
+                    <td class="documents-cell">
+
+                      <div class="document-list">
+
+                        {{#if (gt this.qtyGoodMoral 0)}}
+                          <div>
+                            Good Moral:
+                            {{this.qtyGoodMoral}}
+                            copies
+                          </div>
+                        {{/if}}
+
+                        {{#if (gt this.qtyCTC 0)}}
+                          <div>
+                            CTC/Auth:
+                            {{this.qtyCTC}}
+                            copies
+                          </div>
+                        {{/if}}
+
+                      </div>
+
+                    </td>
+
+                    <!-- AMOUNT -->
+                    <td class="amount-cell">
+
+                      {{#if this.totalAmount}}
+                        {{currency this.totalAmount}}
+                      {{else}}
+                        —
+                      {{/if}}
+
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+
+                      <span class="badge {{statusClass this.status}}">
+                        {{statusLabel this.status}}
+                      </span>
+
+                    </td>
+
+                    <!-- DATE -->
+                    <td class="date-cell">
+                      {{formatDate this.createdAt}}
+                    </td>
+
+                    <!-- ACTION -->
+                    <td>
+
+                      <a
+                        href="/guidance/application/{{this.id}}"
+                        class="view-link"
+                      >
+                        View →
+                      </a>
+
+                    </td>
+
+                  </tr>
+
+                {{/each}}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <!-- Mobile scroll hint -->
+          <div class="mobile-scroll-hint">
+            ← Swipe left/right to view the table →
+          </div>
+
+        </div>
+
       {{else}}
-      <div class="card text-center py-16">
-        <div class="text-5xl mb-3">📋</div>
-        <p class="text-gray-500">No applications found.</p>
-      </div>
+
+        <!-- EMPTY STATE -->
+        <div class="card empty-applications">
+
+          <div class="empty-icon">
+            📋
+          </div>
+
+          <p class="text-gray-500">
+            No applications found.
+          </p>
+
+        </div>
+
       {{/if}}
+
     </div>
-  </div>
+
+  </main>
+
 </div>
-</body></html>
+
+<script>
+(function () {
+
+  const nav = document.getElementById('guidance-top-nav');
+
+  if (!nav) return;
+
+  let lastScrollTop = 0;
+  let ticking = false;
+
+  function handleScroll() {
+
+    const currentScroll =
+      window.pageYOffset ||
+      document.documentElement.scrollTop;
+
+    /*
+     * Always show when near the top.
+     */
+    if (currentScroll <= 20) {
+      nav.classList.remove('nav-hidden');
+      lastScrollTop = currentScroll;
+      ticking = false;
+      return;
+    }
+
+    /*
+     * Scrolling DOWN:
+     * hide the top navigation.
+     */
+    if (currentScroll > lastScrollTop) {
+      nav.classList.add('nav-hidden');
+    }
+
+    /*
+     * Scrolling UP:
+     * show the top navigation again.
+     */
+    else if (currentScroll < lastScrollTop) {
+      nav.classList.remove('nav-hidden');
+    }
+
+    lastScrollTop = currentScroll <= 0
+      ? 0
+      : currentScroll;
+
+    ticking = false;
+  }
+
+  window.addEventListener(
+    'scroll',
+    function () {
+
+      if (!ticking) {
+
+        window.requestAnimationFrame(
+          handleScroll
+        );
+
+        ticking = true;
+      }
+
+    },
+    {
+      passive: true
+    }
+  );
+
+})();
+</script>
+
+</body>
+</html>
