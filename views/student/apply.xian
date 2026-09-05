@@ -1,463 +1,1649 @@
 {{> head}}
+
+<style>
+  /* =========================================================
+     STUDENT APPLICATION FORM - RESPONSIVE
+     ========================================================= */
+
+  .apply-page {
+    min-width: 0;
+  }
+
+  .apply-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Form fields */
+  .apply-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .apply-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .apply-field {
+    min-width: 0;
+  }
+
+  .apply-field .input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Enrollment nested fields */
+  .enrollment-fields {
+    margin-left: 16px;
+    padding: 16px;
+  }
+
+  .enrollment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  /* Purpose */
+  .purpose-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .purpose-option {
+    min-width: 0;
+  }
+
+  .purpose-other {
+    grid-column: span 2;
+    min-width: 0;
+  }
+
+  .purpose-other .input {
+    min-width: 0;
+  }
+
+  /* Fee cards */
+  .fee-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .fee-title {
+    min-width: 0;
+  }
+
+  .fee-price {
+    flex-shrink: 0;
+  }
+
+  .quantity-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .quantity-input {
+    width: 80px !important;
+    flex-shrink: 0;
+  }
+
+  .quantity-help {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+
+  @media (max-width: 767px) {
+
+    .apply-page {
+      width: 100%;
+    }
+
+    .apply-container {
+      max-width: none;
+      padding: 12px;
+    }
+
+    /* Header */
+    .apply-topbar {
+      min-height: 58px;
+      padding: 10px 12px !important;
+    }
+
+    .apply-topbar-title {
+      display: block;
+      line-height: 1.25;
+    }
+
+    .apply-topbar-user {
+      font-size: 11px !important;
+      text-align: right;
+      max-width: 80px;
+    }
+
+    /* Cards */
+    .apply-container .card {
+      border-radius: 12px;
+    }
+
+    /* All grids become ONE column */
+    .apply-grid-3,
+    .apply-grid-2,
+    .enrollment-grid,
+    .purpose-grid {
+      grid-template-columns: 1fr !important;
+      gap: 14px;
+    }
+
+    .purpose-other {
+      grid-column: auto !important;
+    }
+
+    /* Enrollment box */
+    .enrollment-fields {
+      margin-left: 0 !important;
+      padding: 12px !important;
+    }
+
+    /* Make labels and inputs breathe */
+    .apply-field .label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .apply-field .input {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 42px;
+      box-sizing: border-box;
+    }
+
+    /* Radio options */
+    .enrollment-option {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 48px;
+      padding: 12px !important;
+    }
+
+    /* Purpose other */
+    .purpose-other {
+      display: flex !important;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .purpose-other .input {
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-top: 8px;
+      flex-basis: 100%;
+    }
+
+    /* Fee header stacks vertically */
+    .fee-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fee-price {
+      font-size: 20px !important;
+    }
+
+    .quantity-row {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .quantity-input {
+      width: 100% !important;
+      max-width: 120px;
+    }
+
+    .quantity-help {
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* Total */
+    #totalAmount {
+      font-size: 28px !important;
+    }
+
+    /* Submit */
+    .apply-submit {
+      min-height: 48px;
+      font-size: 15px !important;
+    }
+  }
+
+  /* Extra small phones */
+  @media (max-width: 380px) {
+
+    .apply-container {
+      padding: 8px;
+    }
+
+    .apply-container .card {
+      padding: 14px !important;
+    }
+
+    .apply-form-header {
+      padding: 16px !important;
+    }
+
+    .apply-form-header h1 {
+      font-size: 17px !important;
+    }
+
+    .apply-form-header p {
+      font-size: 13px !important;
+    }
+  }
+</style>
+
+
 <div class="flex h-screen overflow-hidden">
+
   {{> sidebar-student activePage="apply"}}
 
-  <div class="flex-1 overflow-y-auto bg-slate-100">
-    <div class="nav-top">
-      <div class="flex items-center gap-3">
-        <a href="/student/dashboard" class="text-teal-700 text-sm font-medium">← Back</a>
-        <h1 class="text-base font-bold text-slate-800">Good Moral Certificate Request Form</h1>
+  <div class="flex-1 overflow-y-auto bg-slate-100 apply-page">
+
+    <!-- TOP NAV -->
+    <div class="nav-top apply-topbar">
+
+      <div class="flex items-center gap-3 min-w-0">
+
+        <a href="/student/dashboard"
+           class="text-teal-700 text-sm font-medium flex-shrink-0">
+          ← Back
+        </a>
+
+        <h1 class="text-base font-bold text-slate-800 apply-topbar-title">
+          Good Moral Certificate Request Form
+        </h1>
+
       </div>
-      <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
+
+      <span class="text-teal-700 text-sm font-medium apply-topbar-user">
+        {{user.firstName}} {{user.lastName}}
+      </span>
+
     </div>
 
-    <div class="max-w-3xl mx-auto px-5 py-5">
+
+    <!-- MAIN CONTENT -->
+    <div class="apply-container">
+
       {{> flash}}
 
-      <!-- Form Header -->
-      <div class="card mb-5 text-center" style="background:#0a1f0a;border-color:#166534">
-        <h1 class="text-xl font-bold text-blue-600">REQUEST FORM</h1>
-        <p class="text-white font-bold text-lg">Certificate of Good Moral Character</p>
-        <p class="text-green-300 text-sm font-semibold mt-1">UniGuide — Mindoro State University Bongabong Campus</p>
+
+      <!-- =====================================================
+           FORM HEADER
+           ===================================================== -->
+      <div class="card mb-5 text-center apply-form-header"
+           style="background:#0a1f0a;border-color:#166534">
+
+        <h1 class="text-xl font-bold text-blue-600">
+          REQUEST FORM
+        </h1>
+
+        <p class="text-white font-bold text-lg">
+          Certificate of Good Moral Character
+        </p>
+
+        <p class="text-green-300 text-sm font-semibold mt-1">
+          UniGuide — Mindoro State University Bongabong Campus
+        </p>
+
       </div>
 
-      <form action="/student/apply" method="POST" class="space-y-5" id="applyForm">
 
-        <!-- Draft Status Indicator -->
-        <div id="draft-indicator" class="card-sm" style="background:#fffbeb;border:1px solid #fbbf24;display:none;">
-          <div class="flex items-center gap-2">
-            <span style="color:#f59e0b;">💾</span>
-            <div style="flex:1;">
-              <p style="color:#92400e;font-size:0.85rem;font-weight:600;margin:0;">Draft Saved</p>
-              <p style="color:#78350f;font-size:0.75rem;margin:2px 0 0;">Your form data is automatically saved. You can come back anytime.</p>
+      <form action="/student/apply"
+            method="POST"
+            class="space-y-5"
+            id="applyForm"
+            autocomplete="off">
+
+
+        <!-- =====================================================
+             DRAFT STATUS
+             ===================================================== -->
+        <div id="draft-indicator"
+             class="card-sm"
+             style="background:#fffbeb;border:1px solid #fbbf24;display:none;">
+
+          <div class="flex items-start gap-2">
+
+            <span style="color:#f59e0b;">
+              💾
+            </span>
+
+            <div style="flex:1;min-width:0;">
+
+              <p style="color:#92400e;font-size:0.85rem;font-weight:600;margin:0;">
+                Draft Saved
+              </p>
+
+              <p style="color:#78350f;font-size:0.75rem;margin:2px 0 0;">
+                Your form data is automatically saved. You can come back anytime.
+              </p>
+
             </div>
-            <button type="button" onclick="clearDraft()" style="color:#dc2626;font-size:0.75rem;text-decoration:underline;">Clear Draft</button>
+
+            <button type="button"
+                    onclick="clearDraft()"
+                    style="color:#dc2626;font-size:0.75rem;text-decoration:underline;flex-shrink:0;">
+              Clear Draft
+            </button>
+
           </div>
+
         </div>
 
-        <!-- Student Info -->
+
+        <!-- =====================================================
+             STUDENT INFORMATION
+             ===================================================== -->
         <div class="card">
-          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">Student's Information</h3>
-          <div class="grid grid-cols-3 gap-4 mb-4">
-            <div>
-              <label class="label">Surname *</label>
-              <input type="text" name="surname" class="input" placeholder="Dela Cruz" required>
+
+          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">
+            Student's Information
+          </h3>
+
+
+          <!-- NAME -->
+          <div class="apply-grid-3 mb-4">
+
+            <div class="apply-field">
+
+              <label class="label">
+                Surname *
+              </label>
+
+              <input type="text"
+                     name="surname"
+                     class="input"
+                     placeholder="Dela Cruz"
+                     required>
+
             </div>
-            <div>
-              <label class="label">Given Name *</label>
-              <input type="text" name="givenName" class="input" placeholder="Juan" required>
+
+
+            <div class="apply-field">
+
+              <label class="label">
+                Given Name *
+              </label>
+
+              <input type="text"
+                     name="givenName"
+                     class="input"
+                     placeholder="Juan"
+                     required>
+
             </div>
-            <div>
-              <label class="label">Middle Name</label>
-              <input type="text" name="middleName" class="input" placeholder="Santos">
+
+
+            <div class="apply-field">
+
+              <label class="label">
+                Middle Name
+              </label>
+
+              <input type="text"
+                     name="middleName"
+                     class="input"
+                     placeholder="Santos">
+
             </div>
+
           </div>
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="label">Gender *</label>
-              <select name="gender" class="input" required>
-                <option value="">Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+
+
+          <!-- GENDER + CONTACT -->
+          <div class="apply-grid-2 mb-4">
+
+            <div class="apply-field">
+
+              <label class="label">
+                Gender *
+              </label>
+
+              <select name="gender"
+                      class="input"
+                      required>
+
+                <option value="">
+                  Select gender
+                </option>
+
+                <option value="Male">
+                  Male
+                </option>
+
+                <option value="Female">
+                  Female
+                </option>
+
+                <option value="Other">
+                  Other
+                </option>
+
               </select>
+
             </div>
-            <div>
-              <label class="label">Contact Number *</label>
-              <input type="text" name="contactNumber" class="input" placeholder="09XXXXXXXXX" required>
+
+
+            <div class="apply-field">
+
+              <label class="label">
+                Contact Number *
+              </label>
+
+              <input type="text"
+                     name="contactNumber"
+                     class="input"
+                     placeholder="09XXXXXXXXX"
+                     inputmode="numeric"
+                     required>
+
             </div>
+
           </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div>
-              <label class="label">Course *</label>
-              <input type="text" name="course" class="input" placeholder="e.g. BSIT" required>
+
+
+          <!-- COURSE -->
+          <div class="apply-grid-3">
+
+            <div class="apply-field">
+
+              <label class="label">
+                Course *
+              </label>
+
+              <input type="text"
+                     name="course"
+                     class="input"
+                     placeholder="e.g. BSIT"
+                     required>
+
             </div>
-            <div>
-              <label class="label">Major</label>
-              <input type="text" name="major" class="input" placeholder="e.g. Network Technology">
+
+
+            <div class="apply-field">
+
+              <label class="label">
+                Major
+              </label>
+
+              <input type="text"
+                     name="major"
+                     class="input"
+                     placeholder="e.g. Network Technology">
+
             </div>
-            <div>
-              <label class="label">Section</label>
-              <input type="text" name="section" class="input" placeholder="e.g. A, B">
+
+
+            <div class="apply-field">
+
+              <label class="label">
+                Section
+              </label>
+
+              <input type="text"
+                     name="section"
+                     class="input"
+                     placeholder="e.g. A, B">
+
             </div>
+
           </div>
+
         </div>
 
-        <!-- Enrollment Status -->
+
+        <!-- =====================================================
+             ENROLLMENT STATUS
+             ===================================================== -->
         <div class="card">
-          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">Enrollment Status *</h3>
+
+          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">
+            Enrollment Status *
+          </h3>
+
 
           <div class="space-y-3 mb-4">
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors" id="lbl-currently">
-              <input type="radio" name="enrollmentStatus" value="currently_enrolled" class="accent-green-500" onchange="switchEnrollment('currently')" required>
-              <span class="text-slate-700 font-medium">Currently Enrolled</span>
+
+
+            <!-- CURRENTLY ENROLLED -->
+            <label class="enrollment-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors"
+                   id="lbl-currently">
+
+              <input type="radio"
+                     name="enrollmentStatus"
+                     value="currently_enrolled"
+                     class="accent-green-500"
+                     onchange="switchEnrollment('currently')"
+                     required>
+
+              <span class="text-slate-700 font-medium">
+                Currently Enrolled
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors" id="lbl-was">
-              <input type="radio" name="enrollmentStatus" value="was_enrolled" class="accent-green-500" onchange="switchEnrollment('was')">
-              <span class="text-slate-700 font-medium">Was Enrolled (Former Student)</span>
+
+
+            <!-- WAS ENROLLED -->
+            <label class="enrollment-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors"
+                   id="lbl-was">
+
+              <input type="radio"
+                     name="enrollmentStatus"
+                     value="was_enrolled"
+                     class="accent-green-500"
+                     onchange="switchEnrollment('was')">
+
+              <span class="text-slate-700 font-medium">
+                Was Enrolled (Former Student)
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors" id="lbl-graduated">
-              <input type="radio" name="enrollmentStatus" value="graduated" class="accent-green-500" onchange="switchEnrollment('graduated')">
-              <span class="text-slate-700 font-medium">Graduated</span>
+
+
+            <!-- GRADUATED -->
+            <label class="enrollment-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors"
+                   id="lbl-graduated">
+
+              <input type="radio"
+                     name="enrollmentStatus"
+                     value="graduated"
+                     class="accent-green-500"
+                     onchange="switchEnrollment('graduated')">
+
+              <span class="text-slate-700 font-medium">
+                Graduated
+              </span>
+
             </label>
+
           </div>
 
-          <!-- Enrolled fields (currently / was enrolled) -->
-          <div id="fields-enrolled" class="ml-4 p-4 border border-slate-200 rounded-lg" style="display:none">
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <label class="label">Year Level</label>
-                <select name="yearLevel" id="yearLevel" class="input">
-                  <option value="">Select</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="5th Year">5th Year</option>
+
+          <!-- ===================================================
+               CURRENT / FORMER STUDENT
+               =================================================== -->
+          <div id="fields-enrolled"
+               class="enrollment-fields p-4 border border-slate-200 rounded-lg"
+               style="display:none">
+
+            <div class="enrollment-grid">
+
+
+              <div class="apply-field">
+
+                <label class="label">
+                  Year Level
+                </label>
+
+                <select name="yearLevel"
+                        id="yearLevel"
+                        class="input">
+
+                  <option value="">
+                    Select
+                  </option>
+
+                  <option value="1st Year">
+                    1st Year
+                  </option>
+
+                  <option value="2nd Year">
+                    2nd Year
+                  </option>
+
+                  <option value="3rd Year">
+                    3rd Year
+                  </option>
+
+                  <option value="4th Year">
+                    4th Year
+                  </option>
+
+                  <option value="5th Year">
+                    5th Year
+                  </option>
+
                 </select>
+
               </div>
-              <div>
-                <label class="label">Academic Year</label>
-                <input type="text" name="academicYear" id="academicYear" class="input" placeholder="e.g. 2024-2025">
+
+
+              <div class="apply-field">
+
+                <label class="label">
+                  Academic Year
+                </label>
+
+                <input type="text"
+                       name="academicYear"
+                       id="academicYear"
+                       class="input"
+                       placeholder="e.g. 2024-2025">
+
               </div>
-              <div>
-                <label class="label">Semester</label>
-                <select name="semester" id="semester" class="input">
-                  <option value="">Select</option>
-                  <option value="1st">1st Semester</option>
-                  <option value="2nd">2nd Semester</option>
+
+
+              <div class="apply-field">
+
+                <label class="label">
+                  Semester
+                </label>
+
+                <select name="semester"
+                        id="semester"
+                        class="input">
+
+                  <option value="">
+                    Select
+                  </option>
+
+                  <option value="1st">
+                    1st Semester
+                  </option>
+
+                  <option value="2nd">
+                    2nd Semester
+                  </option>
+
                 </select>
+
               </div>
+
             </div>
+
           </div>
 
-          <!-- Graduated field -->
-          <div id="fields-graduated" class="ml-4 p-4 border border-slate-200 rounded-lg" style="display:none">
-            <label class="label">Month/Year Graduated</label>
-            <input type="text" name="monthYearGraduated" class="input" placeholder="e.g. May 2024" style="max-width:220px">
+
+          <!-- ===================================================
+               GRADUATED
+               =================================================== -->
+          <div id="fields-graduated"
+               class="enrollment-fields p-4 border border-slate-200 rounded-lg"
+               style="display:none">
+
+            <div class="apply-field">
+
+              <label class="label">
+                Month/Year Graduated
+              </label>
+
+              <input type="text"
+                     name="monthYearGraduated"
+                     class="input"
+                     placeholder="e.g. May 2024"
+                     style="max-width:220px">
+
+            </div>
+
           </div>
+
         </div>
 
-        <!-- Purpose -->
+
+        <!-- =====================================================
+             PURPOSE
+             ===================================================== -->
         <div class="card">
-          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">Purpose/s *</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Employment" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">Employment</span>
+
+          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">
+            Purpose/s *
+          </h3>
+
+
+          <div class="purpose-grid">
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Employment"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                Employment
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Board Examination" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">Board Examination</span>
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Board Examination"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                Board Examination
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Scholarship" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">Scholarship</span>
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Scholarship"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                Scholarship
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="PNP/AFP Application" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">PNP/AFP Application</span>
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="PNP/AFP Application"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                PNP/AFP Application
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Transfer" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">Transfer to Another School</span>
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Transfer"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                Transfer to Another School
+              </span>
+
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Passport Application" class="accent-green-500 w-4 h-4">
-              <span class="text-slate-700 text-sm">Passport Application</span>
+
+
+            <label class="purpose-option flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Passport Application"
+                     class="accent-green-500 w-4 h-4">
+
+              <span class="text-slate-700 text-sm">
+                Passport Application
+              </span>
+
             </label>
-            <label class="col-span-2 flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
-              <input type="checkbox" name="purposes" value="Others" class="accent-green-500 w-4 h-4" id="othersChk">
-              <span class="text-slate-700 text-sm">Others, please specify:</span>
-              <input type="text" name="otherPurpose" id="otherInput" class="input ml-2 text-sm" placeholder="Specify purpose" style="flex:1" disabled>
+
+
+            <!-- OTHERS -->
+            <label class="purpose-other flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600 transition-colors">
+
+              <input type="checkbox"
+                     name="purposes"
+                     value="Others"
+                     class="accent-green-500 w-4 h-4"
+                     id="othersChk">
+
+              <span class="text-slate-700 text-sm">
+                Others, please specify:
+              </span>
+
+              <input type="text"
+                     name="otherPurpose"
+                     id="otherInput"
+                     class="input text-sm"
+                     placeholder="Specify purpose"
+                     disabled>
+
             </label>
+
           </div>
+
         </div>
 
-        <!-- Fee Selection -->
-        <div class="card" style="background:#0a1f0a;border-color:#166534">
-          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">For Cashier Fee</h3>
-          
-          <!-- Good Moral True Copy + Stamp (bundled) -->
-          <div class="mb-4 p-4 rounded-lg" style="background:#052e16;border:1px solid #166534">
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <p class="text-white font-bold text-sm">Good Moral Certificate (True Copy + Stamp)</p>
-                <p class="text-green-300 text-xs">₱40 (True Copy) + ₱30 (Stamp) = ₱70 per set</p>
+
+        <!-- =====================================================
+             CASHIER FEE
+             ===================================================== -->
+        <div class="card"
+             style="background:#0a1f0a;border-color:#166534">
+
+          <h3 class="text-green-700 font-semibold mb-4 text-xs uppercase tracking-wider">
+            For Cashier Fee
+          </h3>
+
+
+          <!-- GOOD MORAL -->
+          <div class="mb-4 p-4 rounded-lg"
+               style="background:#052e16;border:1px solid #166534">
+
+            <div class="fee-header mb-2">
+
+              <div class="fee-title">
+
+                <p class="text-white font-bold text-sm">
+                  Good Moral Certificate (True Copy + Stamp)
+                </p>
+
+                <p class="text-green-300 text-xs">
+                  ₱40 (True Copy) + ₱30 (Stamp) = ₱70 per set
+                </p>
+
               </div>
-              <p class="text-white font-bold text-xl">₱70.00</p>
+
+              <p class="text-white font-bold text-xl fee-price">
+                ₱70.00
+              </p>
+
             </div>
-            <div class="flex items-center gap-3 mt-3">
-              <label class="text-gray-400 text-sm">Quantity:</label>
-              <input type="number" name="qtyGoodMoral" value="0" min="0" max="10" class="input text-center" style="width:80px" onchange="updateTotal()">
-              <span class="text-gray-500 text-xs">copies (set to 0 if not needed)</span>
+
+
+            <div class="quantity-row mt-3">
+
+              <label class="text-gray-400 text-sm">
+                Quantity:
+              </label>
+
+              <input type="number"
+                     name="qtyGoodMoral"
+                     value="0"
+                     min="0"
+                     max="10"
+                     class="input text-center quantity-input"
+                     onchange="updateTotal()">
+
+              <span class="text-gray-500 text-xs quantity-help">
+                copies (set to 0 if not needed)
+              </span>
+
             </div>
+
           </div>
 
-          <!-- CTC / Authentication Request -->
-          <div class="p-4 rounded-lg" style="background:#052e16;border:1px solid #166534">
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <p class="text-white font-bold text-sm">CTC / Authentication Request</p>
-                <p class="text-green-300 text-xs">₱10 per copy</p>
+
+          <!-- CTC -->
+          <div class="p-4 rounded-lg"
+               style="background:#052e16;border:1px solid #166534">
+
+            <div class="fee-header mb-2">
+
+              <div class="fee-title">
+
+                <p class="text-white font-bold text-sm">
+                  CTC / Authentication Request
+                </p>
+
+                <p class="text-green-300 text-xs">
+                  ₱10 per copy
+                </p>
+
               </div>
-              <p class="text-white font-bold text-xl">₱10.00</p>
+
+              <p class="text-white font-bold text-xl fee-price">
+                ₱10.00
+              </p>
+
             </div>
-            <div class="flex items-center gap-3 mt-3">
-              <label class="text-gray-400 text-sm">Quantity:</label>
-              <input type="number" name="qtyCTC" value="0" min="0" max="10" class="input text-center" style="width:80px" onchange="updateTotal()">
-              <span class="text-gray-500 text-xs">copies (set to 0 if not needed)</span>
+
+
+            <div class="quantity-row mt-3">
+
+              <label class="text-gray-400 text-sm">
+                Quantity:
+              </label>
+
+              <input type="number"
+                     name="qtyCTC"
+                     value="0"
+                     min="0"
+                     max="10"
+                     class="input text-center quantity-input"
+                     onchange="updateTotal()">
+
+              <span class="text-gray-500 text-xs quantity-help">
+                copies (set to 0 if not needed)
+              </span>
+
             </div>
+
           </div>
 
-          <!-- Total Display -->
-          <div class="mt-4 p-4 rounded-lg text-center" style="background:#1a472a;border:2px solid #22c55e">
-            <p class="text-gray-400 text-xs mb-1">TOTAL AMOUNT</p>
-            <p class="text-white font-bold text-3xl" id="totalAmount">₱0.00</p>
-            <p class="text-green-300 text-xs mt-1" id="totalNote">Please select at least one item</p>
+
+          <!-- TOTAL -->
+          <div class="mt-4 p-4 rounded-lg text-center"
+               style="background:#1a472a;border:2px solid #22c55e">
+
+            <p class="text-gray-400 text-xs mb-1">
+              TOTAL AMOUNT
+            </p>
+
+            <p class="text-white font-bold text-3xl"
+               id="totalAmount">
+              ₱0.00
+            </p>
+
+            <p class="text-green-300 text-xs mt-1"
+               id="totalNote">
+              Please select at least one item
+            </p>
+
           </div>
+
         </div>
 
-        <button type="submit" class="btn-green w-full py-3 text-base">📤 Submit Application</button>
+
+        <!-- =====================================================
+             SUBMIT
+             ===================================================== -->
+        <button type="submit"
+                class="btn-green w-full py-3 text-base apply-submit">
+          📤 Submit Application
+        </button>
+
+
       </form>
+
     </div>
+
   </div>
+
 </div>
 
+
 <script>
+
+/* =============================================================
+   ENROLLMENT STATUS
+   ============================================================= */
+
 function switchEnrollment(type) {
-  document.getElementById('fields-enrolled').style.display  = (type === 'currently' || type === 'was') ? '' : 'none';
-  document.getElementById('fields-graduated').style.display = (type === 'graduated') ? '' : 'none';
 
-  // Highlight selected radio label
-  ['lbl-currently','lbl-was','lbl-graduated'].forEach(id => {
-    document.getElementById(id).style.borderColor = '';
-  });
-  const map = { currently: 'lbl-currently', was: 'lbl-was', graduated: 'lbl-graduated' };
-  if (map[type]) document.getElementById(map[type]).style.borderColor = '#22c55e';
-}
+  const enrolledFields = document.getElementById('fields-enrolled');
+  const graduatedFields = document.getElementById('fields-graduated');
 
-// Enable "other purpose" text field only when checked
-document.getElementById('othersChk').addEventListener('change', function() {
-  const input = document.getElementById('otherInput');
-  input.disabled = !this.checked;
-  if (this.checked) input.focus();
-  else input.value = '';
-});
+  enrolledFields.style.display =
+    (type === 'currently' || type === 'was') ? '' : 'none';
 
-// Calculate total amount
-function updateTotal() {
-  const qtyGoodMoral = parseInt(document.querySelector('input[name="qtyGoodMoral"]').value) || 0;
-  const qtyCTC = parseInt(document.querySelector('input[name="qtyCTC"]').value) || 0;
-  
-  const total = (qtyGoodMoral * 70) + (qtyCTC * 10);
-  document.getElementById('totalAmount').textContent = '₱' + total.toFixed(2);
-  
-  // Update note
-  const noteEl = document.getElementById('totalNote');
-  if (total === 0) {
-    noteEl.textContent = 'Please select at least one item';
-    noteEl.style.color = '#fca5a5';
-  } else {
-    noteEl.textContent = 'Please pay this exact amount';
-    noteEl.style.color = '#86efac';
-  }
-}
+  graduatedFields.style.display =
+    (type === 'graduated') ? '' : 'none';
 
-// Validate form before submit
-document.getElementById('applyForm').addEventListener('submit', function(e) {
-  const qtyGoodMoral = parseInt(document.querySelector('input[name="qtyGoodMoral"]').value) || 0;
-  const qtyCTC = parseInt(document.querySelector('input[name="qtyCTC"]').value) || 0;
-  
-  if (qtyGoodMoral === 0 && qtyCTC === 0) {
-    e.preventDefault();
-    alert('Please select at least one item: Good Moral Certificate or CTC/Authentication');
-    return false;
-  }
-  
-  // Clear draft on successful submit
-  localStorage.removeItem('applicationDraft');
-});
 
-// ═══════════════════════════════════════════════════════════════
-// AUTO-SAVE DRAFT FEATURE (Form Data Preservation)
-// ═══════════════════════════════════════════════════════════════
+  /* Reset borders */
 
-const DRAFT_KEY = 'applicationDraft';
-const DRAFT_EXPIRY_DAYS = 7; // Draft expires after 7 days
+  [
+    'lbl-currently',
+    'lbl-was',
+    'lbl-graduated'
+  ].forEach(id => {
 
-// Save draft to localStorage
-function saveDraft() {
-  const form = document.getElementById('applyForm');
-  const formData = {};
-  
-  // Get all form inputs
-  const inputs = form.querySelectorAll('input, select, textarea');
-  inputs.forEach(input => {
-    if (input.type === 'checkbox') {
-      if (!formData[input.name]) formData[input.name] = [];
-      if (input.checked) formData[input.name].push(input.value);
-    } else if (input.type === 'radio') {
-      if (input.checked) formData[input.name] = input.value;
-    } else {
-      formData[input.name] = input.value;
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.style.borderColor = '';
     }
+
   });
-  
-  // Save with timestamp
-  const draft = {
-    data: formData,
-    timestamp: Date.now(),
-    expiresAt: Date.now() + (DRAFT_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
+
+
+  /* Highlight selected */
+
+  const map = {
+    currently: 'lbl-currently',
+    was: 'lbl-was',
+    graduated: 'lbl-graduated'
   };
-  
-  try {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    showDraftIndicator();
-  } catch (e) {
-    console.error('Failed to save draft:', e);
+
+  if (map[type]) {
+
+    const selected =
+      document.getElementById(map[type]);
+
+    if (selected) {
+      selected.style.borderColor = '#22c55e';
+    }
+
   }
+
 }
 
-// Load draft from localStorage
-function loadDraft() {
-  try {
-    const draftStr = localStorage.getItem(DRAFT_KEY);
-    if (!draftStr) return;
-    
-    const draft = JSON.parse(draftStr);
-    
-    // Check if expired
-    if (Date.now() > draft.expiresAt) {
-      localStorage.removeItem(DRAFT_KEY);
-      return;
-    }
-    
-    // Restore form data
-    const form = document.getElementById('applyForm');
-    const formData = draft.data;
-    
-    Object.keys(formData).forEach(name => {
-      const value = formData[name];
-      const inputs = form.querySelectorAll(`[name="${name}"]`);
-      
-      inputs.forEach(input => {
-        if (input.type === 'checkbox') {
-          if (Array.isArray(value) && value.includes(input.value)) {
-            input.checked = true;
-          }
-        } else if (input.type === 'radio') {
-          if (input.value === value) {
-            input.checked = true;
-            // Trigger enrollment status change if applicable
-            if (name === 'enrollmentStatus') {
-              const typeMap = {
-                'currently_enrolled': 'currently',
-                'was_enrolled': 'was',
-                'graduated': 'graduated'
-              };
-              if (typeMap[value]) {
-                switchEnrollment(typeMap[value]);
-              }
-            }
-          }
-        } else {
-          input.value = value;
-        }
-      });
-    });
-    
-    // Update total if quantities were loaded
-    if (formData.qtyGoodMoral || formData.qtyCTC) {
-      updateTotal();
-    }
-    
-    // Enable "other purpose" input if "Others" was checked
-    const othersChk = document.getElementById('othersChk');
-    if (othersChk && othersChk.checked) {
-      document.getElementById('otherInput').disabled = false;
-    }
-    
-    showDraftIndicator();
-    
-    // Show confirmation
-    const loadTime = new Date(draft.timestamp).toLocaleString();
-    if (confirm(`Draft found from ${loadTime}. Load this draft?`)) {
-      // Already loaded above
+
+/* =============================================================
+   OTHER PURPOSE
+   ============================================================= */
+
+const othersChk =
+  document.getElementById('othersChk');
+
+const otherInput =
+  document.getElementById('otherInput');
+
+
+if (othersChk && otherInput) {
+
+  othersChk.addEventListener('change', function() {
+
+    otherInput.disabled = !this.checked;
+
+    if (this.checked) {
+
+      otherInput.focus();
+
     } else {
-      clearDraft();
+
+      otherInput.value = '';
+
     }
-    
-  } catch (e) {
-    console.error('Failed to load draft:', e);
-  }
-}
 
-// Clear draft
-function clearDraft() {
-  localStorage.removeItem(DRAFT_KEY);
-  document.getElementById('draft-indicator').style.display = 'none';
-  
-  // Optionally clear form
-  if (confirm('Clear the form data?')) {
-    document.getElementById('applyForm').reset();
-    updateTotal();
-  }
-}
-
-// Show draft indicator
-function showDraftIndicator() {
-  const indicator = document.getElementById('draft-indicator');
-  if (indicator) {
-    indicator.style.display = 'block';
-  }
-}
-
-// Auto-save on input change (debounced)
-let saveTimeout;
-function autoSave() {
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    saveDraft();
-  }, 1000); // Save 1 second after user stops typing
-}
-
-// Initialize draft feature
-document.addEventListener('DOMContentLoaded', function() {
-  // Load existing draft if any
-  loadDraft();
-  
-  // Attach auto-save to all form inputs
-  const form = document.getElementById('applyForm');
-  const inputs = form.querySelectorAll('input, select, textarea');
-  
-  inputs.forEach(input => {
-    input.addEventListener('change', autoSave);
-    if (input.type === 'text' || input.tagName === 'TEXTAREA') {
-      input.addEventListener('input', autoSave);
-    }
   });
-  
-  // Warn user if leaving with unsaved changes
-  let formChanged = false;
-  inputs.forEach(input => {
-    input.addEventListener('change', () => { formChanged = true; });
-  });
-  
-  window.addEventListener('beforeunload', function(e) {
-    if (formChanged && !form.submitted) {
-      // Modern browsers show generic message
+
+}
+
+
+/* =============================================================
+   TOTAL AMOUNT
+   ============================================================= */
+
+function updateTotal() {
+
+  const goodMoralInput =
+    document.querySelector(
+      'input[name="qtyGoodMoral"]'
+    );
+
+  const ctcInput =
+    document.querySelector(
+      'input[name="qtyCTC"]'
+    );
+
+
+  const qtyGoodMoral =
+    parseInt(goodMoralInput?.value) || 0;
+
+  const qtyCTC =
+    parseInt(ctcInput?.value) || 0;
+
+
+  const total =
+    (qtyGoodMoral * 70) +
+    (qtyCTC * 10);
+
+
+  document.getElementById(
+    'totalAmount'
+  ).textContent =
+    '₱' + total.toFixed(2);
+
+
+  const noteEl =
+    document.getElementById('totalNote');
+
+
+  if (total === 0) {
+
+    noteEl.textContent =
+      'Please select at least one item';
+
+    noteEl.style.color =
+      '#fca5a5';
+
+  } else {
+
+    noteEl.textContent =
+      'Please pay this exact amount';
+
+    noteEl.style.color =
+      '#86efac';
+
+  }
+
+}
+
+
+/* =============================================================
+   FORM VALIDATION
+   ============================================================= */
+
+document
+  .getElementById('applyForm')
+  .addEventListener('submit', function(e) {
+
+    const qtyGoodMoral =
+      parseInt(
+        document.querySelector(
+          'input[name="qtyGoodMoral"]'
+        ).value
+      ) || 0;
+
+
+    const qtyCTC =
+      parseInt(
+        document.querySelector(
+          'input[name="qtyCTC"]'
+        ).value
+      ) || 0;
+
+
+    if (
+      qtyGoodMoral === 0 &&
+      qtyCTC === 0
+    ) {
+
       e.preventDefault();
-      e.returnValue = '';
-    }
-  });
-  
-  // Mark form as submitted on submit
-  form.addEventListener('submit', function() {
-    form.submitted = true;
-  });
-});
 
+      alert(
+        'Please select at least one item: Good Moral Certificate or CTC/Authentication'
+      );
+
+      return false;
+
+    }
+
+
+    localStorage.removeItem(
+      'applicationDraft'
+    );
+
+  });
+
+
+/* =============================================================
+   AUTO-SAVE DRAFT
+   ============================================================= */
+
+const DRAFT_KEY =
+  'applicationDraft';
+
+const DRAFT_EXPIRY_DAYS =
+  7;
+
+
+/* SAVE */
+
+function saveDraft() {
+
+  const form =
+    document.getElementById('applyForm');
+
+  const formData = {};
+
+
+  const inputs =
+    form.querySelectorAll(
+      'input, select, textarea'
+    );
+
+
+  inputs.forEach(input => {
+
+    if (input.type === 'checkbox') {
+
+      if (!formData[input.name]) {
+        formData[input.name] = [];
+      }
+
+      if (input.checked) {
+        formData[input.name].push(
+          input.value
+        );
+      }
+
+    } else if (input.type === 'radio') {
+
+      if (input.checked) {
+        formData[input.name] =
+          input.value;
+      }
+
+    } else {
+
+      formData[input.name] =
+        input.value;
+
+    }
+
+  });
+
+
+  const draft = {
+
+    data: formData,
+
+    timestamp: Date.now(),
+
+    expiresAt:
+      Date.now() +
+      (
+        DRAFT_EXPIRY_DAYS *
+        24 *
+        60 *
+        60 *
+        1000
+      )
+
+  };
+
+
+  try {
+
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify(draft)
+    );
+
+    showDraftIndicator();
+
+  } catch (e) {
+
+    console.error(
+      'Failed to save draft:',
+      e
+    );
+
+  }
+
+}
+
+
+/* LOAD */
+
+function loadDraft() {
+
+  try {
+
+    const draftStr =
+      localStorage.getItem(DRAFT_KEY);
+
+    if (!draftStr) return;
+
+
+    const draft =
+      JSON.parse(draftStr);
+
+
+    if (
+      Date.now() >
+      draft.expiresAt
+    ) {
+
+      localStorage.removeItem(
+        DRAFT_KEY
+      );
+
+      return;
+
+    }
+
+
+    const form =
+      document.getElementById(
+        'applyForm'
+      );
+
+    const formData =
+      draft.data;
+
+
+    Object.keys(formData).forEach(
+      name => {
+
+        const value =
+          formData[name];
+
+
+        const inputs =
+          form.querySelectorAll(
+            `[name="${name}"]`
+          );
+
+
+        inputs.forEach(input => {
+
+          if (
+            input.type ===
+            'checkbox'
+          ) {
+
+            if (
+              Array.isArray(value) &&
+              value.includes(input.value)
+            ) {
+
+              input.checked = true;
+
+            }
+
+          } else if (
+            input.type === 'radio'
+          ) {
+
+            if (
+              input.value === value
+            ) {
+
+              input.checked = true;
+
+
+              if (
+                name ===
+                'enrollmentStatus'
+              ) {
+
+                const typeMap = {
+
+                  'currently_enrolled':
+                    'currently',
+
+                  'was_enrolled':
+                    'was',
+
+                  'graduated':
+                    'graduated'
+
+                };
+
+
+                if (
+                  typeMap[value]
+                ) {
+
+                  switchEnrollment(
+                    typeMap[value]
+                  );
+
+                }
+
+              }
+
+            }
+
+          } else {
+
+            input.value = value;
+
+          }
+
+        });
+
+      }
+    );
+
+
+    if (
+      formData.qtyGoodMoral ||
+      formData.qtyCTC
+    ) {
+
+      updateTotal();
+
+    }
+
+
+    const savedOthers =
+      document.getElementById(
+        'othersChk'
+      );
+
+    if (
+      savedOthers &&
+      savedOthers.checked
+    ) {
+
+      document.getElementById(
+        'otherInput'
+      ).disabled = false;
+
+    }
+
+
+    showDraftIndicator();
+
+
+    const loadTime =
+      new Date(
+        draft.timestamp
+      ).toLocaleString();
+
+
+    if (
+      !confirm(
+        `Draft found from ${loadTime}. Load this draft?`
+      )
+    ) {
+
+      clearDraft();
+
+    }
+
+
+  } catch (e) {
+
+    console.error(
+      'Failed to load draft:',
+      e
+    );
+
+  }
+
+}
+
+
+/* CLEAR */
+
+function clearDraft() {
+
+  localStorage.removeItem(
+    DRAFT_KEY
+  );
+
+
+  const indicator =
+    document.getElementById(
+      'draft-indicator'
+    );
+
+
+  if (indicator) {
+
+    indicator.style.display =
+      'none';
+
+  }
+
+
+  if (
+    confirm(
+      'Clear the form data?'
+    )
+  ) {
+
+    document
+      .getElementById(
+        'applyForm'
+      )
+      .reset();
+
+
+    updateTotal();
+
+  }
+
+}
+
+
+/* INDICATOR */
+
+function showDraftIndicator() {
+
+  const indicator =
+    document.getElementById(
+      'draft-indicator'
+    );
+
+
+  if (indicator) {
+
+    indicator.style.display =
+      'block';
+
+  }
+
+}
+
+
+/* AUTO SAVE */
+
+let saveTimeout;
+
+
+function autoSave() {
+
+  clearTimeout(
+    saveTimeout
+  );
+
+
+  saveTimeout =
+    setTimeout(
+      () => {
+
+        saveDraft();
+
+      },
+      1000
+    );
+
+}
+
+
+/* =============================================================
+   INITIALIZE
+   ============================================================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  function() {
+
+    loadDraft();
+
+
+    const form =
+      document.getElementById(
+        'applyForm'
+      );
+
+
+    if (!form) return;
+
+
+    const inputs =
+      form.querySelectorAll(
+        'input, select, textarea'
+      );
+
+
+    inputs.forEach(input => {
+
+      input.addEventListener(
+        'change',
+        autoSave
+      );
+
+
+      if (
+        input.type === 'text' ||
+        input.tagName === 'TEXTAREA'
+      ) {
+
+        input.addEventListener(
+          'input',
+          autoSave
+        );
+
+      }
+
+    });
+
+
+    let formChanged = false;
+
+
+    inputs.forEach(input => {
+
+      input.addEventListener(
+        'change',
+        () => {
+          formChanged = true;
+        }
+      );
+
+    });
+
+
+    window.addEventListener(
+      'beforeunload',
+      function(e) {
+
+        if (
+          formChanged &&
+          !form.submitted
+        ) {
+
+          e.preventDefault();
+
+          e.returnValue = '';
+
+        }
+
+      }
+    );
+
+
+    form.addEventListener(
+      'submit',
+      function() {
+
+        form.submitted = true;
+
+      }
+    );
+
+
+    updateTotal();
+
+  }
+);
 
 </script>
-</body></html>
+
+</body>
+</html>
