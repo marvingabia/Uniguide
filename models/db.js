@@ -7,7 +7,7 @@ console.log('========================================');
 
 console.log(
   'DATABASE_URL:',
-  process.env.DATABASE_URL ? '✓ Set' : '✗ Not set'
+  process.env.DATABASE_URL ? 'Set' : 'Not set'
 );
 
 console.log(
@@ -15,16 +15,16 @@ console.log(
   process.env.NODE_ENV || 'development'
 );
 
-let sequelize;
-
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
 }
 
+let sequelize;
+
 try {
   const dbUrl = new URL(process.env.DATABASE_URL);
 
-  console.log('📍 Using Aiven DATABASE_URL');
+  console.log('Using Aiven DATABASE_URL');
   console.log('DB Host:', dbUrl.hostname);
   console.log('DB Port:', dbUrl.port);
   console.log('DB Name:', dbUrl.pathname.replace(/^\/+/, ''));
@@ -41,6 +41,7 @@ try {
         require: true,
         rejectUnauthorized: false
       },
+
       supportBigNumbers: true,
       bigNumberStrings: true,
       connectTimeout: 10000
@@ -56,11 +57,10 @@ try {
     }
   });
 
-  console.log('✅ Sequelize configured successfully');
+  console.log('Sequelize configured successfully');
 
 } catch (err) {
-  console.error('❌ DATABASE CONFIG ERROR');
-  console.error(err.message);
+  console.error('DATABASE CONFIG ERROR:', err.message);
   throw err;
 }
 
