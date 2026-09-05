@@ -1,19 +1,32 @@
-<aside style="
-  width:240px;
-  background:linear-gradient(180deg,#1b5e38 0%,#154d2f 100%);
-  border-right:none;
-  flex-shrink:0;
-  height:100vh;
-  position:sticky;
-  top:0;
-  display:flex;
-  flex-direction:column;
-  padding:0;
-">
+<!-- Sidebar Toggle -->
+<button
+  type="button"
+  class="sidebar-toggle"
+  onclick="toggleSidebar()"
+  aria-label="Toggle sidebar">
+  &gt;
+</button>
+
+<!-- Dark overlay -->
+<div
+  class="sidebar-overlay"
+  onclick="closeSidebar()">
+</div>
+
+<!-- Student Sidebar -->
+<aside class="app-sidebar">
 
   <!-- Logo + Branding -->
-  <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.1);">
-    <div style="display:flex;align-items:center;gap:12px;">
+  <div style="
+    padding:20px 16px 16px;
+    border-bottom:1px solid rgba(255,255,255,.1);
+  ">
+
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:12px;
+    ">
 
       <img
         src="/uploads/minsulogo.png"
@@ -26,10 +39,10 @@
           background:#fff;
           padding:3px;
           flex-shrink:0;
-        "
-      >
+        ">
 
       <div>
+
         <p style="
           color:#fff;
           font-weight:700;
@@ -47,10 +60,13 @@
         ">
           MinSU — Bongabong Campus
         </p>
+
       </div>
 
     </div>
+
   </div>
+
 
   <!-- Navigation -->
   <div style="
@@ -61,64 +77,61 @@
 
     <a
       href="/student/home"
-      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}">
       🏠 Home
     </a>
 
     <a
       href="/student/apply"
-      class="sidebar-link {{#if (eq activePage 'apply')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'apply')}}active{{/if}}">
       📝 Request for Good Moral & CTC/Authentication
     </a>
 
     <a
       href="/student/history"
-      class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}">
       📋 Track My Request
     </a>
 
     <a
       href="/student/appointments"
-      class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}">
       📅 Request For Counselling
     </a>
 
     <a
       href="/student/notifications"
       class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
-      style="display:flex;align-items:center;"
-    >
+      style="display:flex;align-items:center;">
+
       🔔 Notifications
 
       {{#if unreadNotifCount}}
-        <span
-          class="badge badge-submitted"
-          style="margin-left:auto;"
-        >
-          {{unreadNotifCount}}
-        </span>
+
+      <span
+        class="badge badge-submitted"
+        style="margin-left:auto;">
+        {{unreadNotifCount}}
+      </span>
+
       {{/if}}
+
     </a>
 
     <a
       href="/student/announcements"
-      class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}">
       📢 Announcements
     </a>
 
     <a
       href="/student/profile"
-      class="sidebar-link {{#if (eq activePage 'profile')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'profile')}}active{{/if}}">
       👤 My Profile
     </a>
 
   </div>
+
 
   <!-- User + Logout -->
   <div style="
@@ -139,8 +152,7 @@
         transition:background .15s;
       "
       onmouseover="this.style.background='rgba(255,255,255,.08)'"
-      onmouseout="this.style.background='transparent'"
-    >
+      onmouseout="this.style.background='transparent'">
 
       {{#if user.profileImage}}
 
@@ -154,8 +166,7 @@
             border:2px solid rgba(255,255,255,.3);
             flex-shrink:0;
           "
-          alt="avatar"
-        >
+          alt="avatar">
 
       {{else if user.avatar}}
 
@@ -169,8 +180,7 @@
             border:2px solid rgba(255,255,255,.3);
             flex-shrink:0;
           "
-          alt="avatar"
-        >
+          alt="avatar">
 
       {{else}}
 
@@ -192,6 +202,7 @@
         </div>
 
       {{/if}}
+
 
       <div style="min-width:0;">
 
@@ -219,6 +230,7 @@
 
     </a>
 
+
     <form action="/logout" method="POST">
 
       <button
@@ -233,9 +245,10 @@
           color:#fca5a5;
         "
         onmouseover="this.style.background='rgba(239,68,68,.15)'"
-        onmouseout="this.style.background='transparent'"
-      >
+        onmouseout="this.style.background='transparent'">
+
         🚪 Logout
+
       </button>
 
     </form>

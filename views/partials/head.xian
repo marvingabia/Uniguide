@@ -1,1903 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
-  >
-
-  <meta
-    name="mobile-web-app-capable"
-    content="yes"
-  >
-
-  <meta
-    name="apple-mobile-web-app-capable"
-    content="yes"
-  >
-
-  <meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="default"
-  >
-
-  <meta
-    name="theme-color"
-    content="#1b5e38"
-  >
-
-  <meta
-    name="description"
-    content="MinSU Bongabong Campus Good Moral Certificate Online Application System"
-  >
-
-  <link
-    rel="manifest"
-    href="/manifest.json"
-  >
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="/uploads/minsulogo.png"
-  >
-
-  <link
-    rel="apple-touch-icon"
-    href="/uploads/minsulogo.png"
-  >
-
-  <title>{{title}}</title>
+  <title>UniGuide — MinSU Bongabong</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-
   <style>
-
-    /* =========================================================
-       GLOBAL
-    ========================================================= */
-
-    *,
-    *::before,
-    *::after {
+    * {
       box-sizing: border-box;
     }
 
-
-    html {
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-    }
-
-
+    html,
     body {
-      width: 100%;
-      min-height: 100vh;
-
       margin: 0;
       padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-      background: #f0f4f8;
+    body {
+      background: #f1f5f9;
       color: #1e293b;
-
-      font-family:
-        'Segoe UI',
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        sans-serif;
-
-      overflow-x: hidden;
-      overflow-y: auto;
-
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: auto;
     }
-
-
-    /*
-     * Kapag bukas ang sidebar,
-     * hindi gagalaw ang background page.
-     */
-    body.menu-open {
-      overflow: hidden;
-    }
-
-
-    /* =========================================================
-       APP SHELL
-    ========================================================= */
-
-    .app-shell {
-      display: flex;
-
-      width: 100%;
-      min-height: 100vh;
-
-      align-items: stretch;
-
-      min-width: 0;
-    }
-
-
-    .main-content {
-      flex: 1 1 auto;
-
-      min-width: 0;
-      width: 100%;
-
-      min-height: 100vh;
-
-      background: #f0f4f8;
-
-      overflow-x: hidden;
-      overflow-y: auto;
-
-      -webkit-overflow-scrolling: touch;
-    }
-
-
-    /* =========================================================
-       PAGE CONTENT
-    ========================================================= */
-
-    .page-content {
-      width: 100%;
-      min-width: 0;
-      padding: 20px;
-    }
-
-
-    /* =========================================================
-       NAV TOP
-    ========================================================= */
-
-    .nav-top {
-      width: 100%;
-
-      background: #fff;
-
-      border-bottom:
-        1px solid #e2e8f0;
-
-      padding:
-        12px 24px;
-
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      min-height: 58px;
-
-      box-shadow:
-        0 1px 3px rgba(0,0,0,.05);
-
-      position: relative;
-      z-index: 50;
-
-      flex-shrink: 0;
-
-      min-width: 0;
-
-      transition:
-        transform .25s ease,
-        opacity .25s ease,
-        box-shadow .25s ease;
-    }
-
-
-    .nav-top.nav-hidden {
-      transform:
-        translateY(-100%);
-
-      opacity: 0;
-
-      pointer-events: none;
-    }
-
-
-    .nav-title {
-      min-width: 0;
-    }
-
-
-    /* =========================================================
-       BADGES
-    ========================================================= */
-
-    .badge {
-      display: inline-block;
-
-      padding:
-        3px 12px;
-
-      border-radius: 9999px;
-
-      font-size: .72rem;
-
-      font-weight: 700;
-
-      white-space: nowrap;
-    }
-
-
-    .badge-pending {
-      background: #fef9c3;
-      color: #854d0e;
-    }
-
-
-    .badge-submitted {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-
-    .badge-verified {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-
-    .badge-receipted {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-
-
-    .badge-approved {
-      background: #f3e8ff;
-      color: #6b21a8;
-    }
-
-
-    .badge-released {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-
-    .badge-rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-
-    /* =========================================================
-       BUTTONS
-    ========================================================= */
-
-    .btn-green {
-      background: #1b5e38;
-
-      color: #fff;
-
-      padding:
-        8px 20px;
-
-      border-radius: 8px;
-
-      border: none;
-
-      cursor: pointer;
-
-      font-weight: 600;
-
-      font-size: .88rem;
-
-      transition:
-        background .2s,
-        transform .1s;
-
-      text-decoration: none;
-
-      display: inline-block;
-
-      text-align: center;
-
-      touch-action: manipulation;
-
-      -webkit-tap-highlight-color:
-        transparent;
-    }
-
-
-    .btn-green:hover {
-      background: #154d2f;
-    }
-
-
-    .btn-green:active {
-      transform: scale(.98);
-    }
-
-
-    .btn-blue {
-      background: #1d4ed8;
-
-      color: #fff;
-
-      padding:
-        8px 20px;
-
-      border-radius: 8px;
-
-      border: none;
-
-      cursor: pointer;
-
-      font-weight: 600;
-
-      font-size: .88rem;
-
-      transition:
-        background .2s;
-
-      text-decoration: none;
-
-      display: inline-block;
-
-      text-align: center;
-
-      touch-action: manipulation;
-    }
-
-
-    .btn-blue:hover {
-      background: #1e40af;
-    }
-
-
-    .btn-red {
-      background: #dc2626;
-
-      color: #fff;
-
-      padding:
-        8px 20px;
-
-      border-radius: 8px;
-
-      border: none;
-
-      cursor: pointer;
-
-      font-weight: 600;
-
-      font-size: .88rem;
-
-      touch-action: manipulation;
-    }
-
-
-    .btn-red:hover {
-      background: #b91c1c;
-    }
-
-
-    .btn-outline {
-      background: transparent;
-
-      color: #1b5e38;
-
-      border:
-        1.5px solid #1b5e38;
-
-      padding:
-        7px 18px;
-
-      border-radius: 8px;
-
-      cursor: pointer;
-
-      font-weight: 600;
-
-      font-size: .88rem;
-
-      text-decoration: none;
-
-      display: inline-block;
-
-      text-align: center;
-
-      touch-action: manipulation;
-
-      -webkit-tap-highlight-color:
-        transparent;
-    }
-
-
-    .btn-outline:hover {
-      background: #1b5e38;
-      color: #fff;
-    }
-
-
-    .btn-sm {
-      padding:
-        5px 12px;
-
-      font-size: .78rem;
-    }
-
-
-    /* =========================================================
-       CARDS
-    ========================================================= */
-
-    .card {
-      background: #fff;
-
-      border:
-        1px solid #e2e8f0;
-
-      border-radius: 12px;
-
-      padding: 20px;
-
-      box-shadow:
-        0 1px 4px rgba(0,0,0,.07);
-
-      min-width: 0;
-    }
-
-
-    .card-sm {
-      background: #fff;
-
-      border:
-        1px solid #e2e8f0;
-
-      border-radius: 10px;
-
-      padding: 14px;
-
-      box-shadow:
-        0 1px 2px rgba(0,0,0,.05);
-    }
-
-
-    /* =========================================================
-       INPUT
-    ========================================================= */
-
-    .input {
-      background: #fff;
-
-      border:
-        1px solid #cbd5e1;
-
-      border-radius: 8px;
-
-      padding:
-        10px 14px;
-
-      color: #1e293b;
-
-      width: 100%;
-
-      outline: none;
-
-      font-size: .9rem;
-
-      min-height: 44px;
-
-      touch-action: manipulation;
-    }
-
-
-    .input:focus {
-      border-color:
-        #1b5e38;
-
-      box-shadow:
-        0 0 0 3px
-        rgba(27,94,56,.13);
-    }
-
-
-    .label {
-      font-size: .82rem;
-
-      color: #1b5e38;
-
-      font-weight: 600;
-
-      margin-bottom: 5px;
-
-      display: block;
-    }
-
 
     /* =========================================================
        SIDEBAR
-    ========================================================= */
+       ========================================================= */
 
-    aside {
-      flex-shrink: 0;
+    .app-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      z-index: 9999;
 
-      touch-action: pan-y;
+      background: linear-gradient(
+        180deg,
+        #1b5e38 0%,
+        #154d2f 100%
+      );
 
-      -webkit-overflow-scrolling: touch;
+      box-shadow: 8px 0 30px rgba(0, 0, 0, 0.18);
 
-      overscroll-behavior-y: contain;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
 
-      transition:
-        transform .3s ease,
-        box-shadow .3s ease;
-    }
-
-
-    .sidebar-link {
       display: flex;
+      flex-direction: column;
 
-      align-items: center;
-
-      gap: 10px;
-
-      padding:
-        9px 14px;
-
-      border-radius: 8px;
-
-      color: #a7d4b8;
-
-      text-decoration: none;
-
-      font-size: .875rem;
-
-      font-weight: 500;
-
-      transition:
-        all .18s;
-
-      touch-action: manipulation;
-
-      min-height: 44px;
-
-      -webkit-tap-highlight-color:
-        transparent;
+      overflow: hidden;
     }
 
-
-    .sidebar-link:hover {
-      background:
-        rgba(255,255,255,.13);
-
-      color: #fff;
+    .app-sidebar.open {
+      transform: translateX(0);
     }
-
-
-    .sidebar-link.active {
-      background: #fff;
-
-      color: #1b5e38;
-
-      font-weight: 700;
-
-      box-shadow:
-        0 2px 8px rgba(0,0,0,.13);
-    }
-
-
-    .sidebar-link .badge {
-      font-size: .65rem;
-
-      padding:
-        2px 6px;
-    }
-
 
     /* =========================================================
-       NEW SIDEBAR TOGGLE
-       - hidden on login
-       - fixed sa left edge
-       - hindi sumasakop ng page habang sarado
-    ========================================================= */
+       SIDEBAR TOGGLE BUTTON
+       ========================================================= */
 
-    #sidebar-toggle {
+    .sidebar-toggle {
       position: fixed;
-
+      top: 50%;
       left: 0;
-      top: 16px;
+      transform: translateY(-50%);
 
-      width: 42px;
-      height: 48px;
+      width: 34px;
+      height: 64px;
+
+      z-index: 10000;
+
+      border: none;
+      border-radius: 0 12px 12px 0;
+
+      background: #1b5e38;
+      color: white;
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
-      background: #1b5e38;
-
-      color: #fff;
-
-      border: none;
-
-      border-radius:
-        0 12px 12px 0;
-
       cursor: pointer;
 
-      z-index: 1100;
+      font-size: 22px;
+      font-weight: 800;
 
-      box-shadow:
-        2px 3px 12px rgba(0,0,0,.22);
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.20);
 
       transition:
-        width .2s ease,
-        background .2s ease,
-        transform .2s ease;
-
-      touch-action: manipulation;
-
-      -webkit-tap-highlight-color:
-        transparent;
+        left 0.25s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
     }
 
-
-    #sidebar-toggle:hover {
-      width: 46px;
-
-      background: #154d2f;
+    .sidebar-toggle:hover {
+      background: #166534;
     }
 
-
-    #sidebar-toggle:active {
-      transform: scale(.96);
+    .sidebar-toggle.open {
+      left: 240px;
     }
 
+    /* =========================================================
+       SIDEBAR LINKS
+       ========================================================= */
 
-    #sidebar-toggle svg {
-      width: 22px;
-      height: 22px;
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+
+      width: 100%;
+
+      padding: 10px 12px;
+      margin-bottom: 4px;
+
+      border-radius: 8px;
+
+      color: #d8eee1;
+
+      text-decoration: none;
+
+      font-size: 0.78rem;
+      font-weight: 500;
+
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
     }
 
-
-    /*
-     * Kapag walang sidebar sa page,
-     * automatic na itatago ng JS ang button.
-     */
-    body.login-page #sidebar-toggle {
-      display: none !important;
+    .sidebar-link:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
     }
 
+    .sidebar-link.active {
+      background: #ffffff;
+      color: #14532d;
+      font-weight: 700;
+
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
 
     /* =========================================================
        SIDEBAR OVERLAY
-    ========================================================= */
+       ========================================================= */
 
-    #sidebar-overlay {
+    .sidebar-overlay {
       position: fixed;
-
       inset: 0;
 
-      background:
-        rgba(0,0,0,.42);
+      z-index: 9998;
+
+      background: rgba(0, 0, 0, 0.30);
 
       opacity: 0;
-
       visibility: hidden;
 
-      pointer-events: none;
-
-      z-index: 1000;
-
       transition:
-        opacity .25s ease,
-        visibility .25s ease;
+        opacity 0.25s ease,
+        visibility 0.25s ease;
     }
 
-
-    #sidebar-overlay.active {
+    .sidebar-overlay.show {
       opacity: 1;
-
       visibility: visible;
-
-      pointer-events: auto;
     }
-
 
     /* =========================================================
-       SIDEBAR DRAWER
-    ========================================================= */
+       MAIN CONTENT
+       ========================================================= */
 
-    .app-sidebar {
-      position: fixed !important;
+    .app-main {
+      width: 100%;
+      min-height: 100vh;
+    }
 
-      left: 0;
+    /* =========================================================
+       TOP NAV
+       ========================================================= */
+
+    .nav-top {
+      min-height: 64px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 12px 24px;
+
+      background: #ffffff;
+
+      border-bottom: 1px solid #e2e8f0;
+
+      position: sticky;
       top: 0;
 
-      width: 280px !important;
+      z-index: 100;
+    }
 
-      height: 100vh !important;
+    /* =========================================================
+       CARDS
+       ========================================================= */
 
-      max-height: 100vh;
+    .card {
+      background: #ffffff;
 
-      z-index: 1050;
+      border: 1px solid #e2e8f0;
 
-      transform:
-        translate3d(-100%,0,0);
+      border-radius: 12px;
 
-      transition:
-        transform .3s ease;
-
-      overflow-y: auto;
-
-      overflow-x: hidden;
-
-      -webkit-overflow-scrolling: touch;
+      padding: 16px;
 
       box-shadow:
-        4px 0 18px rgba(0,0,0,.20);
-
-      touch-action: pan-y;
-
-      overscroll-behavior-y: contain;
+        0 1px 3px rgba(15, 23, 42, 0.06);
     }
-
-
-    .app-sidebar.sidebar-open {
-      transform:
-        translate3d(0,0,0);
-    }
-
-
-    /*
-     * Kapag bukas ang sidebar,
-     * ilipat ang toggle sa loob/kanang edge ng sidebar.
-     */
-    body.menu-open #sidebar-toggle {
-      left: 280px;
-
-      top: 16px;
-
-      border-radius:
-        0 10px 10px 0;
-
-      width: 38px;
-
-      box-shadow:
-        3px 3px 10px rgba(0,0,0,.18);
-    }
-
 
     /* =========================================================
        TABLE
-    ========================================================= */
+       ========================================================= */
 
     table {
       width: 100%;
       border-collapse: collapse;
     }
 
-
     th {
       background: #f8fafc;
 
-      color: #1b5e38;
+      color: #475569;
 
-      padding:
-        10px 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
 
       text-align: left;
 
-      font-size: .73rem;
+      padding: 10px 12px;
 
-      text-transform: uppercase;
-
-      letter-spacing: .06em;
-
-      white-space: nowrap;
-
-      border-bottom:
-        2px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
     }
 
-
     td {
-      padding:
-        10px 14px;
+      padding: 10px 12px;
 
-      border-bottom:
-        1px solid #f1f5f9;
-
-      color: #374151;
-
-      font-size: .875rem;
+      border-bottom: 1px solid #f1f5f9;
 
       vertical-align: middle;
     }
-
 
     tr:last-child td {
       border-bottom: none;
     }
 
-
-    tr:hover td {
-      background: #f6fbf8;
-    }
-
-
     /* =========================================================
-       APPLICATION TABLE
-    ========================================================= */
+       BUTTONS
+       ========================================================= */
 
-    .applications-card {
-      width: 100%;
+    .btn-green {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
-      padding: 0;
+      background: #166534;
+      color: #ffffff;
 
-      overflow: hidden;
+      border: none;
+      border-radius: 7px;
 
-      min-width: 0;
-    }
+      padding: 7px 12px;
 
-
-    .applications-table-scroll {
-      width: 100%;
-
-      max-width: 100%;
-
-      overflow-x: auto;
-
-      overflow-y: hidden;
-
-      -webkit-overflow-scrolling: touch;
-
-      overscroll-behavior-x: contain;
-
-      touch-action:
-        pan-x pan-y;
-
-      scrollbar-width: thin;
-    }
-
-
-    .applications-table {
-      width: max-content;
-
-      min-width: 980px;
-
-      table-layout: auto;
-    }
-
-
-    .applications-table th,
-    .applications-table td {
-      white-space: nowrap;
-    }
-
-
-    .applications-table th:nth-child(1) {
-      width: 55px;
-    }
-
-
-    .applications-table th:nth-child(2) {
-      min-width: 190px;
-    }
-
-
-    .applications-table th:nth-child(3) {
-      min-width: 130px;
-    }
-
-
-    .applications-table th:nth-child(4) {
-      min-width: 160px;
-    }
-
-
-    .applications-table th:nth-child(5) {
-      min-width: 100px;
-    }
-
-
-    .applications-table th:nth-child(6) {
-      min-width: 150px;
-    }
-
-
-    .applications-table th:nth-child(7) {
-      min-width: 110px;
-    }
-
-
-    .applications-table th:nth-child(8) {
-      min-width: 80px;
-    }
-
-
-    .student-name {
-      color: #1e293b;
-
-      font-size: .875rem;
-
-      font-weight: 600;
-
-      white-space: nowrap;
-    }
-
-
-    .student-email {
-      color: #64748b;
-
-      font-size: .75rem;
-
-      margin-top: 2px;
-
-      white-space: nowrap;
-    }
-
-
-    .course-cell {
-      color: #64748b;
-
-      font-size: .875rem;
-
-      white-space: nowrap;
-    }
-
-
-    .documents-cell {
-      color: #4b5563;
-
-      font-size: .75rem;
-    }
-
-
-    .document-list {
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 4px;
-    }
-
-
-    .amount-cell {
-      color: #15803d;
-
-      font-size: .875rem;
-
-      font-weight: 600;
-
-      white-space: nowrap;
-    }
-
-
-    .date-cell {
-      color: #64748b;
-
-      font-size: .75rem;
-
-      white-space: nowrap;
-    }
-
-
-    .view-link {
-      color: #15803d;
-
-      font-size: .75rem;
-
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 700;
 
       text-decoration: none;
 
-      white-space: nowrap;
+      cursor: pointer;
     }
 
-
-    .view-link:hover {
-      text-decoration: underline;
+    .btn-green:hover {
+      background: #14532d;
     }
 
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
-    .mobile-scroll-hint {
-      display: none;
+      background: #ffffff;
+      color: #166534;
 
-      text-align: center;
+      border: 1px solid #86efac;
 
-      color: #64748b;
+      border-radius: 7px;
 
-      font-size: .7rem;
+      padding: 7px 12px;
 
-      padding:
-        7px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
 
-      border-top:
-        1px solid #e2e8f0;
+      text-decoration: none;
 
-      background: #f8fafc;
+      cursor: pointer;
     }
 
+    .btn-outline:hover {
+      background: #f0fdf4;
+    }
+
+    .btn-sm {
+      font-size: 0.7rem !important;
+      padding: 6px 10px !important;
+    }
 
     /* =========================================================
-       FILTERS
-    ========================================================= */
+       BADGES
+       ========================================================= */
 
-    .application-filters {
-      width: 100%;
-
-      display: flex;
-
+    .badge {
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
 
-      gap: 12px;
+      min-width: 20px;
 
-      margin-bottom: 16px;
+      padding: 2px 7px;
 
-      min-width: 0;
+      border-radius: 999px;
 
-      flex-wrap: wrap;
+      font-size: 0.65rem;
+      font-weight: 700;
     }
 
-
-    .filter-search {
-      max-width: 260px;
+    .badge-submitted {
+      background: #dbeafe;
+      color: #1d4ed8;
     }
 
-
-    .filter-status {
-      width: auto;
-
-      min-width: 170px;
+    .badge-receipted {
+      background: #dcfce7;
+      color: #166534;
     }
-
-
-    .filter-button,
-    .clear-button {
-      flex: 0 0 auto;
-
-      white-space: nowrap;
-    }
-
 
     /* =========================================================
        MOBILE
-    ========================================================= */
+       ========================================================= */
 
-    @media (max-width: 640px) {
-
-      body {
-        font-size: 14px;
-      }
-
-
-      #sidebar-toggle {
-        top: 12px;
-
-        width: 40px;
-        height: 46px;
-
-        border-radius:
-          0 10px 10px 0;
-      }
-
-
+    @media (max-width: 768px) {
       .app-sidebar {
-        width: 280px !important;
+        width: 260px;
       }
 
-
-      body.menu-open #sidebar-toggle {
-        left: 280px;
-
-        width: 38px;
+      .sidebar-toggle.open {
+        left: 260px;
       }
-
-
-      .app-shell {
-        display: block;
-
-        width: 100%;
-
-        min-height: 100vh;
-      }
-
-
-      .main-content {
-        display: block;
-
-        width: 100%;
-
-        min-width: 0;
-
-        min-height: 100vh;
-
-        margin: 0 !important;
-
-        padding: 0 !important;
-
-        overflow-x: hidden;
-
-        overflow-y: auto;
-
-        -webkit-overflow-scrolling: touch;
-      }
-
-
-      .flex.h-screen {
-        display: block !important;
-
-        height: auto !important;
-
-        min-height: 100vh;
-
-        overflow: visible !important;
-      }
-
-
-      /* TOP NAV */
 
       .nav-top {
-        min-height: 58px;
-
-        padding:
-          10px
-          14px
-          10px
-          56px;
-
-        gap: 8px;
-
-        align-items: center;
-
-        justify-content:
-          space-between;
-
-        flex-wrap: nowrap;
-
-        width: 100%;
+        padding: 12px 16px;
       }
-
-
-      .nav-top h1 {
-        font-size: .95rem !important;
-
-        line-height: 1.3;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-
-        min-width: 0;
-      }
-
-
-      .nav-top span {
-        font-size: .72rem;
-
-        white-space: nowrap;
-
-        max-width: 45vw;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-      }
-
-
-      /* PAGE */
-
-      .page-content {
-        width: 100%;
-
-        min-width: 0;
-
-        padding: 14px;
-      }
-
-
-      /* FILTERS */
-
-      .application-filters {
-        display: grid;
-
-        grid-template-columns: 1fr;
-
-        gap: 10px;
-
-        margin-bottom: 14px;
-      }
-
-
-      .filter-search,
-      .filter-status {
-        width: 100% !important;
-
-        max-width: none !important;
-
-        min-width: 0;
-      }
-
-
-      .filter-button,
-      .clear-button {
-        width: 100%;
-
-        min-height: 46px;
-      }
-
-
-      /* CARDS */
-
-      .card {
-        padding: 16px;
-
-        border-radius: 10px;
-      }
-
-
-      .applications-card {
-        padding: 0;
-
-        border-radius: 10px;
-
-        overflow: hidden;
-      }
-
-
-      /* APPLICATION TABLE */
-
-      .applications-table-scroll {
-        width: 100%;
-
-        max-width: 100%;
-
-        overflow-x: auto;
-
-        overflow-y: hidden;
-
-        -webkit-overflow-scrolling: touch;
-
-        touch-action:
-          pan-x pan-y;
-
-        overscroll-behavior-x:
-          contain;
-      }
-
-
-      .applications-table {
-        width: max-content;
-
-        min-width: 980px;
-      }
-
-
-      .applications-table th {
-        padding:
-          9px 10px;
-
-        font-size: .68rem;
-      }
-
-
-      .applications-table td {
-        padding:
-          10px;
-
-        font-size: .78rem;
-      }
-
-
-      .student-name {
-        font-size: .78rem;
-      }
-
-
-      .student-email {
-        font-size: .68rem;
-      }
-
-
-      .badge {
-        font-size: .68rem;
-
-        padding:
-          4px 9px;
-      }
-
-
-      .mobile-scroll-hint {
-        display: block;
-      }
-
-
-      /* TEXT */
-
-      h1 {
-        font-size:
-          1.3rem !important;
-      }
-
-
-      h2 {
-        font-size:
-          1.15rem !important;
-      }
-
-
-      h3 {
-        font-size:
-          1rem !important;
-      }
-
-
-      /* BUTTONS */
-
-      .btn-green,
-      .btn-blue,
-      .btn-red,
-      .btn-outline {
-        min-height: 46px;
-
-        padding:
-          11px 16px;
-
-        font-size: .9rem;
-      }
-
-
-      .btn-sm {
-        min-height: 46px;
-
-        padding:
-          10px 14px;
-      }
-
-
-      /* INPUTS */
-
-      .input {
-        width: 100%;
-
-        min-height: 48px;
-
-        font-size: 16px;
-
-        padding:
-          12px 14px;
-      }
-
-
-      select.input {
-        font-size: 16px;
-      }
-
-
-      /* GRID */
 
       .grid {
-        display: grid !important;
-      }
-
-
-      .grid-cols-2,
-      .grid-cols-3,
-      .grid-cols-4 {
-        grid-template-columns:
-          1fr !important;
-      }
-
-
-      /* WIDTH */
-
-      .max-w-2xl,
-      .max-w-3xl,
-      .max-w-4xl,
-      .max-w-5xl,
-      .max-w-6xl {
-        max-width:
-          100% !important;
-      }
-
-
-      img {
-        max-width:
-          100%;
-
-        height: auto;
-      }
-
-
-      .hide-mobile {
-        display: none !important;
-      }
-
-
-      .empty-applications {
-        padding-top:
-          50px;
-
-        padding-bottom:
-          50px;
-      }
-
-    }
-
-
-    /* =========================================================
-       TABLET
-    ========================================================= */
-
-    @media
-      (min-width: 641px)
-      and
-      (max-width: 1024px) {
-
-      #sidebar-toggle {
-        display: flex;
-      }
-
-
-      .app-sidebar {
-        width: 280px !important;
-      }
-
-
-      .main-content {
         width: 100%;
-
-        min-width: 0;
-
-        min-height: 100vh;
-
-        margin: 0 !important;
-
-        overflow-x: hidden;
-
-        overflow-y: auto;
-
-        -webkit-overflow-scrolling: touch;
       }
 
-
-      .flex.h-screen {
-        display: block !important;
-
-        height: auto !important;
-
-        min-height: 100vh;
-
-        overflow: visible !important;
+      table {
+        min-width: 700px;
       }
-
-
-      .page-content {
-        padding: 18px;
-      }
-
-
-      .nav-top {
-        padding:
-          12px 20px
-          12px 56px;
-      }
-
-
-      .application-filters {
-        flex-wrap: wrap;
-      }
-
-
-      .filter-search {
-        max-width: 100%;
-
-        flex:
-          1 1 100%;
-      }
-
-
-      .applications-table {
-        min-width: 980px;
-      }
-
-
-      .mobile-scroll-hint {
-        display: block;
-      }
-
 
       .card {
-        padding: 18px;
+        overflow-x: auto;
       }
-
     }
-
-
-    /* =========================================================
-       DESKTOP
-    ========================================================= */
-
-    @media (min-width: 1025px) {
-
-      .app-sidebar {
-        width: 280px !important;
-      }
-
-
-      .mobile-scroll-hint {
-        display: none;
-      }
-
-    }
-
-
-    /* =========================================================
-       TOUCH DEVICES
-    ========================================================= */
-
-    @media (max-width: 1024px) {
-
-      a,
-      button,
-      input,
-      select,
-      textarea {
-        min-height: 44px;
-      }
-
-
-      button,
-      .btn-green,
-      .btn-blue,
-      .btn-red,
-      .btn-outline {
-        -webkit-tap-highlight-color:
-          rgba(0,0,0,.1);
-
-        user-select: none;
-      }
-
-
-      img {
-        max-width: 100%;
-
-        height: auto;
-      }
-
-    }
-
-
-    /* =========================================================
-       LANDSCAPE PHONE
-    ========================================================= */
-
-    @media
-      (max-height: 500px)
-      and
-      (orientation: landscape) {
-
-      .app-sidebar {
-        overflow-y: auto;
-
-        -webkit-overflow-scrolling:
-          touch;
-      }
-
-
-      .nav-top {
-        padding:
-          8px 16px
-          8px 56px;
-      }
-
-    }
-
-
-    /* =========================================================
-       PRINT
-    ========================================================= */
-
-    @media print {
-
-      #sidebar-toggle,
-      #sidebar-overlay,
-      .sidebar-link,
-      .nav-top,
-      button {
-        display: none !important;
-      }
-
-
-      aside {
-        display: none !important;
-      }
-
-
-      .card {
-        border:
-          1px solid #000;
-
-        box-shadow: none;
-
-        page-break-inside:
-          avoid;
-      }
-
-
-      body {
-        background: #fff;
-      }
-
-
-      .main-content,
-      .flex-1,
-      .guidance-main {
-        margin: 0 !important;
-
-        padding: 0 !important;
-
-        overflow: visible !important;
-      }
-
-    }
-
   </style>
 
-</head>
+  <script>
+    function openSidebar() {
+      const sidebar = document.querySelector('.app-sidebar');
+      const toggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.querySelector('.sidebar-overlay');
 
+      if (!sidebar || !toggle) return;
 
-<body>
-
-<script>
-
-  /*
-   * Mark login pages automatically.
-   *
-   * Dahil walang <aside> sa login page,
-   * hindi lalabas ang sidebar button doon.
-   */
-  document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-      const sidebar =
-        document.querySelector('.app-sidebar');
-
-      const toggle =
-        document.getElementById('sidebar-toggle');
-
-      if (!sidebar && toggle) {
-        toggle.style.display = 'none';
-      }
-
-    }
-  );
-
-
-  /*
-   * OPEN / CLOSE SIDEBAR
-   */
-  function toggleSidebar() {
-
-    const sidebar =
-      document.querySelector('.app-sidebar');
-
-    const overlay =
-      document.getElementById('sidebar-overlay');
-
-    const toggle =
-      document.getElementById('sidebar-toggle');
-
-    if (!sidebar) return;
-
-
-    const isOpen =
-      sidebar.classList.contains('sidebar-open');
-
-
-    if (isOpen) {
-
-      closeSidebar();
-
-    } else {
-
-      sidebar.classList.add('sidebar-open');
+      sidebar.classList.add('open');
+      toggle.classList.add('open');
+      toggle.innerHTML = '&lt;';
 
       if (overlay) {
-        overlay.classList.add('active');
+        overlay.classList.add('show');
       }
+    }
 
-      document.body.classList.add('menu-open');
+    function closeSidebar() {
+      const sidebar = document.querySelector('.app-sidebar');
+      const toggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.querySelector('.sidebar-overlay');
 
+      if (!sidebar || !toggle) return;
 
-      if (toggle) {
-        toggle.setAttribute(
-          'aria-expanded',
-          'true'
-        );
+      sidebar.classList.remove('open');
+      toggle.classList.remove('open');
+      toggle.innerHTML = '&gt;';
+
+      if (overlay) {
+        overlay.classList.remove('show');
       }
-
     }
 
-  }
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.app-sidebar');
 
+      if (!sidebar) return;
 
-  /*
-   * CLOSE SIDEBAR
-   */
-  function closeSidebar() {
-
-    const sidebar =
-      document.querySelector('.app-sidebar');
-
-    const overlay =
-      document.getElementById('sidebar-overlay');
-
-    const toggle =
-      document.getElementById('sidebar-toggle');
-
-
-    if (sidebar) {
-
-      sidebar.classList.remove(
-        'sidebar-open'
-      );
-
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     }
 
-
-    if (overlay) {
-
-      overlay.classList.remove(
-        'active'
-      );
-
-    }
-
-
-    document.body.classList.remove(
-      'menu-open'
-    );
-
-
-    if (toggle) {
-
-      toggle.setAttribute(
-        'aria-expanded',
-        'false'
-      );
-
-    }
-
-  }
-
-
-  /*
-   * BACKWARD COMPATIBILITY
-   *
-   * Kung may ibang page na tumatawag pa
-   * sa old function name.
-   */
-  function toggleMobileMenu() {
-    toggleSidebar();
-  }
-
-
-  function closeMobileMenu() {
-    closeSidebar();
-  }
-
-
-  document.addEventListener(
-    'DOMContentLoaded',
-    function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
       /*
-       * SIDEBAR LINKS
-       *
-       * Kapag pumili ng page,
-       * magsasara ang sidebar.
+       * Automatically close sidebar after clicking
+       * a navigation link.
        */
-      const sidebarLinks =
-        document.querySelectorAll(
-          '.app-sidebar .sidebar-link'
-        );
+      document.querySelectorAll('.app-sidebar a.sidebar-link')
+        .forEach(function (link) {
 
+          link.addEventListener('click', function () {
 
-      sidebarLinks.forEach(
-        function (link) {
-
-          link.addEventListener(
-            'click',
-            function () {
-
+            setTimeout(function () {
               closeSidebar();
+            }, 120);
 
-            }
-          );
+          });
 
-        }
-      );
-
+        });
 
       /*
-       * ESC KEY
+       * Close sidebar when clicking the dark overlay.
        */
-      document.addEventListener(
-        'keydown',
-        function (event) {
-
-          if (event.key === 'Escape') {
-
-            closeSidebar();
-
-          }
-
-        }
-      );
-
-
-      /*
-       * OVERLAY CLICK
-       */
-      const overlay =
-        document.getElementById(
-          'sidebar-overlay'
-        );
-
+      const overlay = document.querySelector('.sidebar-overlay');
 
       if (overlay) {
-
-        overlay.addEventListener(
-          'click',
-          function () {
-
-            closeSidebar();
-
-          }
-        );
-
+        overlay.addEventListener('click', function () {
+          closeSidebar();
+        });
       }
 
-
       /*
-       * RESIZE
-       *
-       * Isara kapag nag-resize para
-       * walang naiwan na open state.
+       * ESC closes sidebar.
        */
-      let resizeTimer;
+      document.addEventListener('keydown', function (event) {
 
-
-      window.addEventListener(
-        'resize',
-        function () {
-
-          clearTimeout(
-            resizeTimer
-          );
-
-
-          resizeTimer =
-            setTimeout(
-              function () {
-
-                closeSidebar();
-
-              },
-              150
-            );
-
+        if (event.key === 'Escape') {
+          closeSidebar();
         }
-      );
 
-    }
-  );
+      });
 
-</script>
+    });
+  </script>
+</head>
+<body>

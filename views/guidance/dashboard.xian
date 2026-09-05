@@ -1,31 +1,28 @@
 {{> head}}
 
-<div class="flex h-screen overflow-hidden">
+<div class="app-main">
 
   {{> sidebar-guidance activePage="home"}}
 
-  <div class="flex-1 overflow-y-auto bg-slate-100">
+  <!-- Main Content -->
+  <div class="w-full min-h-screen overflow-y-auto bg-slate-100">
 
     <!-- Top Navigation -->
     <div class="nav-top">
 
       <div>
+
         <h1 class="text-base font-bold text-slate-800">
-          UniGuid Home
+          UniGuide Home
         </h1>
 
         <p class="text-slate-500 text-xs">
           MinSU Bongabong Campus — Guidance Office
         </p>
+
       </div>
 
       <div class="flex items-center gap-3">
-
-        {{#if unreadNotifCount}}
-          <span class="badge badge-submitted">
-            {{unreadNotifCount}} new
-          </span>
-        {{/if}}
 
         <span class="text-teal-700 text-sm font-medium">
           👤 {{user.firstName}} {{user.lastName}}
@@ -35,12 +32,14 @@
 
     </div>
 
+
     <div class="px-5 py-5">
 
       {{> flash}}
 
-      <!-- Statistics -->
-      <div class="grid grid-cols-4 gap-3 mb-6">
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
 
         <div class="card flex items-center gap-3">
 
@@ -60,6 +59,7 @@
 
         </div>
 
+
         <div class="card flex items-center gap-3">
 
           <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
@@ -78,6 +78,7 @@
 
         </div>
 
+
         <div class="card flex items-center gap-3">
 
           <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
@@ -95,6 +96,7 @@
           </div>
 
         </div>
+
 
         <div class="card flex items-center gap-3">
 
@@ -116,12 +118,14 @@
 
       </div>
 
-      <!-- Main Content -->
+
+      <!-- Main Sections -->
       <div class="grid grid-cols-1 gap-5">
 
         <div class="space-y-5">
 
-          <!-- Ready for Processing -->
+
+          <!-- Ready to Process -->
           <div>
 
             <div class="flex items-center justify-between mb-2">
@@ -136,6 +140,7 @@
 
             </div>
 
+
             {{#if toProcess.length}}
 
             <div class="card p-0 overflow-hidden">
@@ -143,6 +148,7 @@
               <table>
 
                 <thead>
+
                   <tr>
                     <th>#</th>
                     <th>Student</th>
@@ -151,7 +157,9 @@
                     <th>Date</th>
                     <th>Action</th>
                   </tr>
+
                 </thead>
+
 
                 <tbody>
 
@@ -164,6 +172,7 @@
                     </td>
 
                     <td>
+
                       <div class="text-slate-800 text-sm font-medium">
                         {{this.surname}}, {{this.givenName}}
                       </div>
@@ -171,27 +180,40 @@
                       <div class="text-gray-600 text-xs">
                         {{this.student.email}}
                       </div>
+
                     </td>
+
 
                     <td class="text-gray-600 text-xs">
 
-                      {{#if (gt this.qtyGoodMoral 0)}}
-                        <div>Good Moral: {{this.qtyGoodMoral}}</div>
-                      {{/if}}
+                      <div class="space-y-1">
 
-                      {{#if (gt this.qtyCTC 0)}}
-                        <div>CTC/Auth: {{this.qtyCTC}}</div>
-                      {{/if}}
+                        {{#if (gt this.qtyGoodMoral 0)}}
+                        <div>
+                          Good Moral: {{this.qtyGoodMoral}}
+                        </div>
+                        {{/if}}
+
+                        {{#if (gt this.qtyCTC 0)}}
+                        <div>
+                          CTC/Auth: {{this.qtyCTC}}
+                        </div>
+                        {{/if}}
+
+                      </div>
 
                     </td>
+
 
                     <td class="text-slate-600 text-xs font-mono">
                       {{this.orNumber}}
                     </td>
 
+
                     <td class="text-gray-500 text-xs">
                       {{formatDate this.updatedAt}}
                     </td>
+
 
                     <td>
 
@@ -199,21 +221,18 @@
 
                         <a
                           href="/guidance/application/{{this.id}}"
-                          class="btn-outline btn-sm"
-                        >
+                          class="btn-outline btn-sm">
                           View
                         </a>
 
                         <form
                           action="/guidance/application/{{this.id}}/approve"
-                          method="POST"
-                        >
+                          method="POST">
 
                           <button
                             type="submit"
                             class="btn-green btn-sm"
-                            onclick="return confirm('Approve this request?')"
-                          >
+                            onclick="return confirm('Approve this request?')">
                             Approve
                           </button>
 
@@ -236,14 +255,17 @@
             {{else}}
 
             <div class="card text-center py-8">
+
               <p class="text-gray-600 text-sm">
                 No requests ready for processing.
               </p>
+
             </div>
 
             {{/if}}
 
           </div>
+
 
           <!-- Approved -->
           {{#if approved.length}}
@@ -262,11 +284,13 @@
 
             </div>
 
+
             <div class="card p-0 overflow-hidden">
 
               <table>
 
                 <thead>
+
                   <tr>
                     <th>#</th>
                     <th>Student</th>
@@ -274,7 +298,9 @@
                     <th>OR No.</th>
                     <th>Action</th>
                   </tr>
+
                 </thead>
+
 
                 <tbody>
 
@@ -286,41 +312,55 @@
                       {{this.id}}
                     </td>
 
+
                     <td>
+
                       <div class="text-slate-800 text-sm font-medium">
                         {{this.surname}}, {{this.givenName}}
                       </div>
+
                     </td>
+
 
                     <td class="text-gray-600 text-xs">
 
-                      {{#if (gt this.qtyGoodMoral 0)}}
-                        <div>Good Moral: {{this.qtyGoodMoral}}</div>
-                      {{/if}}
+                      <div class="space-y-1">
 
-                      {{#if (gt this.qtyCTC 0)}}
-                        <div>CTC/Auth: {{this.qtyCTC}}</div>
-                      {{/if}}
+                        {{#if (gt this.qtyGoodMoral 0)}}
+                        <div>
+                          Good Moral: {{this.qtyGoodMoral}}
+                        </div>
+                        {{/if}}
+
+                        {{#if (gt this.qtyCTC 0)}}
+                        <div>
+                          CTC/Auth: {{this.qtyCTC}}
+                        </div>
+                        {{/if}}
+
+                      </div>
 
                     </td>
+
 
                     <td class="text-slate-600 text-xs font-mono">
                       {{this.orNumber}}
                     </td>
 
+
                     <td>
 
                       <form
                         action="/guidance/application/{{this.id}}/release"
-                        method="POST"
-                      >
+                        method="POST">
 
                         <button
                           type="submit"
                           class="btn-green btn-sm"
-                          onclick="return confirm('Mark as released?')"
-                        >
+                          onclick="return confirm('Mark as released?')">
+
                           ✓ Release
+
                         </button>
 
                       </form>
@@ -341,6 +381,7 @@
 
           {{/if}}
 
+
           <!-- Appointments -->
           {{#if appointments.length}}
 
@@ -354,18 +395,19 @@
 
               <a
                 href="/guidance/appointments"
-                class="text-green-700 text-xs hover:underline font-medium"
-              >
+                class="text-green-700 text-xs hover:underline font-medium">
                 See all
               </a>
 
             </div>
+
 
             <div class="card p-0 overflow-hidden">
 
               <table>
 
                 <thead>
+
                   <tr>
                     <th>Student</th>
                     <th>Purpose</th>
@@ -373,7 +415,9 @@
                     <th>Time</th>
                     <th>Action</th>
                   </tr>
+
                 </thead>
+
 
                 <tbody>
 
@@ -399,12 +443,13 @@
                     </td>
 
                     <td>
+
                       <a
                         href="/guidance/appointments"
-                        class="text-green-700 text-xs hover:underline"
-                      >
+                        class="text-green-700 text-xs hover:underline">
                         Manage
                       </a>
+
                     </td>
 
                   </tr>

@@ -1,15 +1,20 @@
-<aside style="
-  width:240px;
-  background:linear-gradient(180deg,#1b5e38 0%,#154d2f 100%);
-  border-right:none;
-  flex-shrink:0;
-  height:100vh;
-  position:sticky;
-  top:0;
-  display:flex;
-  flex-direction:column;
-  padding:0;
-">
+<!-- Sidebar Toggle -->
+<button
+  type="button"
+  class="sidebar-toggle"
+  onclick="toggleSidebar()"
+  aria-label="Toggle sidebar">
+  &gt;
+</button>
+
+<!-- Dark overlay -->
+<div
+  class="sidebar-overlay"
+  onclick="closeSidebar()">
+</div>
+
+<!-- Cashier Sidebar -->
+<aside class="app-sidebar">
 
   <!-- Logo + Branding -->
   <div style="
@@ -34,8 +39,7 @@
           background:#fff;
           padding:3px;
           flex-shrink:0;
-        "
-      >
+        ">
 
       <div>
 
@@ -63,6 +67,7 @@
 
   </div>
 
+
   <!-- Navigation -->
   <div style="
     flex:1;
@@ -72,44 +77,37 @@
 
     <a
       href="/cashier/home"
-      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}">
       🏠 Home
     </a>
 
     <a
       href="/cashier/history"
-      class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}"
-    >
+      class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}">
       📜 Payment List Student
     </a>
 
     <a
       href="/cashier/notifications"
       class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
-      style="display:flex;align-items:center;"
-    >
+      style="display:flex;align-items:center;">
+
       🔔 Notifications
 
       {{#if (gt unreadNotifCount 0)}}
-        <span
-          style="
-            background:#ef4444;
-            color:#fff;
-            font-size:.65rem;
-            font-weight:700;
-            padding:2px 6px;
-            border-radius:10px;
-            margin-left:auto;
-          "
-        >
-          {{unreadNotifCount}}
-        </span>
+
+      <span
+        class="badge badge-submitted"
+        style="margin-left:auto;">
+        {{unreadNotifCount}}
+      </span>
+
       {{/if}}
 
     </a>
 
   </div>
+
 
   <!-- User + Logout -->
   <div style="
@@ -158,9 +156,10 @@
           color:#fca5a5;
         "
         onmouseover="this.style.background='rgba(239,68,68,.15)'"
-        onmouseout="this.style.background='transparent'"
-      >
+        onmouseout="this.style.background='transparent'">
+
         🚪 Logout
+
       </button>
 
     </form>
