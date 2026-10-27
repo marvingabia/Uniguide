@@ -37,14 +37,24 @@ router.get('/register',  auth.showRegister);
 router.post('/register', auth.register);
 router.post('/logout',   auth.logout);
 
+// ── Health Check ────────────────────────────────────────────────
+router.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
+
 // ── Google OAuth ─────────────────────────────────────────────────
+console.log('🔐 Registering Google OAuth routes...');
+
 router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' })
 );
+
+console.log('✅ Registered /auth/google');
+
 router.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', failureFlash: true, session: false }),
   auth.googleCallback
 );
+
+console.log('✅ Registered /auth/google/callback');
 
 // ── Student ──────────────────────────────────────────────────────
 router.get('/student/home',                     requireRole('student'), student.dashboard);
