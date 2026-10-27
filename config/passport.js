@@ -21,8 +21,14 @@ if (!googleCallbackURL) {
 console.log('🔍 Google OAuth Configuration:');
 console.log('   NODE_ENV:', process.env.NODE_ENV);
 console.log('   VERCEL_URL:', process.env.VERCEL_URL);
+console.log('   VERCEL_URL (full):', process.env.VERCEL_URL || '(NOT SET)');
 console.log('   GOOGLE_CALLBACK_URL env:', process.env.GOOGLE_CALLBACK_URL ? '(SET)' : '(NOT SET)');
+console.log('   GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '(SET)' : '(NOT SET)');
+console.log('   GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '(SET)' : '(NOT SET)');
 console.log('   FINAL CALLBACK_URL:', googleCallbackURL);
+console.log('');
+console.log('⚠️  MAKE SURE THIS CALLBACK URL IS IN GOOGLE CONSOLE:');
+console.log('   ' + googleCallbackURL);
 
 passport.use(
   'google',
