@@ -1,186 +1,194 @@
 import { sequelize } from './db.js';
 
-import { User } from './User.js';
-import { Application } from './Application.js';
-import { Announcement } from './Announcement.js';
-import { Appointment } from './Appointment.js';
-import { Notification } from './Notification.js';
-import { StudentProfile } from './StudentProfile.js';
-import { CounselingSession } from './CounselingSession.js';
-import { TimeSlot } from './TimeSlot.js';
+let models = {
+  User: null,
+  Application: null,
+  Announcement: null,
+  Appointment: null,
+  Notification: null,
+  StudentProfile: null,
+  CounselingSession: null,
+  TimeSlot: null
+};
 
-/*
-==================================================
-GUIDANCECONNECT MODEL RELATIONSHIPS
-==================================================
-*/
+// Only import and setup models if Sequelize is initialized
+if (sequelize) {
+  try {
+    const { User } = await import('./User.js');
+    const { Application } = await import('./Application.js');
+    const { Announcement } = await import('./Announcement.js');
+    const { Appointment } = await import('./Appointment.js');
+    const { Notification } = await import('./Notification.js');
+    const { StudentProfile } = await import('./StudentProfile.js');
+    const { CounselingSession } = await import('./CounselingSession.js');
+    const { TimeSlot } = await import('./TimeSlot.js');
 
-/*
-==================================================
-USER ↔ APPLICATION
-==================================================
-*/
+    models = {
+      User,
+      Application,
+      Announcement,
+      Appointment,
+      Notification,
+      StudentProfile,
+      CounselingSession,
+      TimeSlot
+    };
 
-User.hasMany(Application, {
-  foreignKey: 'userId',
-  as: 'applications',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+    // Setup relationships
+    /*
+    ==================================================
+    USER ↔ APPLICATION
+    ==================================================
+    */
+    User.hasMany(Application, {
+      foreignKey: 'userId',
+      as: 'applications',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-Application.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'student'
-});
+    Application.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'student'
+    });
 
+    /*
+    ==================================================
+    USER ↔ ANNOUNCEMENT
+    ==================================================
+    */
+    User.hasMany(Announcement, {
+      foreignKey: 'authorId',
+      as: 'announcements',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-/*
-==================================================
-USER ↔ ANNOUNCEMENT
-==================================================
-*/
+    Announcement.belongsTo(User, {
+      foreignKey: 'authorId',
+      as: 'author'
+    });
 
-User.hasMany(Announcement, {
-  foreignKey: 'authorId',
-  as: 'announcements',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+    /*
+    ==================================================
+    USER ↔ APPOINTMENT
+    ==================================================
+    */
+    User.hasMany(Appointment, {
+      foreignKey: 'userId',
+      as: 'appointments',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-Announcement.belongsTo(User, {
-  foreignKey: 'authorId',
-  as: 'author'
-});
+    Appointment.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'student'
+    });
 
+    /*
+    ==================================================
+    USER ↔ NOTIFICATION
+    ==================================================
+    */
+    User.hasMany(Notification, {
+      foreignKey: 'userId',
+      as: 'notifications',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-/*
-==================================================
-USER ↔ APPOINTMENT
-==================================================
-*/
+    Notification.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'recipient'
+    });
 
-User.hasMany(Appointment, {
-  foreignKey: 'userId',
-  as: 'appointments',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+    /*
+    ==================================================
+    USER ↔ STUDENT PROFILE
+    ==================================================
+    */
+    User.hasOne(StudentProfile, {
+      foreignKey: 'userId',
+      as: 'profile',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-Appointment.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'student'
-});
+    StudentProfile.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'student'
+    });
 
+    /*
+    ==================================================
+    USER ↔ COUNSELING SESSION
+    ==================================================
+    */
+    // Student
+    User.hasMany(CounselingSession, {
+      foreignKey: 'userId',
+      as: 'counselingSessions',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-/*
-==================================================
-USER ↔ NOTIFICATION
-==================================================
-*/
+    CounselingSession.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'student'
+    });
 
-User.hasMany(Notification, {
-  foreignKey: 'userId',
-  as: 'notifications',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+    // Guidance counselor
+    User.hasMany(CounselingSession, {
+      foreignKey: 'counselorId',
+      as: 'conductedSessions',
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    });
 
-Notification.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'recipient'
-});
+    CounselingSession.belongsTo(User, {
+      foreignKey: 'counselorId',
+      as: 'counselor'
+    });
 
+    /*
+    ==================================================
+    USER ↔ TIME SLOT
+    ==================================================
+    */
+    User.hasMany(TimeSlot, {
+      foreignKey: 'counselorId',
+      as: 'timeSlots',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
 
-/*
-==================================================
-USER ↔ STUDENT PROFILE
-==================================================
-*/
+    TimeSlot.belongsTo(User, {
+      foreignKey: 'counselorId',
+      as: 'counselor'
+    });
 
-User.hasOne(StudentProfile, {
-  foreignKey: 'userId',
-  as: 'profile',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
+    /*
+    ==================================================
+    TIME SLOT ↔ APPOINTMENT
+    ==================================================
+    */
+    TimeSlot.hasMany(Appointment, {
+      foreignKey: 'timeSlotId',
+      as: 'appointments',
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    });
 
-StudentProfile.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'student'
-});
+    Appointment.belongsTo(TimeSlot, {
+      foreignKey: 'timeSlotId',
+      as: 'assignedSlot'
+    });
 
-
-/*
-==================================================
-USER ↔ COUNSELING SESSION
-==================================================
-*/
-
-// Student
-User.hasMany(CounselingSession, {
-  foreignKey: 'userId',
-  as: 'counselingSessions',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-CounselingSession.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'student'
-});
-
-
-// Guidance counselor
-User.hasMany(CounselingSession, {
-  foreignKey: 'counselorId',
-  as: 'conductedSessions',
-  onDelete: 'SET NULL',
-  onUpdate: 'CASCADE'
-});
-
-CounselingSession.belongsTo(User, {
-  foreignKey: 'counselorId',
-  as: 'counselor'
-});
-
-
-/*
-==================================================
-USER ↔ TIME SLOT
-==================================================
-*/
-
-User.hasMany(TimeSlot, {
-  foreignKey: 'counselorId',
-  as: 'timeSlots',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE'
-});
-
-TimeSlot.belongsTo(User, {
-  foreignKey: 'counselorId',
-  as: 'counselor'
-});
-
-
-/*
-==================================================
-TIME SLOT ↔ APPOINTMENT
-==================================================
-*/
-
-TimeSlot.hasMany(Appointment, {
-  foreignKey: 'timeSlotId',
-  as: 'appointments',
-  onDelete: 'SET NULL',
-  onUpdate: 'CASCADE'
-});
-
-Appointment.belongsTo(TimeSlot, {
-  foreignKey: 'timeSlotId',
-  as: 'assignedSlot'
-});
-
+  } catch (err) {
+    console.error('⚠️ Error loading models:', err.message);
+  }
+}
 
 /*
 ==================================================
@@ -189,6 +197,11 @@ DATABASE SYNC
 */
 
 export const syncDB = async () => {
+  if (!sequelize) {
+    console.log('⏭️ Skipping database sync (no Sequelize/DATABASE_URL)');
+    return true;
+  }
+
   try {
     console.log('🔄 Attempting database connection...');
 
@@ -244,6 +257,10 @@ export const syncDB = async () => {
 
 export {
   sequelize,
+  models
+};
+
+export const {
   User,
   Application,
   Announcement,
@@ -252,4 +269,4 @@ export {
   StudentProfile,
   CounselingSession,
   TimeSlot
-};
+} = models;

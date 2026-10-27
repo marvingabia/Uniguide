@@ -5,8 +5,13 @@
   onclick="toggleSidebar()"
   aria-label="Toggle sidebar"
   title="Open navigation"
+  style="margin: 8px; margin-left: 12px;"
 >
-  &rsaquo;
+  <div class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 </button>
 
 <!-- Dark Overlay -->
@@ -73,46 +78,45 @@
   </div>
 
   <!-- Navigation -->
-  <div
+  <nav
     style="
       flex:1;
-      padding:12px 10px;
+      padding:16px 12px;
       overflow-y:auto;
     "
   >
 
+    <!-- HOME -->
     <a
       href="/cashier/home"
       class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
     >
-      🏠 Home
+      <span>🏠</span>
+      <span>Dashboard</span>
     </a>
 
+    <!-- PAYMENT LIST -->
     <a
       href="/cashier/history"
       class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}"
     >
-      📜 Payment List Student
+      <span>💰</span>
+      <span>Payment History</span>
     </a>
 
+    <!-- NOTIFICATIONS -->
     <a
       href="/cashier/notifications"
       class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}"
-      style="display:flex;align-items:center;"
     >
-      🔔 Notifications
-
+      <span>🔔</span>
+      <span>Notifications</span>
       {{#if (gt unreadNotifCount 0)}}
-        <span
-          class="badge badge-submitted"
-          style="margin-left:auto;"
-        >
-          {{unreadNotifCount}}
-        </span>
+        <span class="notif-badge">{{unreadNotifCount}}</span>
       {{/if}}
     </a>
 
-  </div>
+  </nav>
 
   <!-- User -->
   <div

@@ -72,6 +72,7 @@ router.post('/cashier/application/:id/issue-receipt',       requireRole('cashier
 router.post('/cashier/application/:id/reissue-receipt',     requireRole('cashier'), uploadReceipt.single('receiptFile'), cashier.reissueReceipt);
 router.post('/cashier/application/:id/reject',              requireRole('cashier'), cashier.rejectApplication);
 router.get('/cashier/history',                              requireRole('cashier'), cashier.paymentHistory);
+router.get('/cashier/daily-collections',                    requireRole('cashier'), cashier.dailyCollections);
 router.get('/cashier/notifications',                        requireRole('cashier'), cashier.viewNotifications);
 router.post('/cashier/notifications/mark-read',             requireRole('cashier'), cashier.markNotificationsRead);
 

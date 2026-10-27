@@ -147,8 +147,8 @@
                   <tr>
 
                     <!-- ID -->
-                    <td class="text-gray-500 text-xs">
-                      {{this.id}}
+                    <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1; padding: 6px;">
+                      #{{@index}}
                     </td>
 
                     <!-- STUDENT -->
@@ -159,7 +159,7 @@
                       </div>
 
                       <div class="student-email">
-                        {{this.student.email}}
+                        {{this.email}}
                       </div>
 
                     </td>

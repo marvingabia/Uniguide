@@ -23,57 +23,86 @@
       </span>
     </div>
 
-    <div class="max-w-2xl mx-auto px-5 py-6">
+    <div class="max-w-4xl mx-auto px-5 py-6">
 
       {{> flash}}
 
-      <!-- Application Info -->
-      <div class="card mb-5 border-green-800">
-        <div class="flex items-center justify-between gap-3">
+      <!-- APPLICATION DETAILS (WHAT STUDENT FILLED UP) -->
+      <div class="card mb-5 border-blue-800">
+        <h3 class="text-blue-700 font-semibold text-sm mb-4">
+          📋 Application Information
+        </h3>
+
+        <div class="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p class="text-gray-500 text-xs mb-1">
-              Application #{{app.id}}
-            </p>
-
-            <h2 class="text-slate-800 font-bold text-lg">
-              {{app.surname}}, {{app.givenName}}
-            </h2>
-
-            <p class="text-slate-500 text-sm">
-              {{app.course}} — {{app.yearLevel}}
+            <p class="text-gray-500 text-xs">Full Name</p>
+            <p class="text-slate-800 font-medium">
+              {{app.surname}}, {{app.givenName}} {{app.middleName}}
             </p>
           </div>
 
+          <div>
+            <p class="text-gray-500 text-xs">Gender</p>
+            <p class="text-slate-800 font-medium">
+              {{app.gender}}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs">Contact Number</p>
+            <p class="text-slate-800 font-medium">
+              {{app.contactNumber}}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs">Course</p>
+            <p class="text-slate-800 font-medium">
+              {{app.course}} - {{app.major}}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs">Year Level / Section</p>
+            <p class="text-slate-800 font-medium">
+              {{app.yearLevel}} {{#if app.section}}- {{app.section}}{{/if}}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs">Enrollment Status</p>
+            <p class="text-slate-800 font-medium">
+              {{app.enrollmentStatus}}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEE SCHEDULE / ORDER SUMMARY -->
+      <div class="card mb-5 border-green-800">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <h3 class="text-green-700 font-semibold text-sm">
+            💰 Fee Summary
+          </h3>
           <span class="badge badge-pending">
             Pending Payment
           </span>
         </div>
-      </div>
 
-      <!-- Fee Schedule -->
-      <div class="card mb-5"
-           style="background:#0a1f0a;border-color:#166534">
+        <!-- Order Details -->
+        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 mb-4">
 
-        <h3 class="text-green-700 font-semibold text-sm mb-3">
-          💰 For Cashier Fee
-        </h3>
-
-        <!-- Order Summary -->
-        <div class="mb-4 p-4 rounded-lg"
-             style="background:#052e16;border:1px solid #166534">
-
-          <p class="text-gray-400 text-xs mb-3">
-            YOUR ORDER SUMMARY:
+          <p class="text-gray-500 text-xs mb-3 font-semibold">
+            ITEMS REQUESTED:
           </p>
 
           {{#if (gt app.qtyGoodMoral 0)}}
-          <div class="flex justify-between items-center mb-2 gap-3">
+          <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
             <div>
-              <p class="text-white font-medium text-sm">
+              <p class="text-slate-800 font-medium text-sm">
                 Good Moral (True Copy + Stamp)
               </p>
-
-              <p class="text-green-300 text-xs">
+              <p class="text-gray-600 text-xs mt-1">
                 ₱70 × {{app.qtyGoodMoral}}
                 {{#if (gt app.qtyGoodMoral 1)}}
                   copies
@@ -82,21 +111,19 @@
                 {{/if}}
               </p>
             </div>
-
-            <p class="text-white font-bold whitespace-nowrap">
+            <p class="text-slate-800 font-bold whitespace-nowrap">
               ₱{{multiply app.qtyGoodMoral 70}}.00
             </p>
           </div>
           {{/if}}
 
           {{#if (gt app.qtyCTC 0)}}
-          <div class="flex justify-between items-center mb-2 gap-3">
+          <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
             <div>
-              <p class="text-white font-medium text-sm">
+              <p class="text-slate-800 font-medium text-sm">
                 CTC / Authentication Request
               </p>
-
-              <p class="text-green-300 text-xs">
+              <p class="text-gray-600 text-xs mt-1">
                 ₱10 × {{app.qtyCTC}}
                 {{#if (gt app.qtyCTC 1)}}
                   copies
@@ -105,229 +132,323 @@
                 {{/if}}
               </p>
             </div>
-
-            <p class="text-white font-bold whitespace-nowrap">
+            <p class="text-slate-800 font-bold whitespace-nowrap">
               ₱{{multiply app.qtyCTC 10}}.00
             </p>
           </div>
           {{/if}}
 
-          <hr style="border-color:#166534;margin:12px 0">
-
-          <div class="flex justify-between items-center gap-3">
-            <p class="text-green-400 font-bold text-sm">
+          <div class="flex justify-between items-center gap-3 pt-3 border-t-2 border-slate-300">
+            <p class="text-green-700 font-bold text-base">
               TOTAL AMOUNT TO PAY:
             </p>
-
-            <p class="text-white font-bold text-2xl whitespace-nowrap">
-              ₱{{app.totalAmount}}
+            <p class="text-green-700 font-bold text-3xl whitespace-nowrap">
+              ₱{{app.totalAmount}}.00
             </p>
           </div>
 
         </div>
+      </div>
 
-        <!-- Payment Options -->
-        <div class="grid grid-cols-1 gap-4">
+      <!-- PAYMENT METHOD OPTIONS -->
+      <div class="card mb-5 border-purple-800">
+        <h3 class="text-purple-700 font-semibold text-sm mb-4">
+          💳 Payment Methods
+        </h3>
 
-          <!-- LandBank -->
-          <div class="card-sm"
-               style="border:1px solid #1d4ed8;background:#0a0f2e;">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-7 h-7 rounded-full bg-blue-600
-                          flex items-center justify-center
-                          text-white font-bold text-xs">
-                L
+          <!-- METHOD 1: QR CODE -->
+          <div class="card-sm border-2 border-blue-500 bg-blue-50 cursor-pointer hover:bg-blue-100 transition"
+               onclick="selectPaymentMethod('qr')">
+
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                1
               </div>
-
-              <p class="text-blue-400 font-bold text-sm">
-                LandBank
+              <p class="text-blue-700 font-bold text-sm">
+                Scan QR Code
               </p>
             </div>
 
-            <!-- QR CODE -->
-            <div class="flex flex-col items-center">
-
-              <button
-                type="button"
-                onclick="openQRModal()"
-                class="group relative block rounded-xl focus:outline-none
-                       focus:ring-2 focus:ring-blue-400"
-                aria-label="View LandBank QR Code in full size"
-              >
-
-                <img
-                  src="/uploads/LandbankQR.png"
-                  alt="LandBank QR Code"
-                  class="w-56 h-56 sm:w-64 sm:h-64
-                         object-contain
-                         bg-white
-                         rounded-xl
-                         border-2 border-blue-500
-                         p-2
-                         shadow-lg
-                         cursor-pointer
-                         transition-transform
-                         duration-200
-                         group-hover:scale-[1.02]"
-                >
-
-                <!-- Tap indicator -->
-                <div
-                  class="absolute bottom-3 left-1/2
-                         -translate-x-1/2
-                         bg-black/75 text-white
-                         text-xs px-3 py-1.5
-                         rounded-full
-                         whitespace-nowrap"
-                >
-                  🔍 Tap to view full size
-                </div>
-
-              </button>
-
-              <p class="text-gray-400 text-xs mt-3 text-center">
-                Tap the QR code to view it in full size for easier scanning.
-              </p>
-
-            </div>
-
-            <!-- Account Details -->
-            <div class="space-y-2 text-xs mt-5">
-
-              <div class="flex justify-between gap-4">
-                <span class="text-gray-400">
-                  Account Name
-                </span>
-
-                <span class="text-white font-semibold text-right">
-                  MinSU Bongabong Campus
-                </span>
-              </div>
-
-              <div class="flex justify-between gap-4">
-                <span class="text-gray-400">
-                  Account Number
-                </span>
-
-                <span class="text-blue-400 font-bold tracking-wider">
-                  6746-0245-85
-                </span>
-              </div>
-
-            </div>
-
-            <p class="text-gray-500 text-xs mt-3 text-center">
-              Scan QR or deposit to account above
+            <p class="text-gray-600 text-xs">
+              Scan LandBank QR code using your mobile app
             </p>
+
+            <button
+              type="button"
+              class="mt-3 w-full px-3 py-2 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              onclick="openQRModal(); event.stopPropagation();"
+            >
+              🔍 View QR Code
+            </button>
+
+          </div>
+
+          <!-- METHOD 2: LANDBANK PORTAL -->
+          <div class="card-sm border-2 border-purple-500 bg-purple-50 cursor-pointer hover:bg-purple-100 transition"
+               onclick="selectPaymentMethod('portal')">
+
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                2
+              </div>
+              <p class="text-purple-700 font-bold text-sm">
+                Online Portal
+              </p>
+            </div>
+
+            <p class="text-gray-600 text-xs">
+              Pay directly via LandBank e-Services
+            </p>
+
+            <a
+              href="https://www.lbp-eservices.com/egps/portal/index.jsp"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-3 inline-block w-full px-3 py-2 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition text-center"
+              onclick="selectPaymentMethod('portal'); event.stopPropagation();"
+            >
+              🌐 Go to Portal
+            </a>
+
+          </div>
+
+          <!-- METHOD 3: MANUAL TRANSFER -->
+          <div class="card-sm border-2 border-amber-500 bg-amber-50 cursor-pointer hover:bg-amber-100 transition"
+               onclick="selectPaymentMethod('manual')">
+
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold">
+                3
+              </div>
+              <p class="text-amber-700 font-bold text-sm">
+                Manual Transfer
+              </p>
+            </div>
+
+            <p class="text-gray-600 text-xs">
+              Transfer to account details below
+            </p>
+
+            <button
+              type="button"
+              class="mt-3 w-full px-3 py-2 text-xs bg-amber-600 text-white rounded hover:bg-amber-700 transition"
+              onclick="selectPaymentMethod('manual'); event.stopPropagation();"
+            >
+              📋 View Details
+            </button>
 
           </div>
 
         </div>
 
-        <!-- Important Reminder -->
-        <div
-          class="rounded-lg px-4 py-3 text-xs text-yellow-500 mt-4"
-          style="background:#1c1500;border:1px solid #854d0e;"
-        >
-          ⚠️
-          <strong>Important:</strong>
-          After payment via LandBank, take a screenshot of your
-          confirmation and enter the reference number below.
-          Your application will be processed after payment is verified.
+        <!-- ACCOUNT DETAILS (Always visible) -->
+        <div class="mt-4 p-4 rounded-lg bg-slate-100 border border-slate-300">
+          <p class="text-gray-700 font-semibold text-sm mb-3">
+            💰 MinSU Bongabong Campus - LandBank Account Details:
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-gray-600 text-xs">Account Name</p>
+              <p class="text-slate-800 font-bold">MinSU Bongabong Campus</p>
+            </div>
+
+            <div>
+              <p class="text-gray-600 text-xs">Account Number</p>
+              <p class="text-blue-700 font-bold tracking-wider text-lg">6746-0245-85</p>
+            </div>
+
+            <div>
+              <p class="text-gray-600 text-xs">Bank</p>
+              <p class="text-slate-800 font-bold">Landbank of the Philippines</p>
+            </div>
+
+            <div>
+              <p class="text-gray-600 text-xs">Branch</p>
+              <p class="text-slate-800 font-bold">Bongabong</p>
+            </div>
+          </div>
         </div>
 
       </div>
 
-      <!-- Payment Form -->
+      <!-- PAYMENT FORM -->
       <form
+        id="paymentForm"
         action="/student/application/{{app.id}}/payment"
         method="POST"
         enctype="multipart/form-data"
-        class="card space-y-4"
+        class="card border-green-800 space-y-4"
       >
 
         <h3 class="text-green-700 font-semibold text-sm">
-          Upload Payment Proof
+          📤 Submit Payment Proof
         </h3>
 
         <!-- Payment Method -->
         <div>
           <label class="label">
-            Payment Method *
+            Payment Method Used *
           </label>
 
           <select
             name="paymentMethod"
+            id="paymentMethod"
             class="input"
             required
+            onchange="handlePaymentMethodChange()"
           >
-            <option value="LandBank" selected>
-              LandBank
-            </option>
+            <option value="">-- Select Payment Method --</option>
+            <option value="QR Code">QR Code (Scan)</option>
+            <option value="LandBank Portal">LandBank e-Services Portal</option>
+            <option value="Manual Transfer">Manual Bank Transfer</option>
           </select>
         </div>
 
-        <!-- Reference Number -->
-        <div>
-          <label class="label">
-            Reference Number *
-          </label>
+        <!-- MANUAL PAYMENT SECTION (Hidden by default) -->
+        <div id="manualPaymentSection" class="hidden p-4 rounded-lg bg-amber-50 border-2 border-amber-300">
+          <h4 class="text-amber-800 font-bold text-sm mb-3">
+            ⚠️ Manual Payment - Proceed to Cashier
+          </h4>
 
-          <input
-            type="text"
-            name="referenceNumber"
-            class="input"
-            placeholder="e.g. 1234567890"
-            required
+          <div class="space-y-3 text-sm text-amber-900 mb-4">
+            <p>
+              <strong>Step 1:</strong> Click "Send to Cashier" below
+            </p>
+
+            <p>
+              <strong>Step 2:</strong> Proceed to the cashier's office and pay ₱{{app.totalAmount}}.00 in person
+            </p>
+
+            <p>
+              <strong>Step 3:</strong> The cashier will create a receipt and forward it to guidance
+            </p>
+
+            <p>
+              <strong>Step 4:</strong> Once verified, your certificate will be ready for release
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onclick="submitManualPayment(event)"
+            class="w-full px-4 py-3 bg-amber-600 text-white rounded font-semibold hover:bg-amber-700 transition"
           >
-
-          <p class="text-gray-600 text-xs mt-1">
-            Enter the LandBank reference number from your receipt
-          </p>
+            📤 Send Application to Cashier for Manual Payment
+          </button>
         </div>
 
-        <!-- Payment Date -->
-        <div>
-          <label class="label">
-            Date of Payment *
-          </label>
+        <!-- ONLINE PAYMENT SECTION (QR or Portal) -->
+        <div id="onlinePaymentSection" class="hidden space-y-4">
 
-          <input
-            type="date"
-            name="paymentDate"
-            class="input"
-            required
+          <!-- Reference Number -->
+          <div>
+            <label class="label">
+              Reference Number / Transaction ID *
+            </label>
+
+            <input
+              type="text"
+              name="referenceNumber"
+              class="input"
+              placeholder="e.g. 1234567890 or Transaction Reference"
+            >
+
+            <p class="text-gray-600 text-xs mt-1">
+              Enter the reference/transaction number from your LandBank receipt or confirmation
+            </p>
+          </div>
+
+          <!-- Payment Date -->
+          <div>
+            <label class="label">
+              Date of Payment *
+            </label>
+
+            <input
+              type="date"
+              name="paymentDate"
+              class="input"
+            >
+          </div>
+
+          <!-- Screenshot/Proof -->
+          <div>
+            <label class="label">
+              Payment Proof Screenshot *
+            </label>
+
+            <input
+              type="file"
+              name="screenshot"
+              accept="image/*"
+              class="input py-2"
+            >
+
+            <p class="text-gray-600 text-xs mt-1">
+              Upload a clear screenshot of your payment confirmation/receipt. Max 5MB.
+            </p>
+          </div>
+
+          <!-- PAYMENT RECEIPT PREVIEW -->
+          <div class="p-4 rounded-lg bg-white border-2 border-green-300">
+            <h4 class="text-green-700 font-bold text-sm mb-3">
+              🧾 Payment Receipt Preview
+            </h4>
+
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between pb-2 border-b border-gray-200">
+                <span class="text-gray-600">Student Name:</span>
+                <span class="font-semibold text-slate-800">{{app.surname}}, {{app.givenName}}</span>
+              </div>
+
+              <div class="flex justify-between pb-2 border-b border-gray-200">
+                <span class="text-gray-600">Amount to Pay:</span>
+                <span class="font-bold text-green-700 text-base">₱{{app.totalAmount}}.00</span>
+              </div>
+
+              <div class="flex justify-between pb-2 border-b border-gray-200">
+                <span class="text-gray-600">Payment Method:</span>
+                <span class="font-semibold text-slate-800" id="receiptPaymentMethod">
+                  (Select above)
+                </span>
+              </div>
+
+              <div class="flex justify-between pb-2 border-b border-gray-200">
+                <span class="text-gray-600">Reference Number:</span>
+                <span class="font-mono font-semibold text-slate-800" id="receiptRefNumber">
+                  (Enter above)
+                </span>
+              </div>
+
+              <div class="flex justify-between pt-2">
+                <span class="text-gray-600">Status:</span>
+                <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                  Pending Verification
+                </span>
+              </div>
+            </div>
+
+            <p class="text-gray-600 text-xs mt-3 p-2 bg-gray-50 rounded">
+              ℹ️ This receipt will be issued by the cashier after verifying your payment proof.
+            </p>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn-green w-full py-3 text-base font-semibold"
           >
+            ✅ Submit Payment Proof
+          </button>
+
         </div>
 
-        <!-- Screenshot -->
-        <div>
-          <label class="label">
-            Payment Screenshot *
-          </label>
-
-          <input
-            type="file"
-            name="screenshot"
-            accept="image/*"
-            class="input py-2"
-            required
-          >
-
-          <p class="text-gray-600 text-xs mt-1">
-            Upload a clear screenshot of your payment confirmation.
-            Max 5MB.
-          </p>
-        </div>
-
-        <!-- Submit -->
-        <button
-          type="submit"
-          class="btn-green w-full py-3 text-base"
-        >
-          📤 Submit Payment Proof
-        </button>
+        <p class="text-amber-700 text-xs p-3 bg-amber-50 rounded border border-amber-300">
+          ⚠️ <strong>Important:</strong> Ensure proof shows reference number, date, and amount (₱{{app.totalAmount}}.00). Application will be processed after verification.
+        </p>
 
       </form>
 
@@ -376,7 +497,7 @@
 
     <!-- Title -->
     <p class="text-white font-semibold text-sm sm:text-base mb-3">
-      LandBank QR Code
+      LandBank QR Code - Scan to Pay
     </p>
 
     <!-- Full QR -->
@@ -401,7 +522,7 @@
 
     <!-- Instruction -->
     <p class="text-white/80 text-xs sm:text-sm mt-3 text-center">
-      I-zoom kung kinakailangan para mas madaling ma-scan.
+      Zoom in if needed para mas madaling ma-scan.
     </p>
 
   </div>
@@ -410,39 +531,120 @@
 
 
 <!-- ========================================================= -->
-<!-- QR MODAL SCRIPT -->
+<!-- SCRIPTS -->
 <!-- ========================================================= -->
 
 <script>
+  function selectPaymentMethod(method) {
+    const methodSelect = document.getElementById('paymentMethod');
+    
+    if (method === 'qr') {
+      methodSelect.value = 'QR Code';
+    } else if (method === 'portal') {
+      methodSelect.value = 'LandBank Portal';
+    } else if (method === 'manual') {
+      methodSelect.value = 'Manual Transfer';
+    }
+
+    handlePaymentMethodChange();
+  }
+
+  function handlePaymentMethodChange() {
+    const method = document.getElementById('paymentMethod').value;
+    const manualSection = document.getElementById('manualPaymentSection');
+    const onlineSection = document.getElementById('onlinePaymentSection');
+    const form = document.getElementById('paymentForm');
+
+    // Make reference number, payment date, screenshot required only for online payments
+    const referenceInput = form.querySelector('input[name="referenceNumber"]');
+    const dateInput = form.querySelector('input[name="paymentDate"]');
+    const screenshotInput = form.querySelector('input[name="screenshot"]');
+
+    if (method === 'Manual Transfer') {
+      manualSection.classList.remove('hidden');
+      onlineSection.classList.add('hidden');
+
+      // Make them not required
+      referenceInput.removeAttribute('required');
+      dateInput.removeAttribute('required');
+      screenshotInput.removeAttribute('required');
+    } else if (method === 'QR Code' || method === 'LandBank Portal') {
+      manualSection.classList.add('hidden');
+      onlineSection.classList.remove('hidden');
+
+      // Make them required
+      referenceInput.setAttribute('required', 'required');
+      dateInput.setAttribute('required', 'required');
+      screenshotInput.setAttribute('required', 'required');
+
+      // Update receipt preview with payment method
+      document.getElementById('receiptPaymentMethod').textContent = method;
+
+      // Add event listeners for real-time receipt updates
+      referenceInput.addEventListener('input', function() {
+        document.getElementById('receiptRefNumber').textContent = this.value || '(Enter above)';
+      });
+
+    } else {
+      manualSection.classList.add('hidden');
+      onlineSection.classList.add('hidden');
+    }
+  }
+
+  function submitManualPayment(event) {
+    event.preventDefault();
+
+    if (!confirm('Send this application to cashier for manual payment? Student will need to pay in-person.')) {
+      return;
+    }
+
+    // Create a form to submit as manual payment
+    const form = document.getElementById('paymentForm');
+    const formData = new FormData(form);
+
+    // Set payment method
+    formData.set('paymentMethod', 'Manual Transfer');
+    formData.set('paymentType', 'manual');  // Flag for backend
+    formData.set('referenceNumber', '');
+    formData.set('paymentDate', '');
+
+    // Submit via fetch to avoid file upload issues
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Application sent to cashier. Please proceed to pay in person.');
+        window.location.href = '/student/dashboard';
+      } else {
+        alert('Error sending application to cashier');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error sending application');
+    });
+  }
+
   function openQRModal() {
     const modal = document.getElementById('qrModal');
-
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
-    // Prevent background page from scrolling
     document.body.style.overflow = 'hidden';
   }
 
   function closeQRModal(event) {
-    // If clicked on the QR/image area, don't close
-    if (
-      event &&
-      event.target &&
-      event.target.tagName === 'IMG'
-    ) {
+    if (event && event.target && event.target.tagName === 'IMG') {
       return;
     }
 
     const modal = document.getElementById('qrModal');
-
     modal.classList.add('hidden');
     modal.classList.remove('flex');
-
     document.body.style.overflow = '';
   }
 
-  // ESC key closes modal
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
       closeQRModal();

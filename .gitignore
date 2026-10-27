@@ -4,3 +4,5 @@ public/uploads/*
 !public/uploads/.gitkeep
 dist/
 *.log
+firebase-key.json
+exports/

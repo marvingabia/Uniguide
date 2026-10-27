@@ -29,7 +29,7 @@
   .student-sidebar-toggle {
     position: fixed;
     left: 0;
-    top: 14px;
+    top: 100px;
 
     width: 28px;
     height: 36px;
@@ -216,7 +216,11 @@
   aria-label="Show sidebar"
   aria-expanded="false"
   onclick="toggleStudentSidebar()">
-  &gt;
+  <div class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 </button>
 
 
@@ -294,74 +298,73 @@
        NAVIGATION
        ======================================================= -->
 
-  <div
+  <nav
     style="
       flex:1;
-      padding:12px 10px;
+      padding:16px 12px;
       overflow-y:auto;
     ">
 
+    <!-- HOME -->
     <a
       href="/student/home"
       class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}">
-      🏠 Home
+      <span>🏠</span>
+      <span>Home</span>
     </a>
 
-
+    <!-- REQUEST CERTIFICATE -->
     <a
       href="/student/apply"
       class="sidebar-link {{#if (eq activePage 'apply')}}active{{/if}}">
-      📝 Request for Good Moral & CTC/Authentication
+      <span>📝</span>
+      <span>Request Certificate</span>
     </a>
 
-
+    <!-- TRACK REQUEST -->
     <a
       href="/student/history"
       class="sidebar-link {{#if (eq activePage 'history')}}active{{/if}}">
-      📋 Track My Request
+      <span>📋</span>
+      <span>Track Request</span>
     </a>
 
-
+    <!-- COUNSELLING -->
     <a
       href="/student/appointments"
       class="sidebar-link {{#if (eq activePage 'appointments')}}active{{/if}}">
-      📅 Request For Counselling
+      <span>📅</span>
+      <span>Counselling</span>
     </a>
 
-
-    <a
-      href="/student/notifications"
-      class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}">
-
-      🔔 Notifications
-
-      {{#if unreadNotifCount}}
-
-        <span
-          class="badge badge-submitted"
-          style="margin-left:auto;">
-          {{unreadNotifCount}}
-        </span>
-
-      {{/if}}
-
-    </a>
-
-
+    <!-- ANNOUNCEMENTS -->
     <a
       href="/student/announcements"
       class="sidebar-link {{#if (eq activePage 'announcements')}}active{{/if}}">
-      📢 Announcements
+      <span>📢</span>
+      <span>Announcements</span>
     </a>
 
+    <!-- NOTIFICATIONS -->
+    <a
+      href="/student/notifications"
+      class="sidebar-link {{#if (eq activePage 'notifications')}}active{{/if}}">
+      <span>🔔</span>
+      <span>Notifications</span>
+      {{#if unreadNotifCount}}
+        <span class="notif-badge">{{unreadNotifCount}}</span>
+      {{/if}}
+    </a>
 
+    <!-- MY PROFILE -->
     <a
       href="/student/profile"
       class="sidebar-link {{#if (eq activePage 'profile')}}active{{/if}}">
-      👤 My Profile
+      <span>👤</span>
+      <span>My Profile</span>
     </a>
 
-  </div>
+  </nav>
 
 
   <!-- =======================================================
@@ -535,16 +538,19 @@ function updateStudentSidebarButton() {
       'student-sidebar-open'
     );
 
-
-  button.innerHTML =
-    isOpen ? '&lt;' : '&gt;';
-
+  const hamburger = button.querySelector('.hamburger');
+  if (hamburger) {
+    if (isOpen) {
+      hamburger.classList.add('open');
+    } else {
+      hamburger.classList.remove('open');
+    }
+  }
 
   button.setAttribute(
     'aria-expanded',
     isOpen ? 'true' : 'false'
   );
-
 
   button.setAttribute(
     'aria-label',
@@ -602,6 +608,63 @@ document.addEventListener(
       );
 
     });
+
+
+    /* =========================================================
+       SWIPE GESTURE DETECTION FOR STUDENT SIDEBAR
+       ========================================================= */
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    document.addEventListener(
+      'touchstart',
+      function (event) {
+        touchStartX = event.changedTouches[0].screenX;
+        touchStartY = event.changedTouches[0].screenY;
+      },
+      false
+    );
+
+    document.addEventListener(
+      'touchend',
+      function (event) {
+        touchEndX = event.changedTouches[0].screenX;
+        touchEndY = event.changedTouches[0].screenY;
+
+        handleStudentSwipe();
+      },
+      false
+    );
+
+    function handleStudentSwipe() {
+      const diffX = touchStartX - touchEndX;
+      const diffY = Math.abs(touchStartY - touchEndY);
+
+      // Only consider it a horizontal swipe if vertical movement is small
+      if (Math.abs(diffX) > diffY && Math.abs(diffX) > 50) {
+
+        const isOpen =
+          document.body.classList.contains(
+            'student-sidebar-open'
+          );
+
+        // Swipe left (closing) - from right to left
+        if (diffX > 0 && isOpen) {
+          closeStudentSidebar();
+        }
+
+        // Swipe right (opening) - from left to right
+        if (diffX < 0 && !isOpen) {
+          document.body.classList.add(
+            'student-sidebar-open'
+          );
+          updateStudentSidebarButton();
+        }
+      }
+    }
 
   }
 );

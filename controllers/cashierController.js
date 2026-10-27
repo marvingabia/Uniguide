@@ -1,277 +1,524 @@
 import { Application, User, Notification } from '../models/index.js';
+import { FirestoreAdapter } from '../models/firestore-adapter.js';
 import { createNotification, notifyAllRole } from '../utils/notifications.js';
 import { Op } from 'sequelize';
 
 // Dashboard
 export const dashboard = async (req, res) => {
-  const pending   = await Application.findAll({
-    where: { status: 'payment_submitted' },
-    include: [{ model: User, as: 'student' }],
-    order: [['updatedAt', 'DESC']]
-  });
-  const verified  = await Application.findAll({
-    where: { status: 'payment_verified' },
-    include: [{ model: User, as: 'student' }],
-    order: [['updatedAt', 'DESC']]
-  });
-  const receipted = await Application.findAll({
-    where: { status: 'receipt_issued' },
-    include: [{ model: User, as: 'student' }],
-    order: [['updatedAt', 'DESC']]
-  });
+  try {
+    console.log('');
+    console.log('========================================');
+    console.log('💳 CASHIER DASHBOARD');
+    console.log('========================================');
 
-  const notifications = await Notification.findAll({
-    where: { userId: req.session.user.id },
-    order: [['createdAt', 'DESC']],
-    limit: 10
-  });
-  const unreadNotifCount = notifications.filter(n => !n.isRead).length;
+    let manualPayments = [];
+    let pendingPayments = [];
+    let receipted = [];
+    let notifications = [];
+    let dailyTotal = 0;
 
-  // Daily collections
-  const today = new Date().toISOString().split('T')[0];
-  const dailyPayments = await Application.findAll({
-    where: { status: ['receipt_issued', 'approved', 'released'], paymentDate: today }
-  });
-  const dailyTotal = dailyPayments.reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
+    // Get manual payment requests (waiting_for_cashier status)
+    try {
+      manualPayments = await FirestoreAdapter.getAllApplications({ 
+        status: 'waiting_for_cashier' 
+      });
+      console.log(`📋 Manual payments waiting: ${manualPayments.length}`);
+    } catch (e) {
+      console.error('Error fetching manual payments:', e.message);
+    }
 
-  res.render('cashier/dashboard', {
-    title: 'Cashier Dashboard — GuidanceConnect',
-    user: req.session.user,
-    pending,
-    verified,
-    receipted,
-    notifications,
-    unreadNotifCount,
-    dailyTotal,
-    pendingCount: pending.length,
-    verifiedCount: verified.length,
-    receiptedCount: receipted.length,
-    awaitingActionCount: pending.length + verified.length
-  });
+    // Get online payment submissions (payment_submitted status)
+    try {
+      pendingPayments = await FirestoreAdapter.getAllApplications({ 
+        status: 'payment_submitted' 
+      });
+      console.log(`💳 Online payments submitted: ${pendingPayments.length}`);
+    } catch (e) {
+      console.error('Error fetching pending payments:', e.message);
+    }
+
+    // Get receipted applications (receipt_issued status)
+    try {
+      receipted = await FirestoreAdapter.getAllApplications({ 
+        status: 'receipt_issued' 
+      });
+      console.log(`🧾 Receipts issued: ${receipted.length}`);
+    } catch (e) {
+      console.error('Error fetching receipted:', e.message);
+    }
+
+    // Get cashier notifications
+    try {
+      notifications = await FirestoreAdapter.getUserNotifications(req.session.user.id);
+      console.log(`🔔 Notifications: ${notifications.length}`);
+    } catch (e) {
+      console.error('Error fetching notifications:', e.message);
+    }
+
+    // Calculate daily total (all payments collected today)
+    // Includes: manual payments (waiting_for_cashier), forwarded (payment_verified), and receipted (receipt_issued)
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Combine all application arrays
+    const allApplications = [...manualPayments, ...pendingPayments, ...receipted];
+    
+    dailyTotal = allApplications
+      .filter(app => {
+        // Use paymentDate if available, otherwise use updatedAt or createdAt
+        const dateToCheck = app.paymentDate || app.updatedAt || app.createdAt;
+        return dateToCheck && dateToCheck.includes(today);
+      })
+      .reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
+
+    const unreadNotifCount = notifications.filter(n => !n.isRead).length;
+
+    console.log(`✅ Dashboard ready: ${manualPayments.length} manual + ${pendingPayments.length} online`);
+
+    res.render('cashier/dashboard', {
+      title: 'Cashier Dashboard — GuidanceConnect',
+      user: req.session.user,
+      manualPayments,
+      pendingPayments,
+      receipted,
+      notifications,
+      unreadNotifCount,
+      dailyTotal,
+      manualCount: manualPayments.length,
+      pendingCount: pendingPayments.length,
+      receiptedCount: receipted.length,
+      awaitingActionCount: manualPayments.length + pendingPayments.length,
+      testMode: false
+    });
+  } catch (error) {
+    console.error('❌ Dashboard error:', error.message);
+    res.render('cashier/dashboard', {
+      title: 'Cashier Dashboard — GuidanceConnect',
+      user: req.session.user,
+      manualPayments: [],
+      pendingPayments: [],
+      receipted: [],
+      notifications: [],
+      unreadNotifCount: 0,
+      dailyTotal: 0,
+      manualCount: 0,
+      pendingCount: 0,
+      receiptedCount: 0,
+      awaitingActionCount: 0,
+      testMode: true,
+      error: 'Error loading dashboard'
+    });
+  }
 };
 
 // View application
 export const viewApplication = async (req, res) => {
-  const app = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'student' }]
-  });
-  if (!app) return res.redirect('/cashier/dashboard');
-  
-  // If payment just submitted and not yet seen, notify student that cashier is reviewing
-  if (app.status === 'payment_submitted') {
-    // Check if we already sent "reviewing" notification
-    const existingNotif = await Notification.findOne({
-      where: {
-        userId: app.userId,
-        message: { [Op.like]: `%Cashier is reviewing your payment%${app.id}%` }
-      }
-    });
+  try {
+    // Get application from Firestore
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
     
-    if (!existingNotif) {
-      await createNotification(
-        app.userId,
-        `💼 Cashier is reviewing your payment for request #${app.id}.`,
-        'info',
-        `/student/application/${app.id}`
-      );
+    if (!app) {
+      return res.redirect('/cashier/dashboard');
     }
+
+    let purposes = [];
+    try { 
+      purposes = Array.isArray(app.purposes) ? app.purposes : JSON.parse(app.purposes || '[]');
+    } catch (e) {
+      purposes = [];
+    }
+
+    console.log(`📋 Viewing application ${req.params.id}: ${app.givenName} ${app.surname} - Status: ${app.status}`);
+
+    res.render('cashier/view-application', {
+      title: 'Review Application — GuidanceConnect',
+      user: req.session.user,
+      app,
+      purposes
+    });
+  } catch (error) {
+    console.error('View application error:', error.message);
+    res.render('cashier/view-application', {
+      title: 'Review Application — GuidanceConnect',
+      user: req.session.user,
+      app: null,
+      purposes: [],
+      testMode: true,
+      error: 'Test mode - Database disabled'
+    });
   }
-  
-  let purposes = [];
-  try { purposes = JSON.parse(app.purposes); } catch {}
-  res.render('cashier/view-application', {
-    title: 'Review Application — GuidanceConnect',
-    user: req.session.user,
-    app,
-    purposes
-  });
 };
 
-// Verify payment and issue receipt (combined)
+// Verify payment and issue receipt (combined) - also handles forward to guidance
 export const verifyAndIssueReceipt = async (req, res) => {
-  const { orNumber } = req.body;
-  const app = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'student' }]
-  });
-  if (!app) return res.redirect('/cashier/dashboard');
+  try {
+    console.log('');
+    console.log('========================================');
+    console.log('🧾 VERIFY & ISSUE RECEIPT');
+    console.log('========================================');
+    console.log('Application ID:', req.params.id);
 
-  const receiptFile = req.file ? `/uploads/receipts/${req.file.filename}` : null;
+    const { orNumber, action } = req.body;
+    
+    // Get application from Firestore
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
+    if (!app) {
+      return res.redirect('/cashier/dashboard');
+    }
 
-  // OR number is optional - can be blank
-  const orNum = orNumber && orNumber.trim() ? orNumber.trim() : null;
+    // Handle two actions: "issue" (create receipt) and "forward" (send to guidance)
+    if (action === 'forward') {
+      console.log('📨 Forwarding to Guidance Office');
+      
+      // Update status to payment_verified (ready for guidance)
+      // Also set paymentDate since payment has been collected
+      await FirestoreAdapter.updateApplication(req.params.id, {
+        status: 'payment_verified',
+        paymentDate: new Date().toISOString()
+      });
 
-  // Update to payment_verified status first
-  await app.update({
-    orNumber: orNum,
-    receiptFile,
-    status: 'payment_verified'
-  });
+      // Notify student
+      await FirestoreAdapter.createNotification({
+        userId: app.userId,
+        type: 'payment_verified',
+        title: 'Payment Verified',
+        message: `✅ Your payment for request #${req.params.id} has been verified (₱${app.totalAmount}). Your request has been forwarded to the Guidance Office.`,
+        applicationId: req.params.id,
+        isRead: false
+      });
 
-  // Notify student
-  const orText = orNum ? ` Official Receipt #${orNum} issued.` : '';
-  await createNotification(
-    app.userId,
-    `✅ Your payment for request #${app.id} has been verified (₱${app.totalAmount}).${orText} Your request has been forwarded to the Guidance Office.`,
-    'success',
-    `/student/application/${app.id}`
-  );
+      // Notify guidance staff
+      await FirestoreAdapter.createNotification({
+        userId: 'guidance@minsu.edu.ph',  // Use guidance staff account email
+        type: 'new_verified_application',
+        title: 'Payment Verified - Ready for Processing',
+        message: `Payment verified for request #${req.params.id} (${app.surname}, ${app.givenName}). Ready for processing.`,
+        applicationId: req.params.id,
+        isRead: false
+      });
 
-  // Notify guidance
-  await notifyAllRole(
-    'guidance',
-    `Payment verified for request #${app.id} (${app.surname}, ${app.givenName}). Ready for processing.`,
-    'info',
-    `/guidance/application/${app.id}`
-  );
+      console.log('✅ Application forwarded to guidance');
+      req.flash('success', 'Application forwarded to Guidance Office');
+      return res.redirect('/cashier/dashboard');
+    }
 
-  req.flash('success', 'Payment verified and forwarded to Guidance Office.');
-  res.redirect('/cashier/dashboard');
+    // Default action: Issue receipt
+    const receiptFile = req.file ? `/uploads/receipts/${req.file.filename}` : null;
+    const orNum = orNumber && orNumber.trim() ? orNumber.trim() : null;
+
+    console.log('📝 Issuing receipt with OR:', orNum);
+
+    // Update to receipt_issued status
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      orNumber: orNum,
+      receiptFile,
+      status: 'receipt_issued',
+      paymentDate: new Date().toISOString()
+    });
+
+    // Notify student
+    const orText = orNum ? ` Official Receipt #${orNum} issued.` : '';
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'receipt_issued',
+      title: 'Receipt Issued',
+      message: `✅ Your payment for request #${req.params.id} has been verified (₱${app.totalAmount}).${orText} Your request is ready for processing.`,
+      applicationId: req.params.id,
+      isRead: false
+    });
+
+    console.log('✅ Receipt issued');
+    req.flash('success', `Receipt issued! OR: ${orNum || 'Manual entry'}`);
+    res.redirect(`/cashier/application/${req.params.id}`);
+  } catch (error) {
+    console.error('❌ Verify receipt error:', error.message);
+    req.flash('error', `Error: ${error.message}`);
+    res.redirect('/cashier/dashboard');
+  }
 };
 
 // Issue receipt (move from payment_verified to receipt_issued)
 export const issueReceipt = async (req, res) => {
-  const { orNumber } = req.body;
-  const app = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'student' }]
-  });
-  if (!app) return res.redirect('/cashier/dashboard');
+  try {
+    const { orNumber } = req.body;
+    
+    // Get application from Firestore
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
+    if (!app) {
+      return res.redirect('/cashier/dashboard');
+    }
 
-  const receiptFile = req.file ? `/uploads/receipts/${req.file.filename}` : null;
-  const orNum = orNumber && orNumber.trim() ? orNumber.trim() : null;
+    const receiptFile = req.file ? `/uploads/receipts/${req.file.filename}` : null;
+    const orNum = orNumber && orNumber.trim() ? orNumber.trim() : (app.orNumber || null);
 
-  // Update to receipt_issued status
-  await app.update({
-    orNumber: orNum || app.orNumber,
-    receiptFile: receiptFile || app.receiptFile,
-    status: 'receipt_issued'
-  });
+    console.log('🧾 Issuing receipt for application', req.params.id);
 
-  req.flash('success', 'Receipt issued successfully.');
-  res.redirect('/cashier/dashboard');
+    // Update to receipt_issued status
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      orNumber: orNum,
+      receiptFile: receiptFile || app.receiptFile,
+      status: 'receipt_issued'
+    });
+
+    req.flash('success', 'Receipt issued successfully.');
+    res.redirect('/cashier/dashboard');
+  } catch (error) {
+    console.error('Issue receipt error:', error.message);
+    req.flash('error', `Error: ${error.message}`);
+    res.redirect('/cashier/dashboard');
+  }
 };
 
 // Reject application
 export const rejectApplication = async (req, res) => {
-  const { remarks } = req.body;
-  const app = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'student' }]
-  });
-  if (!app) return res.redirect('/cashier/dashboard');
+  try {
+    if (!Application) {
+      req.flash('warning', 'Test mode - Database disabled');
+      return res.redirect('/cashier/dashboard');
+    }
 
-  await app.update({ status: 'rejected', remarks });
+    const { remarks } = req.body;
+    const app = await Application.findByPk(req.params.id, {
+      include: [{ model: User, as: 'student' }]
+    });
+    if (!app) return res.redirect('/cashier/dashboard');
 
-  // Notify student
-  await createNotification(
-    app.userId,
-    `Your payment for request #${app.id} was rejected. Reason: ${remarks}`,
-    'danger',
-    `/student/application/${app.id}`
-  );
+    await app.update({ status: 'rejected', remarks });
 
-  req.flash('success', 'Application rejected.');
-  res.redirect('/cashier/dashboard');
+    // Notify student
+    if (Notification) {
+      await createNotification(
+        app.userId,
+        `Your payment for request #${app.id} was rejected. Reason: ${remarks}`,
+        'danger',
+        `/student/application/${app.id}`
+      );
+    }
+
+    req.flash('success', 'Application rejected.');
+    res.redirect('/cashier/dashboard');
+  } catch (error) {
+    console.error('Reject application error:', error.message);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect('/cashier/dashboard');
+  }
 };
 
 // Re-issue receipt
 export const reissueReceipt = async (req, res) => {
-  const { orNumber, reissueReason } = req.body;
-  const app = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'student' }]
-  });
-  
-  if (!app) return res.redirect('/cashier/dashboard');
+  try {
+    if (!Application) {
+      req.flash('warning', 'Test mode - Database disabled');
+      return res.redirect('/cashier/dashboard');
+    }
 
-  const updates = {};
-  
-  // OR number is optional
-  if (orNumber && orNumber.trim()) {
-    updates.orNumber = orNumber.trim();
+    const { orNumber, reissueReason } = req.body;
+    const app = await Application.findByPk(req.params.id, {
+      include: [{ model: User, as: 'student' }]
+    });
+    
+    if (!app) return res.redirect('/cashier/dashboard');
+
+    const updates = {};
+    
+    // OR number is optional
+    if (orNumber && orNumber.trim()) {
+      updates.orNumber = orNumber.trim();
+    }
+    
+    // Update receipt file if new one uploaded
+    if (req.file) {
+      updates.receiptFile = `/uploads/receipts/${req.file.filename}`;
+    }
+    
+    await app.update(updates);
+
+    // Notify student about receipt update
+    if (Notification) {
+      const orText = updates.orNumber ? ` OR Number: ${updates.orNumber}.` : '';
+      await createNotification(
+        app.userId,
+        `📝 Your receipt information has been updated.${orText} Reason: ${reissueReason}`,
+        'info',
+        `/student/application/${app.id}`
+      );
+
+      // Notify guidance about the update
+      await notifyAllRole(
+        'guidance',
+        `Receipt updated for request #${app.id} (${app.surname}, ${app.givenName}). Reason: ${reissueReason}`,
+        'warning',
+        `/guidance/application/${app.id}`
+      );
+    }
+
+    req.flash('success', `Receipt information updated successfully.`);
+    res.redirect(`/cashier/application/${app.id}`);
+  } catch (error) {
+    console.error('Reissue receipt error:', error.message);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect(`/cashier/application/${req.params.id}`);
   }
-  
-  // Update receipt file if new one uploaded
-  if (req.file) {
-    updates.receiptFile = `/uploads/receipts/${req.file.filename}`;
-  }
-  
-  await app.update(updates);
-
-  // Notify student about receipt update
-  const orText = updates.orNumber ? ` OR Number: ${updates.orNumber}.` : '';
-  await createNotification(
-    app.userId,
-    `📝 Your receipt information has been updated.${orText} Reason: ${reissueReason}`,
-    'info',
-    `/student/application/${app.id}`
-  );
-
-  // Notify guidance about the update
-  await notifyAllRole(
-    'guidance',
-    `Receipt updated for request #${app.id} (${app.surname}, ${app.givenName}). Reason: ${reissueReason}`,
-    'warning',
-    `/guidance/application/${app.id}`
-  );
-
-  req.flash('success', `Receipt information updated successfully.`);
-  res.redirect(`/cashier/application/${app.id}`);
 };
 
 // Payment history
+// Payment History
 export const paymentHistory = async (req, res) => {
-  const payments = await Application.findAll({
-    where: { status: ['receipt_issued', 'approved', 'released'] },
-    include: [{ model: User, as: 'student' }],
-    order: [['paymentDate', 'DESC']]
-  });
-  res.render('cashier/payment-history', {
-    title: 'Payment History — GuidanceConnect',
-    user: req.session.user,
-    payments
-  });
-};
+  try {
+    let payments = [];
+    let totalCollected = 0;
+
+    try {
+      // Fetch applications that have been processed and forwarded
+      const allPayments = await FirestoreAdapter.getAllApplications();
+      
+      // Include: payment_verified (forwarded), receipt_issued, approved, released
+      payments = allPayments.filter(app =>
+        app.status === 'payment_verified' ||
+        app.status === 'receipt_issued' ||
+        app.status === 'approved' ||
+        app.status === 'released'
+      );
+
+      // Calculate total collected
+      totalCollected = payments.reduce((sum, app) => {
+        return sum + (parseFloat(app.totalAmount) || 0);
+      }, 0);
+
+      console.log(`💰 Payment history: ${payments.length} payments, Total: ₱${totalCollected}`);
+    } catch (e) {
+      console.error('Error fetching payment history:', e.message);
+    }
+
+    res.render('cashier/payment-history', {
+      title: 'Payment History — GuidanceConnect',
+      user: req.session.user,
+      payments,
+      totalCollected
+    });
+  } catch (error) {
+    console.error('Payment history error:', error.message);
+    res.render('cashier/payment-history', {
+      title: 'Payment History — GuidanceConnect',
+      user: req.session.user,
+      payments: [],
+      totalCollected: 0,
+      testMode: true,
+      error: 'Test mode'
+    });
+  }
+};;
 
 // Daily collections report
+// Daily Collections
 export const dailyCollections = async (req, res) => {
-  const today = new Date().toISOString().split('T')[0];
-  const payments = await Application.findAll({
-    where: { status: ['receipt_issued', 'approved', 'released'], paymentDate: today },
-    include: [{ model: User, as: 'student' }],
-    order: [['createdAt', 'DESC']]
-  });
-  const total = payments.reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
-  res.render('cashier/daily-collections', {
-    title: 'Daily Collections — GuidanceConnect',
-    user: req.session.user,
-    payments,
-    total,
-    date: today
-  });
-};
+  try {
+    let payments = [];
+    let total = 0;
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      // Fetch all applications from Firestore
+      const allPayments = await FirestoreAdapter.getAllApplications();
+
+      // Filter for today's collections (receipt_issued, approved, released with payment_date today)
+      payments = allPayments.filter(app => {
+        const isProcessed =
+          app.status === 'receipt_issued' ||
+          app.status === 'approved' ||
+          app.status === 'released';
+        // Use paymentDate if available, otherwise use updatedAt or createdAt
+        const dateToCheck = app.paymentDate || app.updatedAt || app.createdAt;
+        const isToday = dateToCheck && dateToCheck.includes(today);
+        return isProcessed && isToday;
+      });
+
+      // Calculate total
+      total = payments.reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
+
+      console.log(`💰 Daily collections (${today}): ${payments.length} payments, Total: ₱${total}`);
+    } catch (e) {
+      console.error('Error fetching daily collections:', e.message);
+    }
+
+    res.render('cashier/daily-collections', {
+      title: 'Daily Collections — GuidanceConnect',
+      user: req.session.user,
+      payments,
+      total,
+      date: today
+    });
+  } catch (error) {
+    console.error('Daily collections error:', error.message);
+    const today = new Date().toISOString().split('T')[0];
+    res.render('cashier/daily-collections', {
+      title: 'Daily Collections — GuidanceConnect',
+      user: req.session.user,
+      payments: [],
+      total: 0,
+      date: today,
+      testMode: true,
+      error: 'Test mode'
+    });
+  }
+};;
 
 // View notifications
+// View Notifications
 export const viewNotifications = async (req, res) => {
-  const notifications = await Notification.findAll({
-    where: { userId: req.session.user.id },
-    order: [['createdAt', 'DESC']],
-    limit: 50
-  });
-  
-  const unreadNotifCount = notifications.filter(n => !n.isRead).length;
-  
-  res.render('cashier/notifications', {
-    title: 'Notifications — UniGuide',
-    user: req.session.user,
-    notifications,
-    unreadNotifCount,
-    activePage: 'notifications'
-  });
+  try {
+    let notifications = [];
+    
+    try {
+      // Get notifications from Firestore
+      notifications = await FirestoreAdapter.getUserNotifications(req.session.user.id);
+      
+      // Mark all as read
+      for (const notif of notifications) {
+        if (!notif.isRead) {
+          await FirestoreAdapter.markNotificationAsRead(notif.id);
+        }
+      }
+      
+      console.log(`📬 Loaded ${notifications.length} notifications for cashier`);
+    } catch (e) {
+      console.error('Error fetching notifications:', e.message);
+    }
+    
+    const unreadNotifCount = notifications.filter(n => !n.isRead).length;
+    
+    res.render('cashier/notifications', {
+      title: 'Notifications — UniGuide',
+      user: req.session.user,
+      notifications,
+      unreadNotifCount,
+      activePage: 'notifications'
+    });
+  } catch (error) {
+    console.error('View notifications error:', error.message);
+    res.render('cashier/notifications', {
+      title: 'Notifications — UniGuide',
+      user: req.session.user,
+      notifications: [],
+      unreadNotifCount: 0,
+      activePage: 'notifications',
+      testMode: true,
+      error: 'Test mode'
+    });
+  }
 };
 
 // Mark notifications as read
 export const markNotificationsRead = async (req, res) => {
-  await Notification.update(
-    { isRead: true },
-    { where: { userId: req.session.user.id, isRead: false } }
-  );
-  res.redirect('/cashier/notifications');
+  try {
+    if (Notification) {
+      await Notification.update(
+        { isRead: true },
+        { where: { userId: req.session.user.id, isRead: false } }
+      );
+    }
+    res.redirect('/cashier/notifications');
+  } catch (error) {
+    console.error('Mark notifications read error:', error.message);
+    res.redirect('/cashier/notifications');
+  }
 };

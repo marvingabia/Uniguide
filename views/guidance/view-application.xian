@@ -5,7 +5,7 @@
     <div class="nav-top">
       <div class="flex items-center gap-3">
         <a href="/guidance/applications" class="text-green-700 hover:text-green-700 text-sm">← Back</a>
-        <h1 class="text-base font-bold text-slate-800">Application #{{app.id}}</h1>
+        <h1 class="text-base font-bold text-slate-800">Application #{{appIndex}}</h1>
       </div>
       <span class="text-teal-700 text-sm font-medium">{{user.firstName}} {{user.lastName}}</span>
     </div>
@@ -17,8 +17,10 @@
       <div class="card mb-4 flex items-center justify-between border-green-800">
         <div>
           <p class="text-gray-500 text-xs">Submitted {{formatDateTime app.createdAt}}</p>
-          <h2 class="text-slate-800 font-bold text-lg">{{app.surname}}, {{app.givenName}} {{app.middleName}}</h2>
-          <p class="text-slate-500 text-sm">{{app.student.email}}</p>
+          <h2 class="text-slate-800 font-bold text-lg">
+            {{#if app.surname}}{{app.surname}}, {{/if}}{{app.givenName}}{{#if app.middleName}} {{app.middleName}}{{/if}}
+          </h2>
+          <p class="text-slate-500 text-sm">{{app.email}}</p>
         </div>
         <span class="badge {{statusClass app.status}} text-sm px-4 py-1">{{statusLabel app.status}}</span>
       </div>
@@ -95,7 +97,7 @@
       </div>
 
       <!-- Actions -->
-      {{#if (eq app.status 'receipt_issued')}}
+      {{#if (or (eq app.status 'receipt_issued') (eq app.status 'payment_verified'))}}
       <div class="flex gap-3">
         <form action="/guidance/application/{{app.id}}/approve" method="POST" class="flex-1">
           <button class="btn-green w-full py-3" onclick="return confirm('Approve and prepare certificate?')">✓ Approve Request</button>

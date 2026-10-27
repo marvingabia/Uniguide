@@ -9,7 +9,7 @@
 
     <!-- Top Navigation -->
 
-    <div class="nav-top">
+    <div class="nav-top" style="margin-left: 50px;">
 
       <div>
 
@@ -185,8 +185,8 @@
 
                     <tr>
 
-                      <td class="text-gray-500 text-xs">
-                        {{this.id}}
+                      <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1; padding: 6px;">
+                        #{{@index}}
                       </td>
 
 
@@ -328,8 +328,8 @@
 
                     <tr>
 
-                      <td class="text-gray-500 text-xs">
-                        {{this.id}}
+                      <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1; padding: 6px;">
+                        #{{@index}}
                       </td>
 
 

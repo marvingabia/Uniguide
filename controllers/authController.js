@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { User } from '../models/index.js';
+import { FirestoreAdapter } from '../models/firestore-adapter.js';
 
 /* =========================================================
    HELPERS
@@ -56,164 +56,68 @@ export const login = async (req, res) => {
 
   console.log('');
   console.log('========================================');
-  console.log('LOGIN DEBUG');
+  console.log('LOGIN ATTEMPT');
   console.log('========================================');
   console.log('Email:', email);
-  console.log('Password received:', !!password);
-  console.log('Password length:', password.length);
-  console.log('Current Session ID:', req.sessionID);
-  console.log('========================================');
 
   try {
     if (!email || !password) {
-      req.flash(
-        'error',
-        'Email and password are required.'
-      );
-
+      req.flash('error', 'Email and password are required.');
       return res.redirect('/login');
     }
 
-    const user = await User.findOne({
-      where: {
-        email
-      }
-    });
+    // Query user from Firestore
+    const user = await FirestoreAdapter.findUserByEmail(email);
 
     if (!user) {
-      console.log('❌ USER NOT FOUND:', email);
-
-      req.flash(
-        'error',
-        'Invalid email or password.'
-      );
-
+      console.log('❌ User not found:', email);
+      req.flash('error', 'Invalid email or password.');
       return res.redirect('/login');
     }
 
-    console.log('✅ USER FOUND');
-    console.log('ID:', user.id);
-    console.log('Name:', user.firstName, user.lastName);
-    console.log('Email:', user.email);
-    console.log('Role:', user.role);
-    console.log('Auth Method:', user.authMethod);
-    console.log('Has Password:', !!user.password);
-    console.log('Is Approved:', user.isApproved);
+    console.log('✅ User found:', user.email);
 
-    /*
-     * Google-only account
-     */
-    if (
-      user.authMethod === 'google' &&
-      !user.password
-    ) {
-      console.log('❌ GOOGLE-ONLY ACCOUNT');
-
-      req.flash(
-        'error',
-        'This account uses Google Sign-In. Please click "Continue with Google".'
-      );
-
+    // Google-only account
+    if (user.authMethod === 'google' && !user.password) {
+      console.log('❌ Google-only account');
+      req.flash('error', 'This account uses Google Sign-In. Click "Continue with Google".');
       return res.redirect('/login');
     }
 
-    /*
-     * No password
-     */
+    // No password
     if (!user.password) {
-      console.log('❌ USER HAS NO PASSWORD');
-
-      req.flash(
-        'error',
-        'This account cannot use password login.'
-      );
-
+      console.log('❌ No password set');
+      req.flash('error', 'This account cannot use password login.');
       return res.redirect('/login');
     }
 
-    console.log('----------------------------------------');
-    console.log('Testing password comparison...');
-
-    const match = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-    console.log('Password match:', match);
+    // Test password
+    const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      console.log('❌ PASSWORD MISMATCH');
-
-      req.flash(
-        'error',
-        'Invalid email or password.'
-      );
-
+      console.log('❌ Password mismatch');
+      req.flash('error', 'Invalid email or password.');
       return res.redirect('/login');
     }
 
-    /*
-     * LOGIN SUCCESS
-     */
-    console.log('');
-    console.log('========================================');
-    console.log('✅ LOGIN SUCCESSFUL');
-    console.log('========================================');
-
+    // Login success
+    console.log('✅ Login successful');
     setSession(req, user);
 
-    console.log('SESSION BEFORE SAVE:');
-    console.log({
-      sessionID: req.sessionID,
-      user: req.session.user
-    });
-
-    /*
-     * Save session before redirect
-     */
     req.session.save((err) => {
       if (err) {
-        console.error(
-          '❌ SESSION SAVE ERROR:',
-          err
-        );
-
-        req.flash(
-          'error',
-          'Unable to save login session. Please try again.'
-        );
-
+        console.error('Session save error:', err);
+        req.flash('error', 'Unable to save session.');
         return res.redirect('/login');
       }
 
-      console.log('');
-      console.log('========================================');
-      console.log('✅ SESSION SAVED SUCCESSFULLY');
-      console.log('========================================');
-      console.log('Session ID:', req.sessionID);
-      console.log('Session User:', req.session.user);
-      console.log('Redirecting as role:', user.role);
-      console.log('========================================');
-
-      return redirectByRole(
-        res,
-        user.role
-      );
+      console.log('✅ Session saved, redirecting as:', user.role);
+      return redirectByRole(res, user.role);
     });
 
   } catch (err) {
-    console.error('');
-    console.error('========================================');
-    console.error('❌ LOGIN ERROR');
-    console.error('========================================');
-    console.error(err.message);
-    console.error(err.stack);
-
-    req.flash(
-      'error',
-      'Server error: ' + err.message
-    );
-
+    console.error('❌ Login error:', err.message);
+    req.flash('error', 'Server error: ' + err.message);
     return res.redirect('/login');
   }
 };
@@ -314,11 +218,7 @@ export const register = async (req, res) => {
     /*
      * Check existing account
      */
-    const existing = await User.findOne({
-      where: {
-        email
-      }
-    });
+    const existing = await FirestoreAdapter.findUserByEmail(email);
 
     if (existing) {
       req.flash(
@@ -340,7 +240,7 @@ export const register = async (req, res) => {
     /*
      * Create student account
      */
-    await User.create({
+    await FirestoreAdapter.createUser({
       firstName,
       lastName,
       email,
@@ -351,7 +251,8 @@ export const register = async (req, res) => {
       course: course || null,
       contactNo: contactNo || null,
       yearLevel: yearLevel || null,
-      section: section || null
+      section: section || null,
+      isApproved: true
     });
 
     console.log(

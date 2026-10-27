@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>{{#if title}}{{title}}{{else}}UniGuide — MinSU Bongabong{{/if}}</title>
+  <title>Uniguide — MinSU Bongabong</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -71,7 +71,7 @@
       position: fixed;
 
       /* Upper-left position */
-      top: 80px;
+      top: 20px;
       left: 0;
 
       width: 34px;
@@ -120,6 +120,38 @@
       left: 240px;
     }
 
+    /* Hamburger icon styling */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 3px;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger.open span:nth-child(1) {
+      transform: rotate(45deg) translate(7px, 7px);
+    }
+
+    .hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
+    }
+
 
     /* =========================================================
        SIDEBAR LINKS
@@ -128,38 +160,70 @@
     .sidebar-link {
       display: flex;
       align-items: center;
+      gap: 16px;
 
       width: 100%;
 
-      padding: 10px 12px;
-      margin-bottom: 4px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
 
-      border-radius: 8px;
+      border-radius: 10px;
+      border-left: 3px solid transparent;
 
       color: #d8eee1;
 
       text-decoration: none;
 
-      font-size: 0.78rem;
+      font-size: 0.9rem;
       font-weight: 500;
 
       transition:
-        background 0.15s ease,
-        color 0.15s ease,
-        transform 0.15s ease;
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
     }
 
     .sidebar-link:hover {
-      background: rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.12);
       color: #ffffff;
+      transform: translateX(4px);
     }
 
     .sidebar-link.active {
       background: #ffffff;
       color: #14532d;
       font-weight: 700;
+      border-left: 3px solid #15803d;
 
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Icon styling */
+    .sidebar-link span:first-child {
+      font-size: 1.3rem;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* Text styling */
+    .sidebar-link span:nth-child(2) {
+      flex: 1;
+    }
+
+    /* Badge styling */
+    .sidebar-link .notif-badge {
+      background: #ff6b6b;
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
 
@@ -211,6 +275,8 @@
       justify-content: space-between;
 
       padding: 12px 24px;
+      margin-top: 20px;
+      margin-left: 50px;
 
       background: #ffffff;
 
@@ -220,6 +286,19 @@
       top: 0;
 
       z-index: 100;
+    }
+
+    .nav-top h1 {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .nav-top p {
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
     }
 
 
@@ -506,6 +585,7 @@
 
       .nav-top {
         padding: 12px 16px;
+        margin-left: 50px;
       }
 
       .nav-top h1 {
@@ -546,7 +626,8 @@
 
       toggle.classList.add('open');
 
-      toggle.innerHTML = '&lsaquo;';
+      const hamburger = toggle.querySelector('.hamburger');
+      if (hamburger) hamburger.classList.add('open');
 
       toggle.setAttribute(
         'aria-label',
@@ -585,7 +666,8 @@
 
       toggle.classList.remove('open');
 
-      toggle.innerHTML = '&rsaquo;';
+      const hamburger = toggle.querySelector('.hamburger');
+      if (hamburger) hamburger.classList.remove('open');
 
       toggle.setAttribute(
         'aria-label',
@@ -689,6 +771,65 @@
 
           }
         );
+
+
+        /* =========================================================
+           SWIPE GESTURE DETECTION
+           ========================================================= */
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener(
+          'touchstart',
+          function (event) {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screenY;
+          },
+          false
+        );
+
+        document.addEventListener(
+          'touchend',
+          function (event) {
+            touchEndX = event.changedTouches[0].screenX;
+            touchEndY = event.changedTouches[0].screenY;
+
+            handleSwipe();
+          },
+          false
+        );
+
+        function handleSwipe() {
+          const diffX = touchStartX - touchEndX;
+          const diffY = Math.abs(touchStartY - touchEndY);
+
+          // Only consider it a horizontal swipe if vertical movement is small
+          if (Math.abs(diffX) > diffY && Math.abs(diffX) > 50) {
+
+            const sidebar =
+              document.querySelector(
+                '.app-sidebar'
+              );
+
+            if (!sidebar) return;
+
+            const isOpen =
+              sidebar.classList.contains('open');
+
+            // Swipe left (closing) - from right to left
+            if (diffX > 0 && isOpen) {
+              closeSidebar();
+            }
+
+            // Swipe right (opening) - from left to right
+            if (diffX < 0 && !isOpen) {
+              openSidebar();
+            }
+          }
+        }
 
       }
     );

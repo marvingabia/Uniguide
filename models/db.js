@@ -5,9 +5,11 @@ console.log('========================================');
 console.log('DATABASE CONFIG');
 console.log('========================================');
 
+const hasDatabaseUrl = !!process.env.DATABASE_URL;
+
 console.log(
   'DATABASE_URL:',
-  process.env.DATABASE_URL ? 'Set' : 'Not set'
+  hasDatabaseUrl ? 'Set' : 'Not set (using Firebase/Testing mode)'
 );
 
 console.log(
@@ -15,53 +17,54 @@ console.log(
   process.env.NODE_ENV || 'development'
 );
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is not configured');
-}
-
 let sequelize;
 
-try {
-  const dbUrl = new URL(process.env.DATABASE_URL);
+if (!hasDatabaseUrl) {
+  console.log('⚠️ Skipping Sequelize initialization (no DATABASE_URL)');
+  console.log('💡 Using Firebase Firestore for data');
+} else {
+  try {
+    const dbUrl = new URL(process.env.DATABASE_URL);
 
-  console.log('Using Aiven DATABASE_URL');
-  console.log('DB Host:', dbUrl.hostname);
-  console.log('DB Port:', dbUrl.port);
-  console.log('DB Name:', dbUrl.pathname.replace(/^\/+/, ''));
+    console.log('Using Aiven DATABASE_URL');
+    console.log('DB Host:', dbUrl.hostname);
+    console.log('DB Port:', dbUrl.port);
+    console.log('DB Name:', dbUrl.pathname.replace(/^\/+/, ''));
 
-  // Remove query parameters such as ssl-mode=REQUIRED
-  dbUrl.search = '';
+    // Remove query parameters such as ssl-mode=REQUIRED
+    dbUrl.search = '';
 
-  sequelize = new Sequelize(dbUrl.toString(), {
-    dialect: 'mysql',
-    dialectModule: mysql2,
+    sequelize = new Sequelize(dbUrl.toString(), {
+      dialect: 'mysql',
+      dialectModule: mysql2,
 
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        },
+
+        supportBigNumbers: true,
+        bigNumberStrings: true,
+        connectTimeout: 10000
       },
 
-      supportBigNumbers: true,
-      bigNumberStrings: true,
-      connectTimeout: 10000
-    },
+      logging: false,
 
-    logging: false,
+      pool: {
+        max: 3,
+        min: 0,
+        idle: 10000,
+        acquire: 30000
+      }
+    });
 
-    pool: {
-      max: 3,
-      min: 0,
-      idle: 10000,
-      acquire: 30000
-    }
-  });
+    console.log('Sequelize configured successfully');
 
-  console.log('Sequelize configured successfully');
-
-} catch (err) {
-  console.error('DATABASE CONFIG ERROR:', err.message);
-  throw err;
+  } catch (err) {
+    console.error('DATABASE CONFIG ERROR:', err.message);
+    throw err;
+  }
 }
 
 export { sequelize };

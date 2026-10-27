@@ -3,9 +3,9 @@
   {{> sidebar-student activePage="announcements"}}
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
-    <div class="nav-top">
+    <div class="nav-top" style="margin-left: 50px;">
       <div>
-        <h1 class="text-base font-bold text-slate-800">📢 Announcements</h1>
+        <h1 class="text-base font-bold text-slate-800">📢 Announcements — Uniguide</h1>
         <p class="text-gray-600 text-xs">Latest news and updates from Guidance Office</p>
       </div>
     </div>

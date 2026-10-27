@@ -9,7 +9,7 @@
 
     <!-- Top Navigation -->
 
-    <div class="nav-top">
+    <div class="nav-top" style="margin-left: 50px;">
 
       <div>
 
@@ -81,6 +81,29 @@
         <div class="card flex items-center gap-4">
 
           <div
+            class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center shrink-0"
+          >
+            🔴
+          </div>
+
+          <div>
+
+            <p class="text-xl font-bold text-red-600">
+              {{manualCount}}
+            </p>
+
+            <p class="text-gray-500 text-xs">
+              Manual Requests
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="card flex items-center gap-4">
+
+          <div
             class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
           >
             🧾
@@ -124,7 +147,7 @@
         </div>
 
 
-        <div class="card flex items-center gap-4">
+        <a href="/cashier/daily-collections" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
 
           <div
             class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
@@ -144,7 +167,7 @@
 
           </div>
 
-        </div>
+        </a>
 
       </div>
 
@@ -152,6 +175,20 @@
       <!-- Tabs -->
 
       <div class="flex gap-1 mb-4 border-b border-slate-200">
+
+        <button
+          onclick="showTab('manual')"
+          id="tab-manual"
+          class="tab-inactive px-5 py-2 text-sm font-semibold rounded-t-lg"
+        >
+
+          🔴 Manual Payments
+
+          <span class="ml-1 badge badge-pending">
+            {{manualCount}}
+          </span>
+
+        </button>
 
         <button
           onclick="showTab('pending')"
@@ -162,7 +199,7 @@
           Payment Submitted
 
           <span class="ml-1 badge badge-submitted">
-            {{pending.length}}
+            {{pendingCount}}
           </span>
 
         </button>
@@ -177,10 +214,131 @@
           Receipt Issued
 
           <span class="ml-1 badge badge-receipted">
-            {{receipted.length}}
+            {{receiptedCount}}
           </span>
 
         </button>
+
+      </div>
+
+
+      <!-- Manual Payments Panel -->
+
+      <div id="panel-manual">
+
+        {{#if manualPayments.length}}
+
+          <div class="card p-0 overflow-x-auto">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Year Level</th>
+                  <th>Documents</th>
+                  <th>Amount</th>
+                  <th>Requested</th>
+                  <th>Action</th>
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {{#each manualPayments}}
+
+                  <tr>
+
+                    <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1;">
+                      #{{@index}}
+                    </td>
+
+
+                    <td>
+
+                      <div class="text-slate-800 text-sm font-medium">
+                        {{this.surname}}, {{this.givenName}}
+                      </div>
+
+                      <div class="text-gray-600 text-xs">
+                        {{this.email}}
+                      </div>
+
+                    </td>
+
+
+                    <td class="text-slate-600 text-xs font-semibold">
+                      {{this.yearLevel}}
+                    </td>
+
+
+                    <td class="text-gray-600 text-xs">
+
+                      {{#if (gt this.qtyGoodMoral 0)}}
+                        <div>
+                          Good Moral: {{this.qtyGoodMoral}}
+                        </div>
+                      {{/if}}
+
+                      {{#if (gt this.qtyCTC 0)}}
+                        <div>
+                          CTC/Auth: {{this.qtyCTC}}
+                        </div>
+                      {{/if}}
+
+                    </td>
+
+
+                    <td class="text-green-700 font-bold">
+                      ₱{{this.totalAmount}}.00
+                    </td>
+
+
+                    <td class="text-gray-500 text-xs">
+                      {{formatDateTime this.createdAt}}
+                    </td>
+
+
+                    <td>
+
+                      <a
+                        href="/cashier/application/{{this.id}}"
+                        class="btn-green btn-sm"
+                      >
+                        Collect Payment
+                      </a>
+
+                    </td>
+
+                  </tr>
+
+                {{/each}}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        {{else}}
+
+          <div class="card text-center py-12">
+
+            <div class="text-4xl mb-2">
+              ✅
+            </div>
+
+            <p class="text-gray-500 text-sm">
+              No manual payment requests waiting.
+            </p>
+
+          </div>
+
+        {{/if}}
 
       </div>
 
@@ -189,7 +347,7 @@
 
       <div id="panel-pending">
 
-        {{#if pending.length}}
+        {{#if pendingPayments.length}}
 
           <div class="card p-0 overflow-x-auto">
 
@@ -213,12 +371,12 @@
 
               <tbody>
 
-                {{#each pending}}
+                {{#each pendingPayments}}
 
                   <tr>
 
-                    <td class="text-gray-500 text-xs">
-                      {{this.id}}
+                    <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1;">
+                      #{{@index}}
                     </td>
 
 
@@ -229,7 +387,7 @@
                       </div>
 
                       <div class="text-gray-600 text-xs">
-                        {{this.student.email}}
+                        {{this.email}}
                       </div>
 
                     </td>
@@ -350,8 +508,8 @@
 
                   <tr>
 
-                    <td class="text-gray-500 text-xs">
-                      {{this.id}}
+                    <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1;">
+                      #{{@index}}
                     </td>
 
 
@@ -477,7 +635,7 @@
 
   function showTab(name) {
 
-    ['pending', 'receipted'].forEach(function (tab) {
+    ['manual', 'pending', 'receipted'].forEach(function (tab) {
 
       const panel = document.getElementById('panel-' + tab);
       const button = document.getElementById('tab-' + tab);

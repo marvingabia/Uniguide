@@ -41,124 +41,92 @@ app.use(
 );
 
 /* ================================================================
-   SESSION — MYSQL STORE
+   SESSION — MYSQL STORE (OR MEMORY FOR TESTING)
 ================================================================ */
 
 const isProduction =
   process.env.NODE_ENV === 'production';
 
-/*
- * Read Aiven DATABASE_URL
- *
- * Example:
- * mysql://avnadmin:password@host:15878/defaultdb
- */
-if (!process.env.DATABASE_URL) {
-  console.error(
-    '❌ DATABASE_URL is not configured.'
-  );
-}
+const hasDatabaseUrl = !!process.env.DATABASE_URL;
 
-/*
- * Parse DATABASE_URL
- */
-let dbUrl;
+console.log('');
+console.log('DATABASE_URL configured:', hasDatabaseUrl ? '✅ Yes' : '❌ No');
 
-try {
-  dbUrl = new URL(
-    process.env.DATABASE_URL
-  );
-} catch (err) {
-  console.error(
-    '❌ Invalid DATABASE_URL'
-  );
+let sessionStore;
 
-  console.error(err.message);
+if (hasDatabaseUrl) {
+  try {
+    /*
+     * Parse DATABASE_URL
+     */
+    const dbUrl = new URL(
+      process.env.DATABASE_URL
+    );
 
-  process.exit(1);
-}
+    /*
+     * MySQL session store
+     */
+    const MySQLStore =
+      MySQLStoreFactory(session);
 
-/*
- * MySQL session store
- */
-const MySQLStore =
-  MySQLStoreFactory(session);
+    /*
+     * Aiven MySQL requires SSL.
+     */
+    const sessionStoreOptions = {
+      host: dbUrl.hostname,
 
-/*
- * Aiven MySQL requires SSL.
- *
- * For local development using the same Aiven
- * database, this will also work.
- */
-const sessionStoreOptions = {
-  host: dbUrl.hostname,
+      port:
+        Number(dbUrl.port) || 3306,
 
-  port:
-    Number(dbUrl.port) || 3306,
+      user:
+        decodeURIComponent(
+          dbUrl.username
+        ),
 
-  user:
-    decodeURIComponent(
-      dbUrl.username
-    ),
+      password:
+        decodeURIComponent(
+          dbUrl.password
+        ),
 
-  password:
-    decodeURIComponent(
-      dbUrl.password
-    ),
+      database:
+        dbUrl.pathname.replace(
+          /^\//,
+          ''
+        ) || 'defaultdb',
 
-  database:
-    dbUrl.pathname.replace(
-      /^\//,
-      ''
-    ) || 'defaultdb',
+      tableName: 'sessions',
+      createDatabaseTable: true,
+      clearExpired: true,
+      checkExpirationInterval:
+        1000 * 60 * 15,
+      expiration:
+        1000 * 60 * 60 * 8,
+      keepAlive: true,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    };
 
-  /*
-   * Session table configuration
-   */
-  tableName: 'sessions',
+    /*
+     * Create persistent MySQL session store.
+     */
+    sessionStore =
+      new MySQLStore(
+        sessionStoreOptions
+      );
 
-  /*
-   * Automatically create the sessions table.
-   */
-  createDatabaseTable: true,
+    console.log('✅ Using MySQL session store');
 
-  /*
-   * Remove expired sessions periodically.
-   */
-  clearExpired: true,
-
-  /*
-   * Check every 15 minutes.
-   */
-  checkExpirationInterval:
-    1000 * 60 * 15,
-
-  /*
-   * Expire sessions after 8 hours.
-   */
-  expiration:
-    1000 * 60 * 60 * 8,
-
-  /*
-   * Keep connection alive.
-   */
-  keepAlive: true,
-
-  /*
-   * Aiven SSL.
-   */
-  ssl: {
-    rejectUnauthorized: false
+  } catch (err) {
+    console.warn('⚠️ MySQL session store failed, using memory:', err.message);
+    // Fall back to memory store
+    sessionStore = undefined;
   }
-};
-
-/*
- * Create persistent MySQL session store.
- */
-const sessionStore =
-  new MySQLStore(
-    sessionStoreOptions
-  );
+} else {
+  console.log('⚠️ Using memory session store (development only)');
+  // Use memory store by default (no persistent store)
+  sessionStore = undefined;
+}
 
 /*
  * Session middleware
@@ -218,6 +186,8 @@ app.use(
  * Make session user and flash messages
  * available to Handlebars.
  */
+console.log('🔧 Setting up flash and session locals...');
+
 app.use(
   (req, res, next) => {
     res.locals.success =
@@ -232,6 +202,8 @@ app.use(
     next();
   }
 );
+
+console.log('✅ Flash and session locals ready');
 
 /* ================================================================
    PASSPORT
@@ -581,6 +553,14 @@ hbs.registerHelper(
     args.slice(0, -1)
 );
 
+hbs.registerHelper(
+  'limit',
+  (arr, limit) => {
+    if (!Array.isArray(arr)) return arr;
+    return arr.slice(0, limit);
+  }
+);
+
 /* ================================================================
    HANDLEBARS PARTIALS
 ================================================================ */
@@ -759,20 +739,35 @@ const startServer =
          Database
       ------------------------------------------------------------ */
 
-      const dbReady =
-        await syncDB();
+      let dbReady = false;
 
-      if (!dbReady) {
-        console.warn(
-          '⚠️ Database sync reported issues.'
-        );
+      if (hasDatabaseUrl) {
+        try {
+          dbReady =
+            await syncDB();
 
-        console.warn(
-          '⚠️ Server will continue starting.'
-        );
+          if (!dbReady) {
+            console.warn(
+              '⚠️ Database sync reported issues.'
+            );
+
+            console.warn(
+              '⚠️ Server will continue starting.'
+            );
+          } else {
+            console.log(
+              '✅ Database ready'
+            );
+          }
+        } catch (dbError) {
+          console.warn(
+            '⚠️ Database error (continuing anyway):',
+            dbError.message
+          );
+        }
       } else {
         console.log(
-          '✅ Database ready'
+          '⚠️ Skipping database sync (no DATABASE_URL)'
         );
       }
 

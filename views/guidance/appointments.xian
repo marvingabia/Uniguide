@@ -7,7 +7,7 @@
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
 
-    <div class="nav-top">
+    <div class="nav-top" style="margin-left: 50px;">
 
       <div>
 
@@ -98,12 +98,12 @@
                     <td>
 
                       <div class="text-slate-800 text-sm font-medium">
-                        {{this.student.firstName}}
-                        {{this.student.lastName}}
+                        {{this.firstName}}
+                        {{this.lastName}}
                       </div>
 
                       <div class="text-slate-500 text-xs">
-                        {{this.student.email}}
+                        {{this.email}}
                       </div>
 
                     </td>
@@ -115,12 +115,20 @@
 
 
                     <td class="text-slate-500 text-xs">
-                      {{formatDate this.date}}
+                      {{#if this.assignedDate}}
+                        {{formatDate this.assignedDate}}
+                      {{else}}
+                        —
+                      {{/if}}
                     </td>
 
 
                     <td class="text-slate-500 text-xs">
-                      {{this.timeSlot}}
+                      {{#if this.assignedTime}}
+                        {{this.assignedTime}}
+                      {{else}}
+                        —
+                      {{/if}}
                     </td>
 
 
@@ -226,9 +234,9 @@
                                 font-size:.75rem;
                               "
                               data-id="{{this.id}}"
-                              data-date="{{this.date}}"
-                              data-time="{{this.timeSlot}}"
-                              data-student="{{this.student.firstName}} {{this.student.lastName}}"
+                              data-date="{{this.assignedDate}}"
+                              data-time="{{this.assignedTime}}"
+                              data-student="{{this.firstName}} {{this.lastName}}"
                               onclick="openRescheduleFromButton(this)"
                             >
                               ✏️ Edit
