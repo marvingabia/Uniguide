@@ -288,79 +288,58 @@ export const register = async (req, res) => {
 
 export const googleCallback = async (req, res) => {
   try {
+    console.log('');
+    console.log('======== GOOGLE CALLBACK HANDLER ========');
+    console.log('req.user:', req.user ? 'EXISTS' : 'NULL');
+    console.log('req.user?.email:', req.user?.email || '(NONE)');
+    console.log('req.authInfo:', req.authInfo || '(NONE)');
+    
     /*
-     * Passport already verified the user.
+     * Passport should have verified the user via the Google strategy.
      */
     if (!req.user) {
-      req.flash(
-        'error',
-        req.authInfo?.message ||
-          'Google sign-in failed.'
-      );
-
+      console.log('❌ req.user is NULL - authentication failed');
+      const errorMsg = req.authInfo?.message || 'Google sign-in failed.';
+      console.log('Error message:', errorMsg);
+      req.flash('error', errorMsg);
       return res.redirect('/login');
     }
 
-    console.log('');
-    console.log('========================================');
-    console.log('GOOGLE LOGIN SUCCESS');
-    console.log('========================================');
-    console.log('User:', req.user.email);
-    console.log('Role:', req.user.role);
+    console.log('✅ req.user found');
+    console.log('   Email:', req.user.email);
+    console.log('   Role:', req.user.role);
+    console.log('   ID:', req.user.id);
 
     /*
      * Create normal application session
      */
-    setSession(
-      req,
-      req.user
-    );
+    setSession(req, req.user);
 
-    console.log(
-      'Google session before save:',
-      req.session.user
-    );
+    console.log('✅ Session set in req.session.user');
+    console.log('   Session Email:', req.session.user?.email);
+    console.log('   Session Role:', req.session.user?.role);
 
     /*
      * Save session before redirect
      */
     req.session.save((err) => {
       if (err) {
-        console.error(
-          '❌ GOOGLE SESSION SAVE ERROR:',
-          err
-        );
-
-        req.flash(
-          'error',
-          'Unable to save Google login session. Please try again.'
-        );
-
+        console.error('❌ GOOGLE SESSION SAVE ERROR:', err.message);
+        req.flash('error', 'Unable to save session: ' + err.message);
         return res.redirect('/login');
       }
 
-      console.log(
-        '✅ GOOGLE SESSION SAVED:',
-        req.sessionID
-      );
+      console.log('✅ GOOGLE SESSION SAVED');
+      console.log('   SessionID:', req.sessionID);
+      console.log('   Redirecting as role:', req.user.role);
 
-      return redirectByRole(
-        res,
-        req.user.role
-      );
+      return redirectByRole(res, req.user.role);
     });
 
   } catch (err) {
-    console.error(
-      'GOOGLE LOGIN ERROR:',
-      err
-    );
-
-    req.flash(
-      'error',
-      'Google sign-in error. Please try again.'
-    );
-
+    console.error('❌ GOOGLE CALLBACK ERROR:', err.message);
+    console.error('   Stack:', err.stack);
+    req.flash('error', 'Google sign-in error: ' + err.message);
     return res.redirect('/login');
   }
 };
