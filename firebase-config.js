@@ -58,7 +58,9 @@ try {
     if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
       throw new Error(
         'Firebase credentials not configured. ' +
-        'Set FIREBASE_SERVICE_ACCOUNT or FIREBASE_SERVICE_ACCOUNT_PATH or individual env vars.'
+        'Set FIREBASE_SERVICE_ACCOUNT or FIREBASE_SERVICE_ACCOUNT_PATH or individual env vars.\n\n' +
+        'For Vercel deployment, run: node scripts/setup-vercel-env.js\n' +
+        'Then copy the FIREBASE_SERVICE_ACCOUNT value to Vercel environment variables.'
       );
     }
 
