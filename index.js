@@ -139,11 +139,11 @@ app.use(
       process.env.SESSION_SECRET ||
       'minsu-guidance-secret-change-this',
 
-    store: sessionStore,
+    store: sessionStore || undefined,
 
-    resave: true,
+    resave: false,
 
-    saveUninitialized: true,
+    saveUninitialized: false,
 
     rolling: true,
 
