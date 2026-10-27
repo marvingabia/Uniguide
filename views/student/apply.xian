@@ -1645,5 +1645,7 @@ document.addEventListener(
 
 </script>
 
+{{> pwa-install-banner}}
+
 </body>
 </html>

@@ -342,5 +342,7 @@
 })();
 </script>
 
+{{> pwa-install-banner}}
+
 </body>
 </html>

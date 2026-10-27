@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline — GuidanceConnect</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1b5e38 0%, #0f3d23 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .offline-container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .offline-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    h1 {
+      color: #1b5e38;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 10px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .offline-tips {
+      background: #f5f5f5;
+      border-left: 4px solid #1b5e38;
+      padding: 15px;
+      margin-top: 25px;
+      text-align: left;
+      border-radius: 4px;
+    }
+
+    .offline-tips h3 {
+      font-size: 13px;
+      color: #1b5e38;
+      margin-bottom: 8px;
+    }
+
+    .offline-tips ul {
+      list-style: none;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .offline-tips li {
+      margin: 5px 0;
+      padding-left: 15px;
+      position: relative;
+    }
+
+    .offline-tips li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #1b5e38;
+      font-weight: bold;
+    }
+
+    .retry-button {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 30px;
+      background: #1b5e38;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .retry-button:hover {
+      background: #0f3d23;
+    }
+
+    .retry-button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection.</p>
+    <p>Don't worry — you can still access cached pages that you've already visited.</p>
+
+    <div class="offline-tips">
+      <h3>What you can do:</h3>
+      <ul>
+        <li>Check your internet connection</li>
+        <li>Try reloading the page</li>
+        <li>Navigate to cached pages you've visited</li>
+      </ul>
+    </div>
+
+    <button class="retry-button" onclick="window.location.reload()">
+      Retry Connection
+    </button>
+  </div>
+
+  <script>
+    // Listen for when the connection is restored
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

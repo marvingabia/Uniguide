@@ -493,5 +493,7 @@
 
 </div>
 
+{{> pwa-install-banner}}
+
 </body>
 </html>
