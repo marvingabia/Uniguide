@@ -5,14 +5,24 @@ import { FirestoreAdapter } from '../models/firestore-adapter.js';
 console.log('🔐 Initializing Passport strategies...');
 
 // ALWAYS register a Google strategy
-const googleCallbackURL = process.env.GOOGLE_CALLBACK_URL || 
-                          (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/auth/google/callback` : 'http://localhost:3000/auth/google/callback');
+// Use VERCEL_URL (set by Vercel automatically) or fallback to env var or localhost
+let googleCallbackURL = process.env.GOOGLE_CALLBACK_URL;
+
+if (!googleCallbackURL) {
+  // Build from VERCEL_URL if available
+  if (process.env.VERCEL_URL) {
+    googleCallbackURL = `https://${process.env.VERCEL_URL}/auth/google/callback`;
+  } else {
+    // Local development
+    googleCallbackURL = 'http://localhost:3000/auth/google/callback';
+  }
+}
 
 console.log('🔍 Google OAuth Configuration:');
-console.log('   CLIENT_ID:', process.env.GOOGLE_CLIENT_ID?.substring(0, 20) + '...');
+console.log('   NODE_ENV:', process.env.NODE_ENV);
 console.log('   VERCEL_URL:', process.env.VERCEL_URL);
-console.log('   CALLBACK_URL env var:', process.env.GOOGLE_CALLBACK_URL || 'NOT SET');
-console.log('   FINAL CALLBACK URL:', googleCallbackURL);
+console.log('   GOOGLE_CALLBACK_URL env:', process.env.GOOGLE_CALLBACK_URL ? '(SET)' : '(NOT SET)');
+console.log('   FINAL CALLBACK_URL:', googleCallbackURL);
 
 passport.use(
   'google',
