@@ -139,7 +139,9 @@ app.use(
       process.env.SESSION_SECRET ||
       'minsu-guidance-secret-change-this',
 
-    store: sessionStore || undefined,
+    // For Vercel serverless: no persistent store needed
+    // Sessions will work within same request/response
+    // store: sessionStore || undefined,
 
     resave: false,
 
