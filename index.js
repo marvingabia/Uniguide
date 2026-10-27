@@ -141,9 +141,9 @@ app.use(
 
     store: sessionStore,
 
-    resave: false,
+    resave: true,
 
-    saveUninitialized: false,
+    saveUninitialized: true,
 
     rolling: true,
 
