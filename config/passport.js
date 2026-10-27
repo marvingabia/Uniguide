@@ -5,14 +5,22 @@ import { FirestoreAdapter } from '../models/firestore-adapter.js';
 console.log('🔐 Initializing Passport strategies...');
 
 // ALWAYS register a Google strategy
+const googleCallbackURL = process.env.GOOGLE_CALLBACK_URL || 
+                          (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/auth/google/callback` : 'http://localhost:3000/auth/google/callback');
+
+console.log('🔍 Google OAuth Configuration:');
+console.log('   CLIENT_ID:', process.env.GOOGLE_CLIENT_ID?.substring(0, 20) + '...');
+console.log('   VERCEL_URL:', process.env.VERCEL_URL);
+console.log('   CALLBACK_URL env var:', process.env.GOOGLE_CALLBACK_URL || 'NOT SET');
+console.log('   FINAL CALLBACK URL:', googleCallbackURL);
+
 passport.use(
   'google',
   new GoogleStrategy(
     {
       clientID:     process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:  process.env.GOOGLE_CALLBACK_URL || 
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/auth/google/callback` : 'http://localhost:3000/auth/google/callback')
+      callbackURL:  googleCallbackURL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
