@@ -260,90 +260,68 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 
 // Google OAuth callback
 app.get('/auth/google/callback', (req, res, next) => {
-  console.log('🔐 [CALLBACK START] Received request');
-  console.log('   URL:', req.originalUrl);
-  console.log('   Code:', req.query.code ? '✅ Present' : '❌ Missing');
+  console.log('🔐 [CALLBACK] Request received');
+  console.log('   Code:', req.query.code ? '✅' : '❌');
+  console.log('   State:', req.query.state ? '✅' : '❌');
   
-  // Set a timeout for the entire callback operation
-  const callbackTimeout = setTimeout(() => {
-    console.error('❌ Callback timeout (10s)');
-    res.status(504).json({ error: 'Callback processing timeout' });
-  }, 10000);
-  
-  // Manually call Passport authenticate with a custom callback
-  try {
-    passport.authenticate('google', { session: true }, async (err, user, info) => {
-      clearTimeout(callbackTimeout);
-      
-      try {
-        console.log('🔐 [PASSPORT CALLBACK] Executed');
-        console.log('   Error:', err ? err.message : 'none');
-        console.log('   User:', user ? user.email : 'null');
-        
-        if (err) {
-          console.error('❌ Passport error:', err.message);
-          return res.status(500).json({ 
-            error: 'Authentication error', 
-            details: err.message 
-          });
-        }
-        
-        if (!user) {
-          console.log('❌ No user from strategy, info:', info);
-          return res.status(401).json({ 
-            error: 'No user from strategy',
-            info: info?.message || 'Unknown'
-          });
-        }
-        
-        console.log('✅ User found/created:', user.email);
-        
-        // Manually log in
-        req.logIn(user, { session: true }, (loginErr) => {
-          if (loginErr) {
-            console.error('❌ Login error:', loginErr.message);
-            return res.status(500).json({ error: 'Login failed', details: loginErr.message });
-          }
-          
-          // Set session user
-          req.session.user = {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            role: user.role || 'student',
-            avatar: user.avatar || null
-          };
-          
-          // Save session
-          req.session.save((saveErr) => {
-            if (saveErr) {
-              console.error('❌ Session save error:', saveErr.message);
-              return res.status(500).json({ error: 'Session save failed' });
-            }
-            
-            console.log('✅ Session saved');
-            
-            // Redirect based on role
-            const role = user.role || 'student';
-            const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
-                               : role === 'cashier' ? '/cashier/dashboard'
-                               : '/student/dashboard';
-            
-            console.log('✅ Redirecting to:', redirectPath);
-            res.redirect(redirectPath);
-          });
-        });
-      } catch (handlerErr) {
-        console.error('❌ Callback handler error:', handlerErr.message);
-        res.status(500).json({ error: 'Handler error', details: handlerErr.message });
+  passport.authenticate('google', { session: true }, async (err, user, info) => {
+    console.log('🔐 [PASSPORT RESULT]');
+    console.log('   Error:', err ? `YES - ${err.message}` : 'NO');
+    console.log('   User:', user ? `YES - ${user.email}` : 'NO');
+    console.log('   Info:', info);
+    
+    if (err) {
+      console.error('❌ Google OAuth error:', err);
+      return res.status(401).json({ 
+        error: 'OAuth failed',
+        message: err.message,
+        type: err.name
+      });
+    }
+    
+    if (!user) {
+      console.log('❌ No user returned. Info:', info);
+      return res.status(401).json({ 
+        error: 'Authentication failed',
+        message: info?.message || 'Unknown error',
+        details: info
+      });
+    }
+    
+    // User exists, log them in
+    console.log('✅ User authenticated:', user.email);
+    
+    req.logIn(user, { session: true }, (loginErr) => {
+      if (loginErr) {
+        console.error('❌ Login error:', loginErr.message);
+        return res.status(500).json({ error: 'Login failed', message: loginErr.message });
       }
-    })(req, res, next);
-  } catch (outerErr) {
-    clearTimeout(callbackTimeout);
-    console.error('❌ Outer callback error:', outerErr.message);
-    res.status(500).json({ error: 'Outer error', details: outerErr.message });
-  }
+      
+      req.session.user = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role || 'student',
+        avatar: user.avatar || null
+      };
+      
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('❌ Session save error:', saveErr.message);
+          return res.status(500).json({ error: 'Session save failed' });
+        }
+        
+        const role = user.role || 'student';
+        const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
+                           : role === 'cashier' ? '/cashier/dashboard'
+                           : '/student/dashboard';
+        
+        console.log('✅ Redirecting to:', redirectPath);
+        res.redirect(redirectPath);
+      });
+    });
+  })(req, res, next);
 });
 
 app.get('/auth/logout', authController.logout);
