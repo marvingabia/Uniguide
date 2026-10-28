@@ -59,13 +59,13 @@ let sessionStore = null;
 try {
   if (hasFirebaseConfig) {
     sessionStore = new FirestoreSessionStore();
-    console.log('✅ Using Firestore session store (persistent)');
+    console.log('✅ Firestore session store ready');
   } else {
-    console.log('⚠️ Using memory session store (development only - sessions will be lost on restart)');
+    console.log('⚠️ Firebase not configured, using memory session store');
   }
 } catch (err) {
-  console.warn('⚠️ Firestore session store initialization warning:', err.message);
-  console.log('⚠️ Falling back to memory session store');
+  console.warn('⚠️ Firestore session store error, using memory:', err.message);
+  sessionStore = null;
 }
 
 /*

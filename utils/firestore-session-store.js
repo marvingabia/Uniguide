@@ -1,5 +1,5 @@
-import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, query, where, getDocs } from 'firebase/firestore';
-import { firebaseApp } from '../models/db.js';
+import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, query, where, getDocs } from 'firebase-admin/firestore';
+import firebaseApp from '../firebase-config.js';
 
 /**
  * Custom Firestore Session Store for Express
@@ -10,14 +10,26 @@ import { firebaseApp } from '../models/db.js';
 
 class FirestoreSessionStore {
   constructor() {
-    this.db = getFirestore(firebaseApp);
-    this.sessionsCollection = 'sessions';
+    try {
+      this.db = getFirestore(firebaseApp);
+      this.sessionsCollection = 'sessions';
+      console.log('✅ Firestore session store initialized');
+    } catch (err) {
+      console.error('❌ Firestore session store init error:', err.message);
+      this.db = null;
+    }
   }
 
   /**
    * Get session from Firestore
    */
   get(sid, callback) {
+    // Fallback if Firebase not initialized
+    if (!this.db) {
+      console.warn('⚠️ Firestore not initialized, returning null');
+      return callback(null, null);
+    }
+
     try {
       const sessionRef = doc(this.db, this.sessionsCollection, sid);
       
@@ -43,12 +55,12 @@ class FirestoreSessionStore {
           }
         })
         .catch((err) => {
-          console.error('❌ Firestore session GET error:', err);
-          callback(err);
+          console.error('❌ Firestore session GET error:', err.message);
+          callback(null, null); // Fallback gracefully
         });
     } catch (err) {
-      console.error('❌ Firestore session GET error:', err);
-      callback(err);
+      console.error('❌ Firestore session GET error:', err.message);
+      callback(null, null);
     }
   }
 
@@ -56,6 +68,12 @@ class FirestoreSessionStore {
    * Set session in Firestore
    */
   set(sid, sessionData, callback) {
+    // Fallback if Firebase not initialized
+    if (!this.db) {
+      console.warn('⚠️ Firestore not initialized, skipping session save');
+      return callback(null);
+    }
+
     try {
       const sessionRef = doc(this.db, this.sessionsCollection, sid);
       
@@ -77,12 +95,12 @@ class FirestoreSessionStore {
           callback(null);
         })
         .catch((err) => {
-          console.error('❌ Firestore session SET error:', err);
-          callback(err);
+          console.error('❌ Firestore session SET error:', err.message);
+          callback(null); // Fallback gracefully
         });
     } catch (err) {
-      console.error('❌ Firestore session SET error:', err);
-      callback(err);
+      console.error('❌ Firestore session SET error:', err.message);
+      callback(null);
     }
   }
 
