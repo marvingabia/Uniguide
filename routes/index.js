@@ -109,6 +109,8 @@ router.post('/guidance/application/:id/reject',             requireRole('guidanc
 router.post('/guidance/application/:id/claim',              requireRole('guidance'), guidance.markClaimed);
 router.get('/guidance/announcements/new',                   requireRole('guidance'), guidance.showAnnouncementForm);
 router.post('/guidance/announcements',                      requireRole('guidance'), guidance.createAnnouncement);
+router.get('/guidance/announcements/:id/edit',              requireRole('guidance'), guidance.editAnnouncement);
+router.post('/guidance/announcements/:id/edit',             requireRole('guidance'), guidance.updateAnnouncement);
 router.post('/guidance/announcements/:id/delete',           requireRole('guidance'), guidance.deleteAnnouncement);
 router.get('/guidance/users',                               requireRole('guidance'), guidance.manageUsers);
 router.post('/guidance/users',                              requireRole('guidance'), guidance.createStaffAccount);

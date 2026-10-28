@@ -444,21 +444,130 @@ export const createAnnouncement = async (req, res) => {
   }
 };
 
+/* =========================================================
+   EDIT ANNOUNCEMENT - Show Edit Form
+========================================================= */
+
+export const editAnnouncement = async (req, res) => {
+  try {
+    const announcement = await FirestoreAdapter.getAnnouncementById(req.params.id);
+    
+    if (!announcement) {
+      req.flash('error', 'Announcement not found.');
+      return res.redirect('/guidance');
+    }
+
+    // Check if user is the author
+    if (announcement.authorId !== req.session.user.id) {
+      req.flash('error', 'You can only edit your own announcements.');
+      return res.redirect('/guidance');
+    }
+
+    res.render('guidance/edit-announcement', {
+      title: 'Edit Announcement — UniGuide',
+      user: req.session.user,
+      announcement
+    });
+  } catch (error) {
+    console.error('Edit announcement error:', error.message);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect('/guidance');
+  }
+};
+
+/* =========================================================
+   UPDATE ANNOUNCEMENT
+========================================================= */
+
+export const updateAnnouncement = async (req, res) => {
+  try {
+    const { title, content, type, eventDate } = req.body;
+    const announcementId = req.params.id;
+
+    // Get the announcement first
+    const announcement = await FirestoreAdapter.getAnnouncementById(announcementId);
+    
+    if (!announcement) {
+      req.flash('error', 'Announcement not found.');
+      return res.redirect('/guidance');
+    }
+
+    // Check if user is the author
+    if (announcement.authorId !== req.session.user.id) {
+      req.flash('error', 'You can only edit your own announcements.');
+      return res.redirect('/guidance');
+    }
+
+    // Update announcement in Firestore
+    await FirestoreAdapter.updateAnnouncement(announcementId, {
+      title,
+      content,
+      type: type || 'general',
+      eventDate: eventDate || null,
+      updatedAt: new Date().toISOString()
+    });
+
+    // Send update notification to all students
+    try {
+      const allStudents = await FirestoreAdapter.getAllUsers({ role: 'student' });
+      
+      for (const student of allStudents) {
+        await FirestoreAdapter.createNotification({
+          userId: student.id,
+          type: 'info',
+          title: `📝 Updated Announcement: ${title}`,
+          message: `The announcement has been updated. ${content.substring(0, 100)}${content.length > 100 ? '...' : ''}`,
+          announcementId: announcementId,
+          isRead: false
+        });
+      }
+      
+      console.log(`📝 Announcement updated and ${allStudents.length} update notifications sent`);
+    } catch (notifErr) {
+      console.error('Error sending update notifications:', notifErr.message);
+    }
+
+    req.flash('success', 'Announcement updated and students have been notified.');
+    res.redirect('/guidance');
+  } catch (error) {
+    console.error('Update announcement error:', error.message);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect('/guidance');
+  }
+};;
+
 export const deleteAnnouncement = async (req, res) => {
   try {
-    if (Announcement) {
-      await Announcement.update({ isActive: false }, { where: { id: req.params.id } });
-      req.flash('success', 'Announcement removed.');
-    } else {
-      req.flash('warning', 'Test mode - Database disabled');
+    const announcementId = req.params.id;
+    
+    // Get the announcement first
+    const announcement = await FirestoreAdapter.getAnnouncementById(announcementId);
+    
+    if (!announcement) {
+      req.flash('error', 'Announcement not found.');
+      return res.redirect('/guidance');
     }
-    res.redirect('/guidance/Home');
+
+    // Check if user is the author
+    if (announcement.authorId !== req.session.user.id) {
+      req.flash('error', 'You can only delete your own announcements.');
+      return res.redirect('/guidance');
+    }
+
+    // Soft delete by marking as inactive
+    await FirestoreAdapter.updateAnnouncement(announcementId, {
+      isActive: false,
+      deletedAt: new Date().toISOString()
+    });
+
+    req.flash('success', 'Announcement deleted.');
+    res.redirect('/guidance');
   } catch (error) {
     console.error('Delete announcement error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
-    res.redirect('/guidance/Home');
+    res.redirect('/guidance');
   }
-};
+};;
 
 // User management
 export const manageUsers = async (req, res) => {

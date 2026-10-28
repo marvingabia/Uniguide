@@ -1,0 +1,198 @@
+{{> head}}
+
+<div class="app-main">
+
+  {{> sidebar-guidance activePage="announcements"}}
+
+
+  <div class="w-full min-h-screen overflow-y-auto bg-slate-100">
+
+    <!-- Top Navigation -->
+
+    <div class="nav-top" style="margin-left: 50px;">
+
+      <div>
+
+        <h1 class="text-base font-bold text-slate-800">
+          Edit Announcement
+        </h1>
+
+        <p class="text-slate-500 text-xs">
+          MinSU Bongabong Campus — Guidance Office
+        </p>
+
+      </div>
+
+
+      <div class="flex items-center gap-3">
+
+        <span class="text-teal-700 text-sm font-medium">
+          👤 {{user.firstName}} {{user.lastName}}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="px-5 py-5">
+
+      {{> flash}}
+
+
+      <div class="max-w-2xl">
+
+        <a href="/guidance" class="text-green-700 text-sm hover:underline mb-4 inline-block">
+          ← Back to Dashboard
+        </a>
+
+
+        <div class="card">
+
+          <h2 class="text-lg font-bold text-teal-700 mb-4">
+            📝 Edit Announcement
+          </h2>
+
+
+          <form method="POST" action="/guidance/announcements/{{announcement.id}}/edit">
+
+            <!-- Type -->
+
+            <div class="mb-4">
+
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Type <span class="text-red-500">*</span>
+              </label>
+
+              <div class="flex gap-4">
+
+                <label class="flex items-center gap-2 cursor-pointer">
+
+                  <input
+                    type="radio"
+                    name="type"
+                    value="general"
+                    {{#if (eq announcement.type "general")}}checked{{/if}}
+                    required
+                    class="rounded border-gray-300"
+                  />
+
+                  <span class="text-sm">📢 Announcement</span>
+
+                </label>
+
+
+                <label class="flex items-center gap-2 cursor-pointer">
+
+                  <input
+                    type="radio"
+                    name="type"
+                    value="event"
+                    {{#if (eq announcement.type "event")}}checked{{/if}}
+                    required
+                    class="rounded border-gray-300"
+                  />
+
+                  <span class="text-sm">🎉 Event</span>
+
+                </label>
+
+              </div>
+
+            </div>
+
+
+            <!-- Title -->
+
+            <div class="mb-4">
+
+              <label for="title" class="block text-sm font-medium text-slate-700 mb-2">
+                Title <span class="text-red-500">*</span>
+              </label>
+
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value="{{announcement.title}}"
+                placeholder="e.g. OCD Office Hour Change"
+                required
+                maxlength="200"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+
+            </div>
+
+
+            <!-- Content -->
+
+            <div class="mb-4">
+
+              <label for="content" class="block text-sm font-medium text-slate-700 mb-2">
+                Content <span class="text-red-500">*</span>
+              </label>
+
+              <textarea
+                id="content"
+                name="content"
+                placeholder="Write the full announcement or event details..."
+                required
+                rows="8"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-sans"
+              >{{announcement.content}}</textarea>
+
+            </div>
+
+
+            <!-- Event Date (optional) -->
+
+            <div class="mb-6">
+
+              <label for="eventDate" class="block text-sm font-medium text-slate-700 mb-2">
+                Event Date <span class="text-gray-500 text-xs">(if applicable)</span>
+              </label>
+
+              <input
+                type="datetime-local"
+                id="eventDate"
+                name="eventDate"
+                {{#if announcement.eventDate}}value="{{announcement.eventDate}}"{{/if}}
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+
+            </div>
+
+
+            <!-- Actions -->
+
+            <div class="flex gap-2">
+
+              <button
+                type="submit"
+                class="btn-green"
+              >
+                💾 Save Changes
+              </button>
+
+              <a href="/guidance" class="btn-outline">
+                Cancel
+              </a>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{{> pwa-install-banner}}
+
+</body>
+</html>

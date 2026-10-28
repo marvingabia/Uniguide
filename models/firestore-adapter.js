@@ -517,6 +517,32 @@ export class FirestoreAdapter {
     }
   }
 
+  static async getAnnouncementById(announcementId) {
+    try {
+      const doc = await db.collection('announcements').doc(announcementId).get();
+      if (doc.exists) {
+        return { id: doc.id, ...doc.data() };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting announcement:', error);
+      throw error;
+    }
+  }
+
+  static async updateAnnouncement(announcementId, updates) {
+    try {
+      await db.collection('announcements').doc(announcementId).update({
+        ...updates,
+        updatedAt: new Date().toISOString()
+      });
+      return { id: announcementId, ...updates };
+    } catch (error) {
+      console.error('Error updating announcement:', error);
+      throw error;
+    }
+  }
+
   static async getAllAnnouncements() {
     try {
       const snapshot = await db.collection('announcements')
