@@ -95,6 +95,32 @@ app.engine('xian', (filePath, options, callback) => {
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+// DEBUG: Log directory contents and path info
+app.get('/debug/paths', (req, res) => {
+  res.json({
+    __dirname,
+    publicDir: path.join(__dirname, '../public'),
+    cwd: process.cwd(),
+    files: fs.existsSync(path.join(__dirname, '../public')) 
+      ? fs.readdirSync(path.join(__dirname, '../public/uploads')).slice(0, 5)
+      : 'public not found'
+  });
+});
+
+// Direct file serving for debugging
+app.get('/uploads/:filename', (req, res) => {
+  const filePath = path.join(__dirname, '../public/uploads', req.params.filename);
+  const publicFilePath = path.join(__dirname, '../public/uploads', req.params.filename);
+  
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else if (fs.existsSync(publicFilePath)) {
+    res.sendFile(publicFilePath);
+  } else {
+    res.status(404).json({ error: 'File not found', tried: filePath });
+  }
+});
+
 // ================================================================
 // ROUTES
 // ================================================================
