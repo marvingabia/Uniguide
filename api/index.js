@@ -102,16 +102,27 @@ const publicDir = path.join(__dirname, '../public');
 // Serve uploads via dedicated endpoint
 app.get('/uploads/:filename', (req, res) => {
   const filePath = path.join(publicDir, 'uploads', req.params.filename);
+  const fileExists = fs.existsSync(filePath);
+  
+  // Return debug info
+  res.set('X-Debug-PublicDir', publicDir);
+  res.set('X-Debug-FilePath', filePath);
+  res.set('X-Debug-FileExists', fileExists ? 'yes' : 'no');
   
   // Security: prevent directory traversal
-  if (!filePath.startsWith(path.join(publicDir, 'uploads'))) {
-    return res.status(403).json({ error: 'Access denied' });
+  const uploadsBase = path.join(publicDir, 'uploads');
+  if (!filePath.startsWith(uploadsBase)) {
+    return res.status(403).json({ error: 'Access denied', path: filePath });
+  }
+  
+  if (!fileExists) {
+    return res.status(404).json({ error: 'File not found', file: req.params.filename, path: filePath, publicDir });
   }
   
   res.sendFile(filePath, (err) => {
     if (err) {
       console.error('Error sending file:', filePath, err.message);
-      res.status(404).json({ error: 'File not found' });
+      res.status(500).json({ error: 'Error sending file', message: err.message });
     }
   });
 });
