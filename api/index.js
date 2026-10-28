@@ -253,71 +253,57 @@ app.get('/health', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-// Google OAuth callback - with detailed error logging
-app.get('/auth/google/callback', (req, res, next) => {
-  console.log('🔍 CALLBACK REQUEST RECEIVED');
-  console.log('   Path:', req.path);
-  console.log('   Query:', req.query);
-  console.log('   Code:', req.query.code ? '✅ Present' : '❌ Missing');
-  console.log('   State:', req.query.state ? '✅ Present' : '❌ Missing');
-  
-  // Manually use Passport authenticate
-  passport.authenticate('google', { session: true }, (err, user, info) => {
-    console.log('🔐 PASSPORT AUTHENTICATE CALLBACK');
-    console.log('   Error:', err || 'none');
-    console.log('   User:', user ? user.email : 'null');
-    console.log('   Info:', info);
-    
-    if (err) {
-      console.error('❌ Passport error:', err);
-      return res.status(500).json({ error: 'Authentication error', details: err.message });
-    }
-    
-    if (!user) {
-      console.error('❌ No user returned from Passport');
-      return res.status(401).json({ error: 'Authentication failed', info: info?.message || 'No user' });
-    }
-    
-    // Manually establish session
-    req.logIn(user, (err) => {
-      if (err) {
-        console.error('❌ Login error:', err);
-        return res.status(500).json({ error: 'Login failed', details: err.message });
+
+// Google OAuth callback
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { 
+    session: true,
+    failureRedirect: '/login'
+  }),
+  async (req, res) => {
+    try {
+      console.log('✅ CALLBACK SUCCESS - User:', req.user?.email);
+      
+      // Ensure session user is set
+      if (req.user) {
+        req.session.user = {
+          id: req.user.id,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          email: req.user.email,
+          role: req.user.role || 'student',
+          avatar: req.user.avatar || null
+        };
+        
+        req.session.save((err) => {
+          if (err) {
+            console.error('❌ Session save error:', err);
+            return res.redirect('/login?error=session');
+          }
+          
+          // Redirect based on role
+          const role = req.user.role || 'student';
+          console.log('✅ Redirecting as role:', role);
+          
+          if (role === 'guidance') {
+            return res.redirect('/guidance/dashboard');
+          } else if (role === 'cashier') {
+            return res.redirect('/cashier/dashboard');
+          } else {
+            return res.redirect('/student/dashboard');
+          }
+        });
+      } else {
+        console.error('❌ req.user is null after authentication');
+        return res.redirect('/login?error=no_user');
       }
-      
-      console.log('✅ User logged in:', user.email);
-      
-      // Set custom session data
-      req.session.user = {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role || 'student',
-        avatar: user.avatar || null
-      };
-      
-      req.session.save((err) => {
-        if (err) {
-          console.error('❌ Session save error:', err);
-          return res.status(500).json({ error: 'Session save failed' });
-        }
-        
-        console.log('✅ Session saved, redirecting');
-        
-        // Redirect based on role
-        const role = user.role || 'student';
-        if (role === 'guidance') {
-          return res.redirect('/guidance/dashboard');
-        } else if (role === 'cashier') {
-          return res.redirect('/cashier/dashboard');
-        } else {
-          return res.redirect('/student/dashboard');
-        }
-      });
-    });
-  })(req, res, next);
-});
+    } catch (err) {
+      console.error('❌ Callback handler error:', err);
+      return res.redirect('/login?error=server');
+    }
+  }
+);
+
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
