@@ -90,36 +90,37 @@ app.engine('xian', (filePath, options, callback) => {
 });
 
 // ================================================================
-// STATIC FILES
+// STATIC FILES AND UPLOADS
 // ================================================================
 
-app.use(express.static(path.join(__dirname, '../public')));
-
-// DEBUG: Log directory contents and path info
-app.get('/debug/paths', (req, res) => {
-  res.json({
-    __dirname,
-    publicDir: path.join(__dirname, '../public'),
-    cwd: process.cwd(),
-    files: fs.existsSync(path.join(__dirname, '../public')) 
-      ? fs.readdirSync(path.join(__dirname, '../public/uploads')).slice(0, 5)
-      : 'public not found'
-  });
-});
-
-// Direct file serving for debugging
+// Direct file serving for uploads (must come before express.static)
 app.get('/uploads/:filename', (req, res) => {
   const filePath = path.join(__dirname, '../public/uploads', req.params.filename);
-  const publicFilePath = path.join(__dirname, '../public/uploads', req.params.filename);
   
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
-  } else if (fs.existsSync(publicFilePath)) {
-    res.sendFile(publicFilePath);
   } else {
-    res.status(404).json({ error: 'File not found', tried: filePath });
+    res.status(404).json({ error: 'File not found', file: req.params.filename });
   }
 });
+
+// DEBUG: Log directory contents and path info
+app.get('/debug/paths', (req, res) => {
+  const publicDir = path.join(__dirname, '../public');
+  res.json({
+    __dirname,
+    publicDir,
+    publicDirExists: fs.existsSync(publicDir),
+    uploadsDir: path.join(publicDir, 'uploads'),
+    uploadsDirExists: fs.existsSync(path.join(publicDir, 'uploads')),
+    cwd: process.cwd(),
+    files: fs.existsSync(path.join(publicDir, 'uploads')) 
+      ? fs.readdirSync(path.join(publicDir, 'uploads')).slice(0, 10)
+      : 'uploads not found'
+  });
+});
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 // ================================================================
 // ROUTES
