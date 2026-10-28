@@ -485,6 +485,138 @@
 
         {{/if}}
 
+
+        <!-- My Announcements -->
+
+        <div>
+
+          <div class="flex items-center justify-between mb-2">
+
+            <h2 class="font-semibold text-teal-700">
+              📢 My Announcements
+            </h2>
+
+            <a
+              href="/guidance/announcements/new"
+              class="text-green-700 text-xs hover:underline font-medium"
+            >
+              + Create New
+            </a>
+
+          </div>
+
+
+          {{#if announcements.length}}
+
+            <div class="card p-0 overflow-x-auto">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  {{#each announcements}}
+
+                    <tr>
+
+                      <td class="text-slate-700 text-sm font-medium">
+                        {{this.title}}
+                      </td>
+
+                      <td class="text-slate-500 text-xs">
+                        {{#if (eq this.type "general")}}
+                          <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Announcement</span>
+                        {{else}}
+                          <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">Event</span>
+                        {{/if}}
+                      </td>
+
+                      <td class="text-slate-500 text-xs">
+                        {{formatDate this.createdAt}}
+                      </td>
+
+                      <td class="text-slate-500 text-xs">
+                        {{#if this.isActive}}
+                          <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Active</span>
+                        {{else}}
+                          <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">Inactive</span>
+                        {{/if}}
+                      </td>
+
+                      <td>
+
+                        <div class="flex gap-1">
+
+                          <a
+                            href="/guidance/announcements/{{this.id}}/edit"
+                            class="btn-outline btn-sm text-blue-600 hover:bg-blue-50"
+                          >
+                            Edit
+                          </a>
+
+                          <form
+                            action="/guidance/announcements/{{this.id}}/delete"
+                            method="POST"
+                            style="display: inline;"
+                          >
+
+                            <button
+                              type="submit"
+                              class="btn-outline btn-sm text-red-600 hover:bg-red-50"
+                              onclick="return confirm('Delete this announcement?')"
+                            >
+                              Delete
+                            </button>
+
+                          </form>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  {{/each}}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          {{else}}
+
+            <div class="card text-center py-8">
+
+              <p class="text-gray-600 text-sm">
+                No announcements yet.
+              </p>
+
+              <a
+                href="/guidance/announcements/new"
+                class="text-green-700 text-xs hover:underline font-medium mt-2 inline-block"
+              >
+                Create one now
+              </a>
+
+            </div>
+
+          {{/if}}
+
+        </div>
+
       </div>
 
     </div>

@@ -56,8 +56,10 @@ export const dashboard = async (req, res) => {
 
     // Fetch announcements from Firestore
     try {
-      announcements = await FirestoreAdapter.getAllAnnouncements() || [];
-      console.log(`📢 Announcements: Found ${announcements.length} announcements`);
+      const allAnnouncements = await FirestoreAdapter.getAllAnnouncements() || [];
+      // Filter to only show current counselor's announcements
+      announcements = allAnnouncements.filter(a => a.authorId === req.session.user.id);
+      console.log(`📢 Dashboard: Found ${announcements.length} announcements by this counselor`);
     } catch (e) {
       console.error('Error fetching announcements from Firestore:', e.message);
     }
