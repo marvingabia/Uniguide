@@ -188,18 +188,6 @@
       </div>
 
 
-      <!-- Recent Applications -->
-      <div class="mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-base font-bold text-slate-800">📋 Your Recent Requests</h2>
-          <a href="/student/history" class="text-teal-700 hover:text-teal-800 text-xs font-semibold">View All →</a>
-        </div>
-        <div class="card text-center py-8">
-          <p class="text-gray-500 text-sm mb-3">Click "Track Request" in the sidebar to view your application status and history.</p>
-          <a href="/student/history" class="btn-green btn-sm">Track Request →</a>
-        </div>
-      </div>
-
     </div>
 
   </div>
