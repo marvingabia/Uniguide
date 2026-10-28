@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",
+      "src": "api/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
@@ -14,8 +14,7 @@
           "utils/**",
           "public/**",
           "views/**",
-          "seeders/**",
-          "migrations/**"
+          "firebase-config.js"
         ]
       }
     }
@@ -23,7 +22,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "index.js"
+      "dest": "api/index.js"
     }
   ]
 }
