@@ -235,7 +235,7 @@ app.get('/test', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login', session: false }), authController.googleCallback);
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), authController.googleCallback);
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
