@@ -97,33 +97,6 @@ app.get('/test', (req, res) => {
 // STATIC FILES AND UPLOADS
 // ================================================================
 
-// Direct file serving for uploads (must come before express.static)
-app.get('/uploads/:filename', (req, res) => {
-  const filePath = path.join(__dirname, '../public/uploads', req.params.filename);
-  
-  if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
-  } else {
-    res.status(404).json({ error: 'File not found', file: req.params.filename, path: filePath });
-  }
-});
-
-// DEBUG: Log directory contents and path info
-app.get('/debug/paths', (req, res) => {
-  const publicDir = path.join(__dirname, '../public');
-  res.json({
-    __dirname,
-    publicDir,
-    publicDirExists: fs.existsSync(publicDir),
-    uploadsDir: path.join(publicDir, 'uploads'),
-    uploadsDirExists: fs.existsSync(path.join(publicDir, 'uploads')),
-    cwd: process.cwd(),
-    files: fs.existsSync(path.join(publicDir, 'uploads')) 
-      ? fs.readdirSync(path.join(publicDir, 'uploads')).slice(0, 10)
-      : 'uploads not found'
-  });
-});
-
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ================================================================
