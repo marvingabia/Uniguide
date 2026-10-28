@@ -257,14 +257,7 @@ app.get('/test', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-app.get('/auth/google/callback', 
-  (req, res, next) => {
-    console.log('🔍 CALLBACK ROUTE HIT');
-    console.log('URL:', req.originalUrl);
-    console.log('Query code:', req.query.code ? '✅ Present' : '❌ Missing');
-    next();
-  },
-  passport.authenticate('google', { 
+app.get('/auth/google/callback', passport.authenticate('google', { 
     failureRedirect: '/login',
     failureMessage: true
   }), 
