@@ -63,7 +63,7 @@
       >
 
         <img
-          src="/uploads/ug-logo.png"
+          src="/api/file/ug-logo.png"
           alt="MinSU Logo"
           class="
             w-24

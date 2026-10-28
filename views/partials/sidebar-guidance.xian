@@ -39,7 +39,7 @@
     >
 
       <img
-        src="/uploads/ug-logo.png"
+        src="/api/file/ug-logo.png"
         alt="MinSU Logo"
         style="
           width:48px;

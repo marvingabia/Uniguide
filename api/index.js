@@ -99,8 +99,8 @@ app.get('/test', (req, res) => {
 
 const publicDir = path.join(__dirname, '../public');
 
-// Serve uploads via dedicated endpoint
-app.get('/uploads/:filename', (req, res) => {
+// Serve uploads via dedicated endpoint (using /api/file as path to avoid Vercel static file interception)
+app.get('/api/file/:filename', (req, res) => {
   const filePath = path.join(publicDir, 'uploads', req.params.filename);
   const fileExists = fs.existsSync(filePath);
   
