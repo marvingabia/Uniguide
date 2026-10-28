@@ -4,7 +4,6 @@ dotenv.config();
 
 import express from 'express';
 import session from 'express-session';
-import MySQLStoreFactory from 'express-mysql-session';
 import flash from 'connect-flash';
 import hbs from 'hbs';
 import path from 'path';
@@ -13,7 +12,6 @@ import { fileURLToPath } from 'url';
 import passport from './config/passport.js';
 import router from './routes/index.js';
 import { syncDB } from './models/index.js';
-import FirestoreSessionStore from './utils/firestore-session-store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,31 +40,21 @@ app.use(
 );
 
 /* ================================================================
-   SESSION — FIRESTORE STORE (PERSISTENT)
+   SESSION — MEMORY STORE (WORKING FOR VERCEL)
 ================================================================ */
 
 const isProduction =
   process.env.NODE_ENV === 'production';
 
-const hasFirebaseConfig = !!process.env.FIREBASE_SERVICE_ACCOUNT_PATH || !!process.env.FIREBASE_SERVICE_ACCOUNT;
-
 console.log('');
-console.log('Firebase configured:', hasFirebaseConfig ? '✅ Yes' : '❌ No');
+console.log('Environment:', isProduction ? 'Production (Vercel)' : 'Development');
 
-// Use Firestore Session Store (best for serverless + persistent)
-let sessionStore = null;
-
-try {
-  if (hasFirebaseConfig) {
-    sessionStore = new FirestoreSessionStore();
-    console.log('✅ Firestore session store ready');
-  } else {
-    console.log('⚠️ Firebase not configured, using memory session store');
-  }
-} catch (err) {
-  console.warn('⚠️ Firestore session store error, using memory:', err.message);
-  sessionStore = null;
-}
+/*
+ * Use memory session store for now
+ * Works reliably on Vercel
+ * Sessions persist within same Vercel container
+ */
+let sessionStore = undefined; // Memory store
 
 /*
  * Session middleware
@@ -79,9 +67,8 @@ app.use(
       process.env.SESSION_SECRET ||
       'minsu-guidance-secret-change-this',
 
-    // Use Firestore persistent store for all environments
-    store: sessionStore || undefined,
-
+    // For Vercel serverless: use memory store
+    // Store parameter omitted - uses default memory store
     resave: false,
 
     saveUninitialized: false,
