@@ -279,16 +279,29 @@ app.get('/auth/google/callback', async (req, res) => {
 // API endpoint for frontend to complete OAuth
 app.post('/api/auth/google/complete', async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, refreshToken, accessToken, expiresIn } = req.body;
     
     if (!idToken) {
       return res.status(400).json({ error: 'No ID token' });
     }
     
-    console.log('✅ Received ID token from frontend');
+    console.log('✅ Received tokens from frontend');
+    console.log('   ID Token (truncated):', idToken.substring(0, 20) + '...');
+    console.log('   Expires in:', expiresIn, 'seconds');
     
-    // Frontend verified the token with Firebase SDK
-    // Backend just creates/updates user session
+    // For now, just store tokens in session for refresh later
+    // Frontend already verified the token with Google SDK
+    if (req.session) {
+      req.session.googleTokens = {
+        idToken,
+        accessToken: accessToken || null,
+        refreshToken: refreshToken || null,
+        expiresAt: Date.now() + (expiresIn * 1000) || Date.now() + (3600 * 1000) // Default 1 hour
+      };
+      
+      console.log('✅ Tokens stored in session');
+      console.log('   Token expires at:', new Date(req.session.googleTokens.expiresAt).toISOString());
+    }
     
     res.json({ 
       success: true, 
@@ -297,6 +310,65 @@ app.post('/api/auth/google/complete', async (req, res) => {
     });
   } catch (err) {
     console.error('❌ Token error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// API endpoint to check token status and refresh if needed
+app.get('/api/auth/token-status', (req, res) => {
+  try {
+    if (!req.session?.googleTokens) {
+      return res.json({ 
+        valid: false, 
+        message: 'No tokens in session' 
+      });
+    }
+    
+    const { expiresAt } = req.session.googleTokens;
+    const now = Date.now();
+    const timeRemaining = expiresAt - now;
+    const isExpired = timeRemaining <= 0;
+    const isExpiringSoon = timeRemaining < (5 * 60 * 1000); // Less than 5 minutes
+    
+    console.log('✅ Token status check');
+    console.log('   Expires at:', new Date(expiresAt).toISOString());
+    console.log('   Time remaining:', Math.floor(timeRemaining / 1000), 'seconds');
+    console.log('   Is expired:', isExpired);
+    console.log('   Expiring soon:', isExpiringSoon);
+    
+    res.json({ 
+      valid: !isExpired,
+      isExpiringSoon,
+      expiresIn: Math.floor(timeRemaining / 1000),
+      message: isExpired ? 'Token expired' : 'Token valid'
+    });
+  } catch (err) {
+    console.error('❌ Token status error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// API endpoint to refresh token (frontend must re-authenticate)
+app.post('/api/auth/refresh-token', (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken) {
+      return res.status(400).json({ error: 'No refresh token provided' });
+    }
+    
+    console.log('✅ Token refresh requested');
+    console.log('   Note: Actual refresh must be done by frontend with Google SDK');
+    
+    // In practice, the frontend should refresh directly with Google SDK
+    // This endpoint just acknowledges the request
+    res.json({ 
+      success: true,
+      message: 'Frontend should refresh token with Google SDK',
+      instruction: 'Call gapi.auth2 or Google Identity Services to refresh'
+    });
+  } catch (err) {
+    console.error('❌ Refresh error:', err);
     res.status(500).json({ error: err.message });
   }
 });
