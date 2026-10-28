@@ -261,14 +261,59 @@ app.get('/auth/google/callback',
   (req, res, next) => {
     console.log('🔍 CALLBACK ROUTE HIT');
     console.log('URL:', req.originalUrl);
-    console.log('Query:', req.query);
+    console.log('Query code:', req.query.code ? '✅ Present' : '❌ Missing');
     next();
   },
   passport.authenticate('google', { 
     failureRedirect: '/login',
     failureMessage: true
   }), 
-  authController.googleCallback
+  async (req, res) => {
+    try {
+      console.log('✅ PASSPORT AUTHENTICATED');
+      console.log('req.user:', req.user ? `${req.user.email}` : 'NULL');
+      
+      // Manually set session since Vercel serverless is finicky
+      if (req.user) {
+        req.session.user = {
+          id: req.user.id,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          email: req.user.email,
+          role: req.user.role || 'student',
+          avatar: req.user.avatar || null
+        };
+
+        console.log('✅ Session set:', req.session.user.email);
+
+        // Save session
+        req.session.save((err) => {
+          if (err) {
+            console.error('❌ Session save error:', err);
+            return res.redirect('/login');
+          }
+
+          console.log('✅ Session saved');
+          
+          // Redirect based on role
+          const role = req.user.role || 'student';
+          if (role === 'guidance') {
+            return res.redirect('/guidance/dashboard');
+          } else if (role === 'cashier') {
+            return res.redirect('/cashier/dashboard');
+          } else {
+            return res.redirect('/student/dashboard');
+          }
+        });
+      } else {
+        console.log('❌ No user in req.user');
+        return res.redirect('/login');
+      }
+    } catch (err) {
+      console.error('❌ Callback error:', err);
+      return res.redirect('/login');
+    }
+  }
 );
 app.get('/auth/logout', authController.logout);
 
