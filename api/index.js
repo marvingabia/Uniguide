@@ -481,7 +481,9 @@ app.use((err, req, res, next) => {
 // EXPORT FOR VERCEL SERVERLESS
 // ================================================================
 
-// Vercel expects a default export that is either:
-// 1. An Express app
-// 2. A handler function
-export default app;
+// Vercel serverless expects a handler function that receives (req, res)
+// We export the Express app wrapped as a handler
+export default (req, res) => {
+  // For Vercel serverless, we need to ensure the Express app handles the request
+  return app(req, res);
+};
