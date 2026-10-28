@@ -10,8 +10,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { FirestoreAdapter } from './models/firestore-adapter.js';
-import * as authController from './controllers/authController.js';
+import { FirestoreAdapter } from '../models/firestore-adapter.js';
+import * as authController from '../controllers/authController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
