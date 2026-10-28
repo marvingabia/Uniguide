@@ -10,96 +10,83 @@ dotenv.config();
  * Firebase Admin SDK initialization
  * 
  * This connects the Node.js app to Firebase Firestore
- * 
- * Environment variables required:
- * - FIREBASE_PROJECT_ID
- * - FIREBASE_PRIVATE_KEY_ID
- * - FIREBASE_PRIVATE_KEY
- * - FIREBASE_CLIENT_EMAIL
- * - FIREBASE_CLIENT_ID
- * - FIREBASE_AUTH_URI
- * - FIREBASE_TOKEN_URI
- * - FIREBASE_AUTH_PROVIDER_X509_CERT_URL
- * - FIREBASE_CLIENT_X509_CERT_URL
- * 
- * Or load from service account JSON file:
- * - FIREBASE_SERVICE_ACCOUNT_PATH (path to JSON file)
+ * Loads credentials from FIREBASE_SERVICE_ACCOUNT (JSON string) or individual env vars
  */
 
 let firebaseApp;
+let db = null;
 
 try {
-  // Option 1: Load from environment variable string (Vercel production - PRIORITY)
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   
-  // Option 2: Load from JSON file (local development only if FIREBASE_SERVICE_ACCOUNT not set)
-  const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
-  
-  let serviceAccount;
+  let serviceAccount = null;
 
-  if (serviceAccountJson && !serviceAccountJson.includes('./') && !serviceAccountJson.includes('firebase-key')) {
-    // Vercel: Read from stringified JSON in env variable (make sure it's actual JSON, not a file path)
-    console.log('🔐 Loading Firebase credentials from FIREBASE_SERVICE_ACCOUNT env variable');
+  // Try parsing JSON string from env (Vercel)
+  if (serviceAccountJson && serviceAccountJson.startsWith('{')) {
     try {
+      console.log('🔐 Parsing FIREBASE_SERVICE_ACCOUNT from env variable');
       serviceAccount = JSON.parse(serviceAccountJson);
-    } catch (e) {
-      console.warn('⚠️ FIREBASE_SERVICE_ACCOUNT appears to be a file path, not JSON. Ignoring and trying fallback.');
-      serviceAccount = null;
+    } catch (parseErr) {
+      console.warn('⚠️ Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:', parseErr.message);
     }
   }
-  
-  if (!serviceAccount && serviceAccountPath && !process.env.VERCEL) {
-    // Local only: Read from JSON file (NOT on Vercel)
-    console.log('📁 Loading Firebase service account from:', serviceAccountPath);
-    const filePath = path.resolve(serviceAccountPath);
-    const serviceAccountContent = fs.readFileSync(filePath, 'utf8');
-    serviceAccount = JSON.parse(serviceAccountContent);
-  }
-  
+
+  // If no JSON string, try loading from file (local development only)
   if (!serviceAccount) {
-    // Fallback: Try to construct from individual env variables
-    console.log('🔐 Loading Firebase credentials from individual environment variables');
-    
+    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+    if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
+      console.log('📁 Loading Firebase from file:', serviceAccountPath);
+      const content = fs.readFileSync(serviceAccountPath, 'utf8');
+      serviceAccount = JSON.parse(content);
+    }
+  }
+
+  // If still no credentials, try individual env variables
+  if (!serviceAccount && process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL) {
+    console.log('🔐 Building serviceAccount from individual env variables');
     const privateKey = process.env.FIREBASE_PRIVATE_KEY
       ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
       : undefined;
 
-    if (!privateKey || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PROJECT_ID) {
-      throw new Error(
-        'Firebase credentials not configured. ' +
-        'Set FIREBASE_SERVICE_ACCOUNT (as complete JSON string) or individual env vars.\n\n' +
-        'For Vercel deployment: Set FIREBASE_SERVICE_ACCOUNT with the full JSON credentials.\n' +
-        'Do NOT set FIREBASE_SERVICE_ACCOUNT_PATH on Vercel - it will not work.'
-      );
+    if (privateKey) {
+      serviceAccount = {
+        type: 'service_account',
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+        private_key: privateKey,
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+        client_id: process.env.FIREBASE_CLIENT_ID,
+        auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+        token_uri: 'https://oauth2.googleapis.com/token',
+        auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+        client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
+      };
     }
-
-    serviceAccount = {
-      type: 'service_account',
-      project_id: process.env.FIREBASE_PROJECT_ID,
-      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: privateKey,
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      client_id: process.env.FIREBASE_CLIENT_ID,
-      auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-      token_uri: 'https://oauth2.googleapis.com/token',
-      auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-      client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
-    };
   }
 
-  firebaseApp = admin.initializeApp({
-    credential: admin.cert(serviceAccount),
-    projectId: serviceAccount.project_id
-  });
-
-  console.log('✅ Firebase Admin SDK initialized');
-  console.log('🔥 Project ID:', process.env.FIREBASE_PROJECT_ID);
+  // Initialize Firebase if credentials are available
+  if (serviceAccount && serviceAccount.project_id) {
+    firebaseApp = admin.initializeApp({
+      credential: admin.cert(serviceAccount),
+      projectId: serviceAccount.project_id
+    });
+    db = getFirestore(firebaseApp);
+    console.log('✅ Firebase Admin SDK initialized');
+    console.log('🔥 Project ID:', serviceAccount.project_id);
+  } else {
+    console.warn('⚠️ Firebase credentials not fully configured');
+    console.warn('   Available env vars:');
+    console.warn('   - FIREBASE_SERVICE_ACCOUNT:', !!process.env.FIREBASE_SERVICE_ACCOUNT);
+    console.warn('   - FIREBASE_SERVICE_ACCOUNT_PATH:', !!process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
+    console.warn('   - FIREBASE_PROJECT_ID:', !!process.env.FIREBASE_PROJECT_ID);
+    console.warn('   - FIREBASE_CLIENT_EMAIL:', !!process.env.FIREBASE_CLIENT_EMAIL);
+    console.warn('   Firebase will NOT be available - app may fail on protected routes');
+  }
 
 } catch (error) {
-  console.error('❌ Firebase initialization failed:');
-  console.error(error.message);
-  process.exit(1);
+  console.error('❌ Firebase initialization error:', error.message);
+  console.warn('⚠️ Continuing without Firebase - app may fail on protected routes');
 }
 
-export const db = getFirestore(firebaseApp);
+export const db_instance = db;
 export default firebaseApp;
