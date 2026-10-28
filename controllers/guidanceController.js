@@ -373,7 +373,10 @@ export const showAnnouncementForm = async (req, res) => {
     let announcements = [];
     
     try {
-      announcements = await FirestoreAdapter.getAllAnnouncements();
+      const allAnnouncements = await FirestoreAdapter.getAllAnnouncements();
+      // Filter to only show current counselor's announcements
+      announcements = allAnnouncements.filter(a => a.authorId === req.session.user.id);
+      console.log(`📢 Show form: Found ${announcements.length} announcements by this counselor`);
     } catch (e) {
       console.error('Error fetching announcements:', e.message);
     }

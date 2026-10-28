@@ -20,7 +20,7 @@
             <label class="label">Type</label>
             <div class="flex gap-4 mt-1">
               <label class="flex items-center gap-2 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600">
-                <input type="radio" name="type" value="announcement" class="accent-green-500" checked>
+                <input type="radio" name="type" value="general" class="accent-green-500" checked>
                 <span class="text-slate-700 text-sm">📣 Announcement</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer p-3 border border-slate-200 rounded-lg hover:border-green-600">
@@ -67,11 +67,16 @@
                 <p class="text-blue-600 text-xs mt-2">📅 Event Date: {{formatDate this.eventDate}}</p>
                 {{/if}}
               </div>
-              <form action="/guidance/announcements/{{this.id}}/delete" method="POST">
-                <button type="submit" class="text-red-500 hover:text-red-400 text-xs px-3 py-1 rounded border border-red-500 hover:bg-red-500/10" onclick="return confirm('Remove this announcement?')">
-                  ✕ Remove
-                </button>
-              </form>
+              <div class="flex gap-1 flex-shrink-0">
+                <a href="/guidance/announcements/{{this.id}}/edit" class="text-blue-500 hover:text-blue-400 text-xs px-3 py-1 rounded border border-blue-500 hover:bg-blue-500/10">
+                  ✏️ Edit
+                </a>
+                <form action="/guidance/announcements/{{this.id}}/delete" method="POST" style="display:inline;">
+                  <button type="submit" class="text-red-500 hover:text-red-400 text-xs px-3 py-1 rounded border border-red-500 hover:bg-red-500/10" onclick="return confirm('Remove this announcement?')">
+                    ✕ Remove
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
           {{/if}}
