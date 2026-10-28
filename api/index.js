@@ -98,16 +98,23 @@ app.get('/test', (req, res) => {
 // ================================================================
 
 const publicDir = path.join(__dirname, '../public');
-console.log('Static file path configured:', publicDir, 'Exists:', fs.existsSync(publicDir));
 
-if (fs.existsSync(publicDir)) {
-  const uploadsDir = path.join(publicDir, 'uploads');
-  console.log('Uploads dir:', uploadsDir, 'Exists:', fs.existsSync(uploadsDir));
-  if (fs.existsSync(uploadsDir)) {
-    const files = fs.readdirSync(uploadsDir);
-    console.log('Files in uploads:', files.slice(0, 5));
+// Serve uploads via dedicated endpoint
+app.get('/uploads/:filename', (req, res) => {
+  const filePath = path.join(publicDir, 'uploads', req.params.filename);
+  
+  // Security: prevent directory traversal
+  if (!filePath.startsWith(path.join(publicDir, 'uploads'))) {
+    return res.status(403).json({ error: 'Access denied' });
   }
-}
+  
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('Error sending file:', filePath, err.message);
+      res.status(404).json({ error: 'File not found' });
+    }
+  });
+});
 
 app.use(express.static(publicDir));
 
