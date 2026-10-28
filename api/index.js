@@ -137,8 +137,15 @@ console.log('PASSPORT CONFIGURATION');
 console.log('========================================');
 console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ SET' : '❌ NOT SET');
 console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '✅ SET' : '❌ NOT SET');
-console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || 'NOT SET - USING DEFAULT: /auth/google/callback');
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || '❌ NOT SET - USING DEFAULT: /auth/google/callback');
 console.log('========================================');
+
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  console.error('❌ CRITICAL: Google OAuth credentials missing!');
+  console.error('   Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to Vercel environment variables');
+} else {
+  console.log('✅ Google OAuth credentials found');
+}
 
 passport.use(
   new GoogleStrategy(
