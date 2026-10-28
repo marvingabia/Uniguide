@@ -8,20 +8,14 @@
         "includeFiles": [
           "public/**",
           "views/**",
-          "firebase-config.js"
+          "firebase-config.js",
+          "models/**",
+          "config/**"
         ]
       }
     }
   ],
   "routes": [
-    {
-      "src": "/uploads/(.*)",
-      "dest": "public/uploads/$1"
-    },
-    {
-      "src": "/public/(.*)",
-      "dest": "public/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "api/index.js"
