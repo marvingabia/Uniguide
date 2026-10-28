@@ -547,19 +547,22 @@ export class FirestoreAdapter {
     try {
       const snapshot = await db.collection('announcements')
         .where('isActive', '==', true)
-        .orderBy('createdAt', 'desc')
         .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Sort manually in JavaScript instead of relying on Firestore index
+      const announcements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      announcements.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB - dateA; // Descending order (newest first)
+      });
+      
+      return announcements;
     } catch (error) {
       console.error('Error getting announcements:', error);
       throw error;
     }
   }
-
-  /**
-   * TIME SLOTS COLLECTION
-   */
 
   static async createTimeSlot(slotData) {
     try {
