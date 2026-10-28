@@ -132,6 +132,14 @@ app.engine('xian', (filePath, options, callback) => {
 // PASSPORT CONFIGURATION
 // ================================================================
 
+console.log('========================================');
+console.log('PASSPORT CONFIGURATION');
+console.log('========================================');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ SET' : '❌ NOT SET');
+console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '✅ SET' : '❌ NOT SET');
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL || 'NOT SET - USING DEFAULT: /auth/google/callback');
+console.log('========================================');
+
 passport.use(
   new GoogleStrategy(
     {
@@ -140,6 +148,8 @@ passport.use(
       callbackURL: process.env.GOOGLE_CALLBACK_URL || '/auth/google/callback'
     },
     async (accessToken, refreshToken, profile, done) => {
+      console.log('🔐 GOOGLE STRATEGY EXECUTING');
+      console.log('Email:', profile.emails?.[0]?.value);
       try {
         const email = profile.emails?.[0]?.value;
         if (!email) {
@@ -160,9 +170,10 @@ passport.use(
           });
         }
 
+        console.log('✅ User found/created:', email);
         return done(null, user);
       } catch (err) {
-        console.error('Google strategy error:', err);
+        console.error('❌ Google strategy error:', err);
         return done(err);
       }
     }
@@ -235,7 +246,16 @@ app.get('/test', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), authController.googleCallback);
+app.get('/auth/google/callback', 
+  (req, res, next) => {
+    console.log('🔍 CALLBACK ROUTE HIT');
+    console.log('URL:', req.originalUrl);
+    console.log('Query:', req.query);
+    next();
+  },
+  passport.authenticate('google', { failureRedirect: '/login' }), 
+  authController.googleCallback
+);
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
