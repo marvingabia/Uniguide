@@ -246,6 +246,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.get('/auth-test', (req, res) => {
+  res.json({ message: 'Auth test endpoint works', timestamp: new Date().toISOString(), path: req.path });
+});
+
 // ================================================================
 // AUTH ROUTES
 // ================================================================
