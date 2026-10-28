@@ -49,6 +49,18 @@ router.get('/auth/google',
 
 console.log('✅ Registered /auth/google');
 
+// Debug endpoint to see what Vercel URL we're on
+router.get('/auth/debug/vercel-url', (req, res) => {
+  res.json({
+    vercelUrl: process.env.VERCEL_URL || 'NOT SET',
+    nodeEnv: process.env.NODE_ENV,
+    requestUrl: req.originalUrl,
+    requestHost: req.get('host'),
+    protocol: req.protocol,
+    expectedCallbackUrl: `https://${process.env.VERCEL_URL || 'unknown'}/auth/google/callback`
+  });
+});
+
 router.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', failureFlash: true, session: false }),
   auth.googleCallback
