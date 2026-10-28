@@ -89,6 +89,10 @@ app.engine('xian', (filePath, options, callback) => {
   }
 });
 
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test endpoint works', time: new Date().toISOString() });
+});
+
 // ================================================================
 // STATIC FILES AND UPLOADS
 // ================================================================
@@ -100,7 +104,7 @@ app.get('/uploads/:filename', (req, res) => {
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
   } else {
-    res.status(404).json({ error: 'File not found', file: req.params.filename });
+    res.status(404).json({ error: 'File not found', file: req.params.filename, path: filePath });
   }
 });
 
