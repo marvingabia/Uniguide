@@ -97,7 +97,19 @@ app.get('/test', (req, res) => {
 // STATIC FILES AND UPLOADS
 // ================================================================
 
-app.use(express.static(path.join(__dirname, '../public')));
+const publicDir = path.join(__dirname, '../public');
+console.log('Static file path configured:', publicDir, 'Exists:', fs.existsSync(publicDir));
+
+if (fs.existsSync(publicDir)) {
+  const uploadsDir = path.join(publicDir, 'uploads');
+  console.log('Uploads dir:', uploadsDir, 'Exists:', fs.existsSync(uploadsDir));
+  if (fs.existsSync(uploadsDir)) {
+    const files = fs.readdirSync(uploadsDir);
+    console.log('Files in uploads:', files.slice(0, 5));
+  }
+}
+
+app.use(express.static(publicDir));
 
 // ================================================================
 // ROUTES
