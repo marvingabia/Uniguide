@@ -2,8 +2,20 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/node"
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "public/**",
+          "views/**",
+          "firebase-config.js",
+          "config/**",
+          "controllers/**",
+          "models/**",
+          "middleware/**",
+          "utils/**"
+        ]
+      }
     }
   ],
   "routes": [
@@ -11,8 +23,5 @@
       "src": "/(.*)",
       "dest": "api/index.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
