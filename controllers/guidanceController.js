@@ -440,12 +440,22 @@ export const createAnnouncement = async (req, res) => {
       // Don't fail the announcement creation if notifications fail
     }
 
-    req.flash('success', 'Announcement posted and notifications sent to all students.');
-    res.redirect('/guidance/announcements/new');
+    // Return JSON response for AJAX
+    res.json({
+      success: true,
+      announcement: {
+        id: announcement.id,
+        title,
+        content,
+        type: type || 'general',
+        eventDate: eventDate || null,
+        isActive: true,
+        createdAt: new Date().toISOString()
+      }
+    });
   } catch (error) {
     console.error('Create announcement error:', error.message);
-    req.flash('error', 'An error occurred. Please try again.');
-    res.redirect('/guidance/announcements/new');
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
