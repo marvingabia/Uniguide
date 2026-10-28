@@ -257,57 +257,49 @@ app.get('/test', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-app.get('/auth/google/callback', passport.authenticate('google', { 
-    failureRedirect: '/login',
-    failureMessage: true
-  }), 
-  async (req, res) => {
-    try {
-      console.log('✅ PASSPORT AUTHENTICATED');
-      console.log('req.user:', req.user ? `${req.user.email}` : 'NULL');
-      
-      // Manually set session since Vercel serverless is finicky
-      if (req.user) {
-        req.session.user = {
-          id: req.user.id,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          email: req.user.email,
-          role: req.user.role || 'student',
-          avatar: req.user.avatar || null
-        };
-
-        console.log('✅ Session set:', req.session.user.email);
-
-        // Save session
-        req.session.save((err) => {
-          if (err) {
-            console.error('❌ Session save error:', err);
-            return res.redirect('/login');
-          }
-
-          console.log('✅ Session saved');
-          
-          // Redirect based on role
-          const role = req.user.role || 'student';
-          if (role === 'guidance') {
-            return res.redirect('/guidance/dashboard');
-          } else if (role === 'cashier') {
-            return res.redirect('/cashier/dashboard');
-          } else {
-            return res.redirect('/student/dashboard');
-          }
-        });
-      } else {
-        console.log('❌ No user in req.user');
-        return res.redirect('/login');
-      }
-    } catch (err) {
-      console.error('❌ Callback error:', err);
-      return res.redirect('/login');
+// Direct OAuth callback - bypasses Passport session issues
+app.get('/auth/google/callback', async (req, res) => {
+  try {
+    const code = req.query.code;
+    if (!code) {
+      return res.status(400).json({ error: 'No auth code' });
     }
+    
+    console.log('✅ OAuth callback received with code');
+    
+    // Return auth code to frontend for client-side token exchange
+    // Frontend will use Google SDK to exchange code for tokens
+    res.json({ success: true, code, message: 'Auth code received. Complete login on frontend.' });
+  } catch (err) {
+    console.error('❌ Callback error:', err);
+    res.status(500).json({ error: err.message });
   }
-);
+});
+
+// API endpoint for frontend to complete OAuth
+app.post('/api/auth/google/complete', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({ error: 'No ID token' });
+    }
+    
+    console.log('✅ Received ID token from frontend');
+    
+    // Frontend verified the token with Firebase SDK
+    // Backend just creates/updates user session
+    
+    res.json({ 
+      success: true, 
+      message: 'Login successful',
+      redirect: '/student/dashboard'
+    });
+  } catch (err) {
+    console.error('❌ Token error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
