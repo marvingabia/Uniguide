@@ -88,5 +88,4 @@ try {
   console.warn('⚠️ Continuing without Firebase - app may fail on protected routes');
 }
 
-export const db = db_instance;
-export default firebaseApp;
+export { db, firebaseApp as default };
