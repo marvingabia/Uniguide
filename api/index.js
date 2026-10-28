@@ -259,7 +259,8 @@ app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 app.get('/auth/google/callback', passport.authenticate('google', { 
     failureRedirect: '/login',
-    failureMessage: true
+    failureMessage: true,
+    session: true
   }), 
   async (req, res) => {
     try {
@@ -381,11 +382,38 @@ app.post('/guidance/profiling/student/:id', requireRole('guidance'), guidance.up
 app.post('/guidance/profiling/student/:id/session', requireRole('guidance'), guidance.addCounselingSession);
 
 // ================================================================
+// DEBUG: Log all requests before 404
+// ================================================================
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/auth') || req.path.includes('callback')) {
+    console.log('🔍 REQUEST MATCHED:', req.method, req.path);
+  }
+  next();
+});
+
+// ================================================================
 // 404 & ERROR HANDLING
 // ================================================================
 
 app.use((req, res) => {
-  res.status(404).render('404', { title: '404 — Not Found' });
+  console.log('❌ 404 NOT FOUND:', req.method, req.path);
+  console.log('   Query:', req.query);
+  console.log('   Session:', req.session?.user ? 'exists' : 'none');
+  
+  // Check if it's an API request or browser
+  if (req.accepts('json')) {
+    return res.status(404).json({ error: 'Not found', path: req.path });
+  }
+  
+  // For browser requests, try rendering view
+  try {
+    return res.status(404).render('404', { title: '404 — Not Found' });
+  } catch (err) {
+    // Fallback to JSON if rendering fails
+    console.error('❌ Could not render 404 view:', err.message);
+    return res.status(404).json({ error: 'Not found', path: req.path });
+  }
 });
 
 app.use((err, req, res, next) => {
@@ -393,7 +421,17 @@ app.use((err, req, res, next) => {
   console.error('Message:', err.message);
   console.error('Status:', err.status || 500);
   console.error('Stack:', err.stack);
-  res.status(500).render('404', { title: 'Error' });
+  
+  if (req.accepts('json')) {
+    return res.status(500).json({ error: err.message || 'Server error' });
+  }
+  
+  try {
+    return res.status(500).render('404', { title: 'Error' });
+  } catch (renderErr) {
+    console.error('❌ Could not render error view:', renderErr.message);
+    return res.status(500).json({ error: err.message || 'Server error' });
+  }
 });
 
 // ================================================================
