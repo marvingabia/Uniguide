@@ -34,8 +34,6 @@ app.use(
     secret: process.env.SESSION_SECRET || 'dev-secret',
     resave: false,
     saveUninitialized: false,
-    rolling: true,
-    proxy: true,
     cookie: {
       httpOnly: true,
       secure: true,
@@ -46,45 +44,45 @@ app.use(
   })
 );
 
+app.use(flash());
+
 // ================================================================
-// FLASH MESSAGES
+// MAKE LOCALS AVAILABLE
 // ================================================================
 
-app.use(flash());
 app.use((req, res, next) => {
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
+  res.locals.success = req.flash('success') || [];
+  res.locals.error = req.flash('error') || [];
   res.locals.user = req.session?.user || null;
   next();
 });
 
 // ================================================================
-// VIEWS
+// VIEWS SETUP
 // ================================================================
 
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'xian');
 
+// Register partials
+const partialsDir = path.join(__dirname, '../views/partials');
+if (fs.existsSync(partialsDir)) {
+  fs.readdirSync(partialsDir)
+    .filter(f => f.endsWith('.xian'))
+    .forEach(file => {
+      const partialName = file.replace('.xian', '');
+      hbs.registerPartial(partialName, fs.readFileSync(path.join(partialsDir, file), 'utf8'));
+    });
+}
+
+// Register helpers
 hbs.registerHelper('eq', (a, b) => a === b);
 hbs.registerHelper('ne', (a, b) => a !== b);
-hbs.registerHelper('or', (a, b) => a || b);
-hbs.registerHelper('and', (a, b) => a && b);
-
-hbs.registerHelper('formatDate', (d) => {
-  if (!d) return '—';
-  const date = new Date(d);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
-});
 
 app.engine('xian', (filePath, options, callback) => {
   try {
-    hbs.__express(filePath, options, (err, renderedHtml) => {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, renderedHtml);
-      }
+    hbs.__express(filePath, options, (err, html) => {
+      callback(err, html);
     });
   } catch (err) {
     callback(err);
@@ -98,15 +96,11 @@ app.engine('xian', (filePath, options, callback) => {
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ================================================================
-// ROUTES - MINIMAL FOR TESTING
+// ROUTES
 // ================================================================
 
 app.get('/', (req, res) => {
   res.render('login', { title: 'Login - GuidanceConnect' });
-});
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.get('/login', (req, res) => {
@@ -117,24 +111,25 @@ app.get('/register', (req, res) => {
   res.render('register', { title: 'Register - GuidanceConnect' });
 });
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // ================================================================
 // ERROR HANDLING
 // ================================================================
 
 app.use((req, res) => {
-  res.status(404).render('404', { title: '404 - Not Found' });
+  res.status(404).json({ error: 'Not found' });
 });
 
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: err.message 
-  });
+  console.error('Error:', err.message);
+  res.status(500).json({ error: 'Server error', message: err.message });
 });
 
 // ================================================================
-// EXPORT FOR VERCEL
+// EXPORT
 // ================================================================
 
 export default app;

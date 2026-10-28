@@ -7,3 +7,4 @@ dist/
 firebase-key.json
 exports/
 .vercel
+.env*.local
