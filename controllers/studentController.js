@@ -35,6 +35,24 @@ export const dashboard = async (req, res) => {
       console.error('Error fetching applications from Firestore:', e.message);
     }
 
+    // Fetch announcements from Firestore
+    try {
+      announcements = await FirestoreAdapter.getAllAnnouncements();
+      console.log(`📢 Dashboard: Found ${announcements.length} announcements`);
+    } catch (e) {
+      console.error('Error fetching announcements:', e.message);
+      announcements = [];
+    }
+
+    // Fetch notifications from Firestore
+    try {
+      notifications = await FirestoreAdapter.getNotifications(req.session.user.id);
+      console.log(`🔔 Dashboard: Found ${notifications.length} notifications`);
+    } catch (e) {
+      console.error('Error fetching notifications:', e.message);
+      notifications = [];
+    }
+
     const unreadNotifCount = notifications.filter(n => !n.isRead).length;
 
     safeRender(res, 'student/dashboard', {
@@ -391,16 +409,13 @@ export const viewNotifications = async (req, res) => {
 // View announcements
 export const viewAnnouncements = async (req, res) => {
   try {
-    const announcements = Announcement ?
-      await Announcement.findAll({
-        where: { isActive: true },
-        order: [['createdAt', 'DESC']]
-      }) : [];
+    // Fetch active announcements from Firebase
+    const announcements = await FirestoreAdapter.getAllAnnouncements();
 
     safeRender(res, 'student/announcements', {
       title: 'Announcements — UniGuide',
       user: req.session.user,
-      announcements
+      announcements: announcements || []
     });
   } catch (error) {
     console.error('Announcements error:', error.message);

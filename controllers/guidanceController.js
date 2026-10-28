@@ -414,14 +414,13 @@ export const createAnnouncement = async (req, res) => {
 
     // Send notification to all students
     try {
-      // Get all user IDs who are students (we can fetch from applications to get unique student IDs)
-      const applications = await FirestoreAdapter.getAllApplications();
-      const studentUserIds = new Set(applications.map(app => app.userId));
+      // Get ALL students (not just those with applications)
+      const allStudents = await FirestoreAdapter.getAllUsers({ role: 'student' });
       
       // Send notification to each student
-      for (const studentId of studentUserIds) {
+      for (const student of allStudents) {
         await FirestoreAdapter.createNotification({
-          userId: studentId,
+          userId: student.id,
           type: 'info',
           title: `📢 New Announcement: ${title}`,
           message: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
@@ -430,7 +429,7 @@ export const createAnnouncement = async (req, res) => {
         });
       }
       
-      console.log(`📢 Announcement created and ${studentUserIds.size} notifications sent`);
+      console.log(`📢 Announcement created and ${allStudents.length} notifications sent to all students`);
     } catch (notifErr) {
       console.error('Error sending notifications:', notifErr.message);
       // Don't fail the announcement creation if notifications fail
