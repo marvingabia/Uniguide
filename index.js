@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import passport from './config/passport.js';
 import router from './routes/index.js';
 import { syncDB } from './models/index.js';
+import FirestoreSessionStore from './utils/firestore-session-store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,91 +42,30 @@ app.use(
 );
 
 /* ================================================================
-   SESSION — MYSQL STORE (OR MEMORY FOR TESTING)
+   SESSION — FIRESTORE STORE (PERSISTENT)
 ================================================================ */
 
 const isProduction =
   process.env.NODE_ENV === 'production';
 
-const hasDatabaseUrl = !!process.env.DATABASE_URL;
+const hasFirebaseConfig = !!process.env.FIREBASE_SERVICE_ACCOUNT_PATH || !!process.env.FIREBASE_SERVICE_ACCOUNT;
 
 console.log('');
-console.log('DATABASE_URL configured:', hasDatabaseUrl ? '✅ Yes' : '❌ No');
+console.log('Firebase configured:', hasFirebaseConfig ? '✅ Yes' : '❌ No');
 
-let sessionStore;
+// Use Firestore Session Store (best for serverless + persistent)
+let sessionStore = null;
 
-if (hasDatabaseUrl) {
-  try {
-    /*
-     * Parse DATABASE_URL
-     */
-    const dbUrl = new URL(
-      process.env.DATABASE_URL
-    );
-
-    /*
-     * MySQL session store
-     */
-    const MySQLStore =
-      MySQLStoreFactory(session);
-
-    /*
-     * Aiven MySQL requires SSL.
-     */
-    const sessionStoreOptions = {
-      host: dbUrl.hostname,
-
-      port:
-        Number(dbUrl.port) || 3306,
-
-      user:
-        decodeURIComponent(
-          dbUrl.username
-        ),
-
-      password:
-        decodeURIComponent(
-          dbUrl.password
-        ),
-
-      database:
-        dbUrl.pathname.replace(
-          /^\//,
-          ''
-        ) || 'defaultdb',
-
-      tableName: 'sessions',
-      createDatabaseTable: true,
-      clearExpired: true,
-      checkExpirationInterval:
-        1000 * 60 * 15,
-      expiration:
-        1000 * 60 * 60 * 8,
-      keepAlive: true,
-      ssl: {
-        rejectUnauthorized: false
-      }
-    };
-
-    /*
-     * Create persistent MySQL session store.
-     */
-    sessionStore =
-      new MySQLStore(
-        sessionStoreOptions
-      );
-
-    console.log('✅ Using MySQL session store');
-
-  } catch (err) {
-    console.warn('⚠️ MySQL session store failed, using memory:', err.message);
-    // Fall back to memory store
-    sessionStore = undefined;
+try {
+  if (hasFirebaseConfig) {
+    sessionStore = new FirestoreSessionStore();
+    console.log('✅ Using Firestore session store (persistent)');
+  } else {
+    console.log('⚠️ Using memory session store (development only - sessions will be lost on restart)');
   }
-} else {
-  console.log('⚠️ Using memory session store (development only)');
-  // Use memory store by default (no persistent store)
-  sessionStore = undefined;
+} catch (err) {
+  console.warn('⚠️ Firestore session store initialization warning:', err.message);
+  console.log('⚠️ Falling back to memory session store');
 }
 
 /*
@@ -139,9 +79,8 @@ app.use(
       process.env.SESSION_SECRET ||
       'minsu-guidance-secret-change-this',
 
-    // For Vercel serverless: no persistent store needed
-    // Sessions will work within same request/response
-    // store: sessionStore || undefined,
+    // Use Firestore persistent store for all environments
+    store: sessionStore || undefined,
 
     resave: false,
 
