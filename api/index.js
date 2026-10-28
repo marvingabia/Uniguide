@@ -188,14 +188,18 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
+  console.log('🔐 SERIALIZE USER:', user.id || user.email);
   done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
+    console.log('🔐 DESERIALIZE USER:', id);
     const user = await FirestoreAdapter.findUserById(id);
+    console.log('✅ User deserialized:', user?.email);
     done(null, user);
   } catch (err) {
+    console.error('❌ Deserialization error:', err);
     done(err);
   }
 });
@@ -260,7 +264,10 @@ app.get('/auth/google/callback',
     console.log('Query:', req.query);
     next();
   },
-  passport.authenticate('google', { failureRedirect: '/login' }), 
+  passport.authenticate('google', { 
+    failureRedirect: '/login',
+    failureMessage: true
+  }), 
   authController.googleCallback
 );
 app.get('/auth/logout', authController.logout);
@@ -344,7 +351,10 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+  console.error('❌ ERROR HANDLER TRIGGERED');
+  console.error('Message:', err.message);
+  console.error('Status:', err.status || 500);
+  console.error('Stack:', err.stack);
   res.status(500).render('404', { title: 'Error' });
 });
 
