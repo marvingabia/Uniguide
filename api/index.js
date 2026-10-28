@@ -257,121 +257,57 @@ app.get('/test', (req, res) => {
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-// Direct OAuth callback - bypasses Passport session issues
-app.get('/auth/google/callback', async (req, res) => {
-  try {
-    const code = req.query.code;
-    if (!code) {
-      return res.status(400).json({ error: 'No auth code' });
-    }
-    
-    console.log('✅ OAuth callback received with code');
-    
-    // Return auth code to frontend for client-side token exchange
-    // Frontend will use Google SDK to exchange code for tokens
-    res.json({ success: true, code, message: 'Auth code received. Complete login on frontend.' });
-  } catch (err) {
-    console.error('❌ Callback error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// API endpoint for frontend to complete OAuth
-app.post('/api/auth/google/complete', async (req, res) => {
-  try {
-    const { idToken, refreshToken, accessToken, expiresIn } = req.body;
-    
-    if (!idToken) {
-      return res.status(400).json({ error: 'No ID token' });
-    }
-    
-    console.log('✅ Received tokens from frontend');
-    console.log('   ID Token (truncated):', idToken.substring(0, 20) + '...');
-    console.log('   Expires in:', expiresIn, 'seconds');
-    
-    // For now, just store tokens in session for refresh later
-    // Frontend already verified the token with Google SDK
-    if (req.session) {
-      req.session.googleTokens = {
-        idToken,
-        accessToken: accessToken || null,
-        refreshToken: refreshToken || null,
-        expiresAt: Date.now() + (expiresIn * 1000) || Date.now() + (3600 * 1000) // Default 1 hour
-      };
+app.get('/auth/google/callback', passport.authenticate('google', { 
+    failureRedirect: '/login',
+    failureMessage: true
+  }), 
+  async (req, res) => {
+    try {
+      console.log('✅ PASSPORT AUTHENTICATED');
+      console.log('req.user:', req.user ? `${req.user.email}` : 'NULL');
       
-      console.log('✅ Tokens stored in session');
-      console.log('   Token expires at:', new Date(req.session.googleTokens.expiresAt).toISOString());
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Login successful',
-      redirect: '/student/dashboard'
-    });
-  } catch (err) {
-    console.error('❌ Token error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+      // Set session with user data
+      if (req.user) {
+        req.session.user = {
+          id: req.user.id,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          email: req.user.email,
+          role: req.user.role || 'student',
+          avatar: req.user.avatar || null
+        };
 
-// API endpoint to check token status and refresh if needed
-app.get('/api/auth/token-status', (req, res) => {
-  try {
-    if (!req.session?.googleTokens) {
-      return res.json({ 
-        valid: false, 
-        message: 'No tokens in session' 
-      });
-    }
-    
-    const { expiresAt } = req.session.googleTokens;
-    const now = Date.now();
-    const timeRemaining = expiresAt - now;
-    const isExpired = timeRemaining <= 0;
-    const isExpiringSoon = timeRemaining < (5 * 60 * 1000); // Less than 5 minutes
-    
-    console.log('✅ Token status check');
-    console.log('   Expires at:', new Date(expiresAt).toISOString());
-    console.log('   Time remaining:', Math.floor(timeRemaining / 1000), 'seconds');
-    console.log('   Is expired:', isExpired);
-    console.log('   Expiring soon:', isExpiringSoon);
-    
-    res.json({ 
-      valid: !isExpired,
-      isExpiringSoon,
-      expiresIn: Math.floor(timeRemaining / 1000),
-      message: isExpired ? 'Token expired' : 'Token valid'
-    });
-  } catch (err) {
-    console.error('❌ Token status error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+        console.log('✅ Session set:', req.session.user.email);
 
-// API endpoint to refresh token (frontend must re-authenticate)
-app.post('/api/auth/refresh-token', (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    
-    if (!refreshToken) {
-      return res.status(400).json({ error: 'No refresh token provided' });
+        // Save session
+        req.session.save((err) => {
+          if (err) {
+            console.error('❌ Session save error:', err);
+            return res.redirect('/login');
+          }
+
+          console.log('✅ Session saved');
+          
+          // Redirect based on role
+          const role = req.user.role || 'student';
+          if (role === 'guidance') {
+            return res.redirect('/guidance/dashboard');
+          } else if (role === 'cashier') {
+            return res.redirect('/cashier/dashboard');
+          } else {
+            return res.redirect('/student/dashboard');
+          }
+        });
+      } else {
+        console.log('❌ No user in req.user');
+        return res.redirect('/login');
+      }
+    } catch (err) {
+      console.error('❌ Callback error:', err);
+      return res.redirect('/login');
     }
-    
-    console.log('✅ Token refresh requested');
-    console.log('   Note: Actual refresh must be done by frontend with Google SDK');
-    
-    // In practice, the frontend should refresh directly with Google SDK
-    // This endpoint just acknowledges the request
-    res.json({ 
-      success: true,
-      message: 'Frontend should refresh token with Google SDK',
-      instruction: 'Call gapi.auth2 or Google Identity Services to refresh'
-    });
-  } catch (err) {
-    console.error('❌ Refresh error:', err);
-    res.status(500).json({ error: err.message });
   }
-});
+);
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
