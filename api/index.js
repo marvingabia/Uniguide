@@ -60,12 +60,6 @@ const uploadAvatar = multer({ storage: storage('avatars'), limits: { fileSize: 3
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-// LOG ALL REQUESTS TO DEBUG VERCEL ROUTING
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}${req.url.includes('?') ? '?...' : ''}`);
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
