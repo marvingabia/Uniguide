@@ -60,6 +60,12 @@ const uploadAvatar = multer({ storage: storage('avatars'), limits: { fileSize: 3
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
+// LOG ALL REQUESTS TO DEBUG VERCEL ROUTING
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}${req.url.includes('?') ? '?...' : ''}`);
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -434,7 +440,10 @@ app.use((err, req, res, next) => {
 });
 
 // ================================================================
-// EXPORT
+// EXPORT FOR VERCEL SERVERLESS
 // ================================================================
 
+// Vercel expects a default export that is either:
+// 1. An Express app
+// 2. A handler function
 export default app;
