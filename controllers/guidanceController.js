@@ -64,17 +64,12 @@ export const dashboard = async (req, res) => {
       console.error('Error fetching announcements from Firestore:', e.message);
     }
 
-    if (Appointment) {
-      appointments = await Appointment.findAll({
-        where: {
-          status: 'pending',
-          date: { [Op.ne]: null },
-          timeSlot: { [Op.ne]: null }
-        },
-        include: [{ model: User, as: 'student' }],
-        order: [['date', 'ASC']],
-        limit: 5
-      });
+    // Fetch pending appointments from Firestore
+    try {
+      const allAppts = await FirestoreAdapter.getAppointmentRequests({ status: 'pending' });
+      appointments = allAppts.slice(0, 5);
+    } catch (e) {
+      console.error('Error fetching appointments:', e.message);
     }
 
     const { notifications, unreadNotifCount } = await getSidebarNotifs(req.session.user.id);
@@ -85,7 +80,7 @@ export const dashboard = async (req, res) => {
       toProcess, approved, released, announcements, appointments,
       notifications, unreadNotifCount,
       totalApps, pendingCount, verifiedCount, readyCount, releasedCount,
-      testMode: !Application
+      testMode: false
     });
   } catch (error) {
     console.error('Dashboard error:', error.message);
