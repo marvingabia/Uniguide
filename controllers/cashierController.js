@@ -15,7 +15,6 @@ export const dashboard = async (req, res) => {
     let pendingPayments = [];
     let receipted = [];
     let notifications = [];
-    let dailyTotal = 0;
 
     // Get manual payment requests (waiting_for_cashier status)
     try {
