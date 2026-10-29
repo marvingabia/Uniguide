@@ -198,7 +198,15 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     console.log('🔐 DESERIALIZE USER:', id);
-    const user = await FirestoreAdapter.findUserById(id);
+    
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Deserialization timeout')), 5000)
+    );
+    
+    const userPromise = FirestoreAdapter.findUserById(id);
+    const user = await Promise.race([userPromise, timeoutPromise]);
+    
     console.log('✅ User deserialized:', user?.email);
     done(null, user);
   } catch (err) {
@@ -261,12 +269,12 @@ app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 
-// Google OAuth callback
+// Google OAuth callback - bypass session middleware to avoid deserialization
 app.get('/auth/google/callback', (req, res, next) => {
   try {
     console.log('🔐 CALLBACK: Starting auth...');
     
-    passport.authenticate('google', { session: true }, (err, user, info) => {
+    passport.authenticate('google', { session: false }, (err, user, info) => {
       try {
         if (err) {
           console.error('❌ PASSPORT ERROR:', err.message);
@@ -280,47 +288,28 @@ app.get('/auth/google/callback', (req, res, next) => {
 
         console.log('✅ User from passport:', user.email);
 
-        try {
-          req.logIn(user, (loginErr) => {
-            try {
-              if (loginErr) {
-                console.error('❌ LOGIN ERROR:', loginErr.message);
-                return res.redirect('/login?error=login_failed');
-              }
+        // Manually set the user in session (bypass deserialization)
+        req.session.user = {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role || 'student',
+          avatar: user.avatar || null
+        };
 
-              console.log('✅ User logged in via Passport');
+        console.log('✅ Session user set:', req.session.user.email);
 
-              // Set session user
-              req.session.user = {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role || 'student',
-                avatar: user.avatar || null
-              };
+        const role = user.role || 'student';
+        const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
+                           : role === 'cashier' ? '/cashier/dashboard'
+                           : '/student/dashboard';
 
-              console.log('✅ Session user set:', req.session.user.email);
-
-              const role = user.role || 'student';
-              const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
-                                 : role === 'cashier' ? '/cashier/dashboard'
-                                 : '/student/dashboard';
-
-              console.log('✅ Redirecting to:', redirectPath);
-              res.redirect(redirectPath);
-            } catch (innerErr) {
-              console.error('❌ ERROR IN LOGIN CALLBACK:', innerErr.message);
-              res.status(500).send('Login callback error');
-            }
-          });
-        } catch (loginErr) {
-          console.error('❌ ERROR CALLING LOGIN:', loginErr.message);
-          res.status(500).send('Login error');
-        }
+        console.log('✅ Redirecting to:', redirectPath);
+        res.redirect(redirectPath);
       } catch (authErr) {
         console.error('❌ ERROR IN PASSPORT CALLBACK:', authErr.message);
-        res.status(500).send('Passport callback error');
+        res.status(500).send('Passport callback error: ' + authErr.message);
       }
     })(req, res, next);
   } catch (e) {
