@@ -121,6 +121,88 @@ if (fs.existsSync(partialsDir)) {
 hbs.registerHelper('eq', (a, b) => a === b);
 hbs.registerHelper('ne', (a, b) => a !== b);
 
+// ── Date/time helpers ──────────────────────────────────────────
+hbs.registerHelper('formatDate', (val) => {
+  if (!val) return '—';
+  try {
+    return new Date(val).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch { return val; }
+});
+
+hbs.registerHelper('formatDateTime', (val) => {
+  if (!val) return '—';
+  try {
+    return new Date(val).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch { return val; }
+});
+
+hbs.registerHelper('formatTime', (val) => {
+  if (!val) return '—';
+  try {
+    return new Date(val).toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+  } catch { return val; }
+});
+
+// ── Currency / math helpers ────────────────────────────────────
+hbs.registerHelper('currency', (val) => {
+  if (val === null || val === undefined || val === '') return '₱0.00';
+  return '₱' + parseFloat(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+});
+
+hbs.registerHelper('multiply', (a, b) => {
+  return (parseFloat(a) || 0) * (parseFloat(b) || 0);
+});
+
+// ── Application status helpers ─────────────────────────────────
+const STATUS_LABELS = {
+  pending:             'Pending',
+  payment_submitted:   'Payment Submitted',
+  waiting_for_cashier: 'Waiting for Cashier',
+  payment_verified:    'Payment Verified',
+  receipt_issued:      'Receipt Issued',
+  approved:            'Approved',
+  released:            'Released',
+  rejected:            'Rejected',
+  claimed:             'Claimed',
+};
+
+const STATUS_CLASSES = {
+  pending:             'badge-warning',
+  payment_submitted:   'badge-info',
+  waiting_for_cashier: 'badge-info',
+  payment_verified:    'badge-info',
+  receipt_issued:      'badge-success',
+  approved:            'badge-success',
+  released:            'badge-success',
+  rejected:            'badge-danger',
+  claimed:             'badge-success',
+};
+
+hbs.registerHelper('statusLabel', (status) => STATUS_LABELS[status] || status || '—');
+hbs.registerHelper('statusClass', (status) => STATUS_CLASSES[status] || 'badge-secondary');
+
+// ── Appointment status helper ──────────────────────────────────
+const APPT_STATUS_CLASSES = {
+  pending:   'badge-warning',
+  approved:  'badge-success',
+  done:      'badge-secondary',
+  cancelled: 'badge-danger',
+  rejected:  'badge-danger',
+};
+
+hbs.registerHelper('apptStatusClass', (status) => APPT_STATUS_CLASSES[status] || 'badge-secondary');
+
+// ── Notification type helper ───────────────────────────────────
+hbs.registerHelper('notifClass', (type) => {
+  const map = {
+    success: 'bg-green-50',
+    danger:  'bg-red-50',
+    warning: 'bg-yellow-50',
+    info:    'bg-blue-50',
+  };
+  return map[type] || 'bg-gray-50';
+});
+
 app.engine('xian', (filePath, options, callback) => {
   try {
     hbs.__express(filePath, options, (err, html) => {
