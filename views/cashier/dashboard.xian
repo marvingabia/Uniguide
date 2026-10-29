@@ -157,7 +157,7 @@
             <p class="text-xl font-bold text-slate-800">
               {{currency pendingTotal}}
             </p>
-            <p class="text-gray-500 text-xs">Pending Collection</p>
+            <p class="text-gray-500 text-xs">Today's Collection</p>
           </div>
 
         </a>
