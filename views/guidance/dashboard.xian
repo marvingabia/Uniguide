@@ -55,58 +55,7 @@
 
       </div>
 
-      <!-- Quick Links -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-        <a href="/guidance/applications" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-2xl shrink-0">📋</div>
-          <div>
-            <p class="font-semibold text-slate-800">Applications</p>
-            <p class="text-gray-500 text-xs">View and process all requests</p>
-          </div>
-        </a>
-
-        <a href="/guidance/appointments" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl shrink-0">📅</div>
-          <div>
-            <p class="font-semibold text-slate-800">Appointments</p>
-            <p class="text-gray-500 text-xs">Manage counseling schedules</p>
-          </div>
-        </a>
-
-        <a href="/guidance/announcements/new" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center text-2xl shrink-0">📣</div>
-          <div>
-            <p class="font-semibold text-slate-800">Announcements</p>
-            <p class="text-gray-500 text-xs">Post announcements to students</p>
-          </div>
-        </a>
-
-        <a href="/guidance/profiling" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-2xl shrink-0">👥</div>
-          <div>
-            <p class="font-semibold text-slate-800">Student Profiles</p>
-            <p class="text-gray-500 text-xs">View and update student records</p>
-          </div>
-        </a>
-
-        <a href="/guidance/reports" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-2xl shrink-0">📈</div>
-          <div>
-            <p class="font-semibold text-slate-800">Reports</p>
-            <p class="text-gray-500 text-xs">Monthly and yearly statistics</p>
-          </div>
-        </a>
-
-        <a href="/guidance/notifications" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
-          <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-2xl shrink-0">🔔</div>
-          <div>
-            <p class="font-semibold text-slate-800">Notifications</p>
-            <p class="text-gray-500 text-xs">{{#if (gt unreadNotifCount 0)}}{{unreadNotifCount}} unread{{else}}All caught up{{/if}}</p>
-          </div>
-        </a>
-
-      </div>
 
     </div>
   </div>
