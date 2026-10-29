@@ -55,19 +55,10 @@ export const dashboard = async (req, res) => {
       console.error('Error fetching notifications:', e.message);
     }
 
-    // Calculate daily total (all payments collected today)
-    // Includes: manual payments (waiting_for_cashier), forwarded (payment_verified), and receipted (receipt_issued)
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Combine all application arrays
-    const allApplications = [...manualPayments, ...pendingPayments, ...receipted];
-    
-    dailyTotal = allApplications
-      .filter(app => {
-        // Use paymentDate if available, otherwise use updatedAt or createdAt
-        const dateToCheck = app.paymentDate || app.updatedAt || app.createdAt;
-        return dateToCheck && dateToCheck.includes(today);
-      })
+    // Today's Collection = ALL uncollected payments (any date)
+    // This shows everything the cashier still needs to collect
+    // Amount goes down automatically as cashier processes each payment
+    dailyTotal = [...manualPayments, ...pendingPayments]
       .reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
 
     const unreadNotifCount = notifications.filter(n => !n.isRead).length;
