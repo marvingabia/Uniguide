@@ -16,11 +16,50 @@ import * as authController from '../controllers/authController.js';
 import * as student from '../controllers/studentController.js';
 import * as cashier from '../controllers/cashierController.js';
 import * as guidance from '../controllers/guidanceController.js';
+import { getFirestore } from 'firebase-admin/firestore';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// ================================================================
+// FIRESTORE SESSION STORE
+// ================================================================
+
+class FirestoreSessionStore extends session.Store {
+  constructor(db) {
+    super();
+    this.db = db;
+    this.collection = 'sessions';
+  }
+
+  get(sid, callback) {
+    this.db.collection(this.collection).doc(sid).get().then(doc => {
+      if (!doc.exists) return callback(null, null);
+      const sess = doc.data();
+      if (sess.expires && new Date() > new Date(sess.expires)) {
+        this.destroy(sid, callback);
+      } else {
+        callback(null, sess.data);
+      }
+    }).catch(err => callback(err));
+  }
+
+  set(sid, sess, callback) {
+    const expires = sess.cookie.expires || new Date(Date.now() + sess.cookie.maxAge);
+    this.db.collection(this.collection).doc(sid).set({
+      data: sess,
+      expires: expires.toISOString()
+    }).then(() => callback()).catch(err => callback(err));
+  }
+
+  destroy(sid, callback) {
+    this.db.collection(this.collection).doc(sid).delete()
+      .then(() => callback())
+      .catch(err => callback(err));
+  }
+}
 
 // ================================================================
 // AUTH MIDDLEWARE
@@ -64,8 +103,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ================================================================
-// SESSIONS
+// SESSIONS - Using Firestore Store for Vercel
 // ================================================================
+
+const db = getFirestore();
+const sessionStore = new FirestoreSessionStore(db);
 
 app.use(
   session({
@@ -73,6 +115,7 @@ app.use(
     secret: process.env.SESSION_SECRET || 'dev-secret',
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
     cookie: {
       httpOnly: true,
       secure: true,
@@ -80,6 +123,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 8,
       path: '/'
     }
+    // Vercel serverless: store sessions in Firestore instead of MemoryStore
   })
 );
 
