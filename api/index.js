@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
-import session from 'express-session';
+import cookieSession from 'cookie-session';
 import flash from 'connect-flash';
 import hbs from 'hbs';
 import path from 'path';
@@ -64,27 +64,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ================================================================
-// SESSIONS - Cookie-based (works on Vercel serverless)
+// SESSIONS - cookie-session stores everything in the cookie itself
+// No server-side store = works perfectly on Vercel serverless
+// (each cold start reads session from the cookie, not memory)
 // ================================================================
 
 app.use(
-  session({
+  cookieSession({
     name: 'uniguide.sid',
-    secret: process.env.SESSION_SECRET || 'dev-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 8,  // 8 hours
-      path: '/'
-    }
-    // No store specified = uses memory store
-    // Session data is signed and stored in the cookie itself
-    // This works on Vercel serverless without persistence issues
+    secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+    maxAge: 1000 * 60 * 60 * 8,  // 8 hours
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    path: '/'
   })
 );
+
+// cookie-session doesn't have .save() — shim it so existing code doesn't break
+app.use((req, res, next) => {
+  if (req.session && !req.session.save) {
+    req.session.save = (cb) => { if (cb) cb(); };
+  }
+  if (req.session && !req.session.destroy) {
+    req.session.destroy = (cb) => {
+      req.session = null;
+      if (cb) cb();
+    };
+  }
+  next();
+});
 
 app.use(flash());
 
@@ -282,32 +291,16 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log('🔐 SERIALIZE USER:', user.id || user.email);
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    console.log('🔐 DESERIALIZE USER:', id);
-    
-    // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Deserialization timeout')), 5000)
-    );
-    
-    const userPromise = FirestoreAdapter.findUserById(id);
-    const user = await Promise.race([userPromise, timeoutPromise]);
-    
-    console.log('✅ User deserialized:', user?.email);
-    done(null, user);
-  } catch (err) {
-    console.error('❌ Deserialization error:', err);
-    done(err);
-  }
+passport.deserializeUser((id, done) => {
+  // We store full user in req.session.user, so this is a no-op
+  done(null, { id });
 });
 
 app.use(passport.initialize());
-app.use(passport.session());
+// NOTE: NOT using passport.session() — we manage sessions via cookie-session directly
 
 app.get('/test', (req, res) => {
   res.json({ message: 'Test endpoint works', time: new Date().toISOString() });

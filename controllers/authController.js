@@ -103,17 +103,8 @@ export const login = async (req, res) => {
     // Login success
     console.log('✅ Login successful');
     setSession(req, user);
-
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
-        req.flash('error', 'Unable to save session.');
-        return res.redirect('/login');
-      }
-
-      console.log('✅ Session saved, redirecting as:', user.role);
-      return redirectByRole(res, user.role);
-    });
+    console.log('✅ Session saved, redirecting as:', user.role);
+    return redirectByRole(res, user.role);
 
   } catch (err) {
     console.error('❌ Login error:', err.message);
@@ -365,35 +356,10 @@ export const logout = (req, res) => {
   );
 
   /*
-   * Destroy session
+   * Destroy session - works with both express-session and cookie-session
    */
-  req.session.destroy((err) => {
-    if (err) {
-      console.error(
-        '❌ LOGOUT ERROR:',
-        err
-      );
-
-      return res.redirect('/login');
-    }
-
-    /*
-     * Clear session cookie
-     */
-    res.clearCookie(
-      'uniguide.sid',
-      {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        path: '/'
-      }
-    );
-
-    console.log(
-      '✅ SESSION DESTROYED'
-    );
-
-    return res.redirect('/login');
-  });
+  req.session = null;
+  res.clearCookie('uniguide.sid');
+  console.log('✅ SESSION CLEARED');
+  return res.redirect('/login');
 };
