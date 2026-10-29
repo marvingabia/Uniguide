@@ -55,32 +55,23 @@ export const dashboard = async (req, res) => {
       console.error('Error fetching notifications:', e.message);
     }
 
-    // ── Two totals the cashier actually cares about ──────────────
-    // 1. pendingTotal  = all uncollected payments (waiting for cashier action)
-    // 2. collectedToday = payments processed/collected today (PH timezone)
+    // Calculate daily total — use PH timezone (UTC+8) for "today"
+    const nowPH = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const todayPH = nowPH.toISOString().split('T')[0]; // e.g. "2026-10-29"
 
-    const nowPH   = new Date(Date.now() + 8 * 60 * 60 * 1000);
-    const todayPH = nowPH.toISOString().split('T')[0];
+    // Combine all application arrays
+    const allApplications = [...manualPayments, ...pendingPayments, ...receipted];
 
-    // Pending = everything still waiting for cashier (no date filter)
-    const pendingTotal = [...manualPayments, ...pendingPayments]
-      .reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
-
-    // Collected today = receipts issued today OR forwarded to guidance today
-    const allProcessed = await FirestoreAdapter.getAllApplications().catch(() => []);
-    const collectedToday = allProcessed
+    dailyTotal = allApplications
       .filter(app => {
-        const isCollected = ['receipt_issued','payment_verified','approved','released'].includes(app.status);
+        // Convert stored date to PH time for comparison
         const rawDate = app.paymentDate || app.updatedAt || app.createdAt;
         if (!rawDate) return false;
         const datePH = new Date(new Date(rawDate).getTime() + 8 * 60 * 60 * 1000)
           .toISOString().split('T')[0];
-        return isCollected && datePH === todayPH;
+        return datePH === todayPH;
       })
       .reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
-
-    // Keep dailyTotal as collectedToday for backward compat with view
-    const dailyTotal = collectedToday;
 
     const unreadNotifCount = notifications.filter(n => !n.isRead).length;
 
@@ -95,8 +86,6 @@ export const dashboard = async (req, res) => {
       notifications,
       unreadNotifCount,
       dailyTotal,
-      pendingTotal,
-      collectedToday,
       manualCount: manualPayments.length,
       pendingCount: pendingPayments.length,
       receiptedCount: receipted.length,
