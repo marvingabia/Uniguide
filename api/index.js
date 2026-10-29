@@ -459,6 +459,8 @@ app.all('/auth/google/callback', (req, res, next) => {
 });
 
 app.get('/auth/logout', authController.logout);
+app.post('/logout', authController.logout);       // sidebar logout button
+app.get('/logout', authController.logout);        // direct link fallback
 
 // ================================================================
 // DEBUG ROUTES
