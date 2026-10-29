@@ -55,18 +55,21 @@ export const dashboard = async (req, res) => {
       console.error('Error fetching notifications:', e.message);
     }
 
-    // Calculate daily total (all payments collected today)
-    // Includes: manual payments (waiting_for_cashier), forwarded (payment_verified), and receipted (receipt_issued)
-    const today = new Date().toISOString().split('T')[0];
-    
+    // Calculate daily total — use PH timezone (UTC+8) for "today"
+    const nowPH = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const todayPH = nowPH.toISOString().split('T')[0]; // e.g. "2026-10-29"
+
     // Combine all application arrays
     const allApplications = [...manualPayments, ...pendingPayments, ...receipted];
-    
+
     dailyTotal = allApplications
       .filter(app => {
-        // Use paymentDate if available, otherwise use updatedAt or createdAt
-        const dateToCheck = app.paymentDate || app.updatedAt || app.createdAt;
-        return dateToCheck && dateToCheck.includes(today);
+        // Convert stored date to PH time for comparison
+        const rawDate = app.paymentDate || app.updatedAt || app.createdAt;
+        if (!rawDate) return false;
+        const datePH = new Date(new Date(rawDate).getTime() + 8 * 60 * 60 * 1000)
+          .toISOString().split('T')[0];
+        return datePH === todayPH;
       })
       .reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
 
@@ -392,28 +395,30 @@ export const dailyCollections = async (req, res) => {
   try {
     let payments = [];
     let total = 0;
-    const today = new Date().toISOString().split('T')[0];
+
+    // Use PH timezone (UTC+8) for "today"
+    const nowPH = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const today = nowPH.toISOString().split('T')[0];
 
     try {
-      // Fetch all applications from Firestore
       const allPayments = await FirestoreAdapter.getAllApplications();
 
-      // Filter for today's collections (receipt_issued, approved, released with payment_date today)
       payments = allPayments.filter(app => {
         const isProcessed =
           app.status === 'receipt_issued' ||
+          app.status === 'payment_verified' ||
           app.status === 'approved' ||
-          app.status === 'released';
-        // Use paymentDate if available, otherwise use updatedAt or createdAt
-        const dateToCheck = app.paymentDate || app.updatedAt || app.createdAt;
-        const isToday = dateToCheck && dateToCheck.includes(today);
-        return isProcessed && isToday;
+          app.status === 'released' ||
+          app.status === 'waiting_for_cashier';
+        const rawDate = app.paymentDate || app.updatedAt || app.createdAt;
+        if (!rawDate) return false;
+        const datePH = new Date(new Date(rawDate).getTime() + 8 * 60 * 60 * 1000)
+          .toISOString().split('T')[0];
+        return isProcessed && datePH === today;
       });
 
-      // Calculate total
       total = payments.reduce((sum, app) => sum + parseFloat(app.totalAmount || 0), 0);
-
-      console.log(`💰 Daily collections (${today}): ${payments.length} payments, Total: ₱${total}`);
+      console.log(`💰 Daily collections (${today} PH): ${payments.length} payments, Total: ₱${total}`);
     } catch (e) {
       console.error('Error fetching daily collections:', e.message);
     }
