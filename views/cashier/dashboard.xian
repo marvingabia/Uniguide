@@ -149,22 +149,30 @@
 
         <a href="/cashier/daily-collections" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
 
-          <div
-            class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
-          >
+          <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center shrink-0">
+            ⏳
+          </div>
+
+          <div>
+            <p class="text-xl font-bold text-yellow-600">
+              {{currency pendingTotal}}
+            </p>
+            <p class="text-gray-500 text-xs">Pending Collection</p>
+          </div>
+
+        </a>
+
+        <a href="/cashier/daily-collections" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+
+          <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
             💰
           </div>
 
           <div>
-
-            <p class="text-xl font-bold text-slate-800">
-              {{currency dailyTotal}}
+            <p class="text-xl font-bold text-green-700">
+              {{currency collectedToday}}
             </p>
-
-            <p class="text-gray-500 text-xs">
-              Today's Collection
-            </p>
-
+            <p class="text-gray-500 text-xs">Collected Today</p>
           </div>
 
         </a>
