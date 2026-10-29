@@ -150,12 +150,21 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   console.log('✅ Google OAuth credentials found');
 }
 
+// Determine callback URL:
+// Always use the git-main URL in production (works on any Vercel deployment alias)
+// Fall back to env var or relative path for local dev
+const CALLBACK_URL = process.env.NODE_ENV === 'production'
+  ? 'https://uniguide-git-main-marvingabia5-gmailcoms-projects.vercel.app/auth/google/callback'
+  : (process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback');
+
+console.log('🔗 OAuth Callback URL:', CALLBACK_URL);
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || '/auth/google/callback'
+      callbackURL: CALLBACK_URL
     },
     async (accessToken, refreshToken, profile, done) => {
       console.log('🔐 GOOGLE STRATEGY EXECUTING');
@@ -271,7 +280,11 @@ app.get('/auth-test', (req, res) => {
 
 app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
+app.get('/auth/google', passport.authenticate('google', { 
+  scope: ['profile', 'email'], 
+  prompt: 'select_account',
+  callbackURL: 'https://uniguide-git-main-marvingabia5-gmailcoms-projects.vercel.app/auth/google/callback'
+}));
 
 // Google OAuth callback - handle both real OAuth and test requests
 app.all('/auth/google/callback', (req, res, next) => {
