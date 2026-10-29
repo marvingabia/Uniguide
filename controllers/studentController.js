@@ -283,17 +283,22 @@ export const submitPayment = async (req, res) => {
         paymentStatus: 'pending_manual'
       });
 
-      // Send notification to cashier (use email-based ID for staff accounts)
-      // Cashier staff accounts use email as their ID in session
-      await FirestoreAdapter.createNotification({
-        userId: 'cashier@minsu.edu.ph',  // Use cashier staff account email
-        type: 'manual_payment',
-        title: 'Manual Payment Pending',
-        message: `${app.givenName} ${app.surname} needs to pay ₱${app.totalAmount} in person`,
-        applicationId: req.params.id,
-        relatedUserId: req.session.user.id,
-        isRead: false
-      });
+      // Look up cashier's real Firestore ID then send notification
+      try {
+        const cashierUser = await FirestoreAdapter.findUserByEmail('cashier@minsu.edu.ph');
+        const cashierUserId = cashierUser?.id || 'cashier@minsu.edu.ph';
+        await FirestoreAdapter.createNotification({
+          userId: cashierUserId,
+          type: 'manual_payment',
+          title: 'Manual Payment Pending',
+          message: `${app.givenName} ${app.surname} needs to pay ₱${app.totalAmount} in person`,
+          applicationId: req.params.id,
+          relatedUserId: req.session.user.id,
+          isRead: false
+        });
+      } catch (notifErr) {
+        console.error('⚠️ Could not send cashier notification:', notifErr.message);
+      }
 
       console.log('✅ Application sent to cashier for manual payment');
       req.flash('success', 'Application sent to cashier. Please proceed to pay in person.');
@@ -326,15 +331,21 @@ export const submitPayment = async (req, res) => {
     });
 
     // Send notification to cashier about online payment submission
-    await FirestoreAdapter.createNotification({
-      userId: 'cashier@minsu.edu.ph',  // Use cashier staff account email
-      type: 'online_payment_submitted',
-      title: 'Online Payment Submitted',
-      message: `${app.givenName} ${app.surname} submitted payment proof for ₱${app.totalAmount}. Reference: ${referenceNumber}`,
-      applicationId: req.params.id,
-      relatedUserId: req.session.user.id,
-      isRead: false
-    });
+    try {
+      const cashierUser = await FirestoreAdapter.findUserByEmail('cashier@minsu.edu.ph');
+      const cashierUserId = cashierUser?.id || 'cashier@minsu.edu.ph';
+      await FirestoreAdapter.createNotification({
+        userId: cashierUserId,
+        type: 'online_payment_submitted',
+        title: 'Online Payment Submitted',
+        message: `${app.givenName} ${app.surname} submitted payment proof for ₱${app.totalAmount}. Reference: ${referenceNumber}`,
+        applicationId: req.params.id,
+        relatedUserId: req.session.user.id,
+        isRead: false
+      });
+    } catch (notifErr) {
+      console.error('⚠️ Could not send cashier notification:', notifErr.message);
+    }
 
     console.log('✅ Payment proof submitted');
     req.flash('success', 'Payment proof submitted! Waiting for cashier verification.');
@@ -349,23 +360,19 @@ export const submitPayment = async (req, res) => {
 // View application
 export const viewApplication = async (req, res) => {
   try {
-    const app = Application ?
-      await Application.findOne({
-        where: { id: req.params.id, userId: req.session.user.id }
-      }) : null;
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
 
-    if (!app) return res.redirect('/student/dashboard');
-
-    let purposes = [];
-    try { purposes = JSON.parse(app.purposes); } catch {}
+    if (!app || app.userId !== req.session.user.id) {
+      return res.redirect('/student/dashboard');
+    }
 
     safeRender(res, 'student/view-application', {
       title: 'Application Details — UniGuide',
       user: req.session.user,
-      app,
-      purposes
+      app
     });
   } catch (error) {
+    console.error('View application error:', error.message);
     res.redirect('/student/dashboard');
   }
 };

@@ -186,15 +186,21 @@ export const verifyAndIssueReceipt = async (req, res) => {
         isRead: false
       });
 
-      // Notify guidance staff
-      await FirestoreAdapter.createNotification({
-        userId: 'guidance@minsu.edu.ph',  // Use guidance staff account email
-        type: 'new_verified_application',
-        title: 'Payment Verified - Ready for Processing',
-        message: `Payment verified for request #${req.params.id} (${app.surname}, ${app.givenName}). Ready for processing.`,
-        applicationId: req.params.id,
-        isRead: false
-      });
+      // Notify guidance staff (look up real Firestore ID)
+      try {
+        const guidanceUser = await FirestoreAdapter.findUserByEmail('guidance@minsu.edu.ph');
+        const guidanceUserId = guidanceUser?.id || 'guidance@minsu.edu.ph';
+        await FirestoreAdapter.createNotification({
+          userId: guidanceUserId,
+          type: 'new_verified_application',
+          title: 'Payment Verified - Ready for Processing',
+          message: `Payment verified for request #${req.params.id} (${app.surname}, ${app.givenName}). Ready for processing.`,
+          applicationId: req.params.id,
+          isRead: false
+        });
+      } catch (notifErr) {
+        console.error('⚠️ Could not notify guidance:', notifErr.message);
+      }
 
       console.log('✅ Application forwarded to guidance');
       req.flash('success', 'Application forwarded to Guidance Office');
@@ -510,11 +516,11 @@ export const viewNotifications = async (req, res) => {
 // Mark notifications as read
 export const markNotificationsRead = async (req, res) => {
   try {
-    if (Notification) {
-      await Notification.update(
-        { isRead: true },
-        { where: { userId: req.session.user.id, isRead: false } }
-      );
+    const notifications = await FirestoreAdapter.getUserNotifications(req.session.user.id);
+    for (const notif of notifications) {
+      if (!notif.isRead) {
+        await FirestoreAdapter.markNotificationAsRead(notif.id);
+      }
     }
     res.redirect('/cashier/notifications');
   } catch (error) {
