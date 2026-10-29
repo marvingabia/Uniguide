@@ -273,11 +273,31 @@ app.post('/auth/login', authController.login);
 app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 
-// Google OAuth callback - bypass session middleware to avoid deserialization
+// Google OAuth callback - handle both real OAuth and test requests
 app.get('/auth/google/callback', (req, res, next) => {
   try {
-    console.log('🔐 CALLBACK: Request reached handler...');
-    console.log('🔐 CALLBACK: Starting auth...');
+    console.log('🔐 CALLBACK: Request received');
+    console.log('   Has code?', !!req.query.code);
+    console.log('   Has error?', !!req.query.error);
+
+    // If no code and no error, this is likely a test/direct request
+    if (!req.query.code && !req.query.error) {
+      console.log('✅ Test callback endpoint working');
+      return res.json({ 
+        message: 'OAuth callback endpoint is working',
+        timestamp: new Date().toISOString(),
+        path: req.path
+      });
+    }
+
+    // If there's an error from Google
+    if (req.query.error) {
+      console.error('❌ Google OAuth error:', req.query.error);
+      return res.redirect('/login?error=' + req.query.error);
+    }
+
+    // Real OAuth callback with code
+    console.log('🔐 Processing OAuth callback with code');
     
     passport.authenticate('google', { session: false }, (err, user, info) => {
       try {
