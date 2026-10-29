@@ -578,7 +578,7 @@ export const manageUsers = async (req, res) => {
       user: req.session.user,
       users,
       notifications, unreadNotifCount,
-      testMode: !User
+      testMode: false
     });
   } catch (error) {
     console.error('Manage users error:', error.message);
@@ -840,7 +840,7 @@ export const reports = async (req, res) => {
       applications, totalCollection,
       reportType: type, selectedYear, selectedMonth,
       notifications, unreadNotifCount,
-      testMode: !Application
+      testMode: false
     });
   } catch (error) {
     console.error('Reports error:', error.message);
