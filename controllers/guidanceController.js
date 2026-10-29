@@ -451,7 +451,7 @@ export const editAnnouncement = async (req, res) => {
       return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author (lenient ó allow if no authorId set)
+    // Check if user is the author (lenient ÔøΩ allow if no authorId set)
     if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only edit your own announcements.');
       return res.redirect('/guidance/announcements/new');
@@ -486,7 +486,7 @@ export const updateAnnouncement = async (req, res) => {
       return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author (lenient ó allow if no authorId set)
+    // Check if user is the author (lenient ÔøΩ allow if no authorId set)
     if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only edit your own announcements.');
       return res.redirect('/guidance/announcements/new');
@@ -542,7 +542,7 @@ export const deleteAnnouncement = async (req, res) => {
       return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author (lenient ó allow if no authorId set)
+    // Check if user is the author (lenient ÔøΩ allow if no authorId set)
     if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only delete your own announcements.');
       return res.redirect('/guidance/announcements/new');
@@ -628,10 +628,24 @@ export const manageAppointments = async (req, res) => {
     
     // Fetch from Firestore
     try {
-      // Only show PENDING appointments in the current appointments list
-      // Approved appointments are moved to available slots
       appointments = await FirestoreAdapter.getAppointmentRequests({ status: 'pending' }) || [];
       console.log(`üìÖ Guidance appointments: Found ${appointments.length} pending appointment requests`);
+
+      // Enrich each appointment with student name
+      appointments = await Promise.all(appointments.map(async (appt) => {
+        try {
+          const student = await FirestoreAdapter.findUserById(appt.userId);
+          return {
+            ...appt,
+            firstName: student?.firstName || '',
+            lastName: student?.lastName || '',
+            studentEmail: student?.email || ''
+          };
+        } catch {
+          return { ...appt, firstName: '', lastName: '' };
+        }
+      }));
+
       timeSlots = await FirestoreAdapter.getCollectionData('timeSlots') || [];
       console.log(`‚è∞ Time slots: Found ${timeSlots.length} time slots`);
     } catch (e) {
