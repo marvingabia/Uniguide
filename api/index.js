@@ -272,6 +272,7 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 // Google OAuth callback - bypass session middleware to avoid deserialization
 app.get('/auth/google/callback', (req, res, next) => {
   try {
+    console.log('🔐 CALLBACK: Request reached handler...');
     console.log('🔐 CALLBACK: Starting auth...');
     
     passport.authenticate('google', { session: false }, (err, user, info) => {
