@@ -1,77 +1,109 @@
-<!-- PWA Install Button (top-right corner, shows when installable) -->
+<!-- PWA Install Button - always visible in top right -->
 <button
   id="pwa-install-fab"
-  title="Install App"
-  onclick="window.installPWA()"
+  title="Install App on your device"
   style="
-    display:none;
     position:fixed;
-    top:12px;
-    right:12px;
+    top:10px;
+    right:10px;
     z-index:9999;
     background:#1b5e38;
     color:#fff;
     border:none;
     border-radius:8px;
-    padding:8px 14px;
-    font-size:13px;
+    padding:7px 13px;
+    font-size:12px;
     font-weight:600;
     cursor:pointer;
-    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+    display:flex;
     align-items:center;
-    gap:6px;
-  ">
+    gap:5px;
+  "
+  onclick="handlePWAInstall()"
+>
   📲 Install App
 </button>
 
-<!-- PWA Install Bottom Banner -->
-<div id="pwa-install-banner" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9998;background:linear-gradient(135deg,#1b5e38,#0f3d23);color:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.25);padding:14px 20px;max-width:420px;width:calc(100% - 32px);">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <span style="font-size:28px;flex-shrink:0;">📱</span>
-    <div style="flex:1;">
-      <div style="font-weight:700;font-size:14px;">Install UniGuide</div>
-      <div style="font-size:12px;opacity:.9;margin-top:2px;">Access anytime from your home screen</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-shrink:0;">
-      <button onclick="window.installPWA()" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;">Install</button>
-      <button onclick="document.getElementById('pwa-install-banner').style.display='none';sessionStorage.setItem('pwa-dismissed','1');" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:6px;padding:7px 10px;font-size:14px;cursor:pointer;">✕</button>
-    </div>
+<!-- iOS install instructions modal -->
+<div id="ios-install-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:flex-end;justify-content:center;">
+  <div style="background:#fff;border-radius:16px 16px 0 0;padding:24px;max-width:420px;width:100%;margin:0 auto;">
+    <h3 style="font-weight:700;font-size:16px;margin:0 0 12px;">Install UniGuide on iPhone</h3>
+    <ol style="font-size:14px;color:#374151;line-height:1.8;padding-left:20px;margin:0 0 16px;">
+      <li>Tap the <strong>Share</strong> button <span style="font-size:18px;">⎋</span> at the bottom of Safari</li>
+      <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+      <li>Tap <strong>Add</strong> — done!</li>
+    </ol>
+    <button onclick="document.getElementById('ios-install-modal').style.display='none'" style="width:100%;background:#1b5e38;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;">Got it</button>
   </div>
 </div>
 
 <script>
-(function() {
-  // Show install UI when browser signals PWA is installable
-  window.addEventListener('pwaInstallPromptReady', function() {
-    if (sessionStorage.getItem('pwa-dismissed') === '1') return;
+var _pwaPrompt = null;
 
-    // Show floating button
-    const fab = document.getElementById('pwa-install-fab');
-    if (fab) fab.style.display = 'flex';
+// Capture install prompt
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _pwaPrompt = e;
+  console.log('[PWA] Install prompt ready');
+  window.dispatchEvent(new CustomEvent('pwaInstallPromptReady'));
+});
 
-    // Show bottom banner (after 2s delay)
-    setTimeout(function() {
-      const banner = document.getElementById('pwa-install-banner');
-      if (banner && sessionStorage.getItem('pwa-dismissed') !== '1') {
-        banner.style.display = 'block';
+window.addEventListener('appinstalled', function() {
+  console.log('[PWA] Installed!');
+  var fab = document.getElementById('pwa-install-fab');
+  if (fab) fab.style.display = 'none';
+  _pwaPrompt = null;
+});
+
+function handlePWAInstall() {
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  // Already installed
+  if (isStandalone) {
+    alert('UniGuide is already installed on your device!');
+    return;
+  }
+
+  // iOS: show manual instructions
+  if (isIOS) {
+    var modal = document.getElementById('ios-install-modal');
+    if (modal) modal.style.display = 'flex';
+    return;
+  }
+
+  // Android/Desktop: use browser prompt
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(function(result) {
+      console.log('[PWA] User choice:', result.outcome);
+      _pwaPrompt = null;
+      if (result.outcome === 'accepted') {
+        var fab = document.getElementById('pwa-install-fab');
+        if (fab) fab.style.display = 'none';
       }
-    }, 2000);
-  });
+    });
+  } else {
+    // Prompt not ready yet — show browser instructions
+    alert('To install:\n\nChrome: Click the install icon (⊕) in the address bar\nEdge: Click the install icon in the address bar\n\nIf you don\'t see it, try refreshing the page first.');
+  }
+}
 
-  // Hide banner after successful install
-  window.addEventListener('pwaAppInstalled', function() {
-    const fab = document.getElementById('pwa-install-fab');
-    const banner = document.getElementById('pwa-install-banner');
-    if (fab) fab.style.display = 'none';
-    if (banner) banner.style.display = 'none';
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+      .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
+      .catch(function(err) { console.warn('[SW] Failed:', err); });
   });
+}
 
-  // Show update notification
-  window.addEventListener('pwaUpdateAvailable', function() {
-    const n = document.createElement('div');
-    n.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);';
-    n.innerHTML = '🔄 New version available! <button onclick="window.location.reload()" style="background:#fff;color:#f59e0b;border:none;border-radius:4px;padding:3px 10px;margin-left:8px;cursor:pointer;font-weight:700;">Update</button>';
-    document.body.appendChild(n);
-  });
-})();
+// Show update notification
+window.addEventListener('pwaUpdateAvailable', function() {
+  var n = document.createElement('div');
+  n.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;';
+  n.innerHTML = '🔄 Update available! <button onclick="window.location.reload()" style="background:#fff;color:#f59e0b;border:none;border-radius:4px;padding:3px 10px;margin-left:8px;cursor:pointer;font-weight:700;">Update now</button>';
+  document.body.appendChild(n);
+});
 </script>
