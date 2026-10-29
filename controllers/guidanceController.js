@@ -631,18 +631,22 @@ export const manageAppointments = async (req, res) => {
       appointments = await FirestoreAdapter.getAppointmentRequests({ status: 'pending' }) || [];
       console.log(`📅 Guidance appointments: Found ${appointments.length} pending appointment requests`);
 
-      // Enrich each appointment with student name
+      // Enrich each appointment with student name (use stored name first, fallback to lookup)
       appointments = await Promise.all(appointments.map(async (appt) => {
+        // If name already stored in appointment record, use it
+        if (appt.firstName || appt.lastName) return appt;
+        // Otherwise look up from users collection with timeout
         try {
-          const student = await FirestoreAdapter.findUserById(appt.userId);
+          const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+          const student = await Promise.race([FirestoreAdapter.findUserById(appt.userId), timeout]);
           return {
             ...appt,
-            firstName: student?.firstName || '',
-            lastName: student?.lastName || '',
-            studentEmail: student?.email || ''
+            firstName: student?.firstName || 'Unknown',
+            lastName: student?.lastName || 'Student',
+            email: student?.email || ''
           };
         } catch {
-          return { ...appt, firstName: '', lastName: '' };
+          return { ...appt, firstName: 'Unknown', lastName: 'Student' };
         }
       }));
 

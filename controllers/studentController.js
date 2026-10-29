@@ -478,9 +478,12 @@ export const bookAppointment = async (req, res) => {
     // Create appointment request in Firestore
     const appointmentRequest = await FirestoreAdapter.createAppointmentRequest({
       userId: req.session.user.id,
+      firstName: req.session.user.firstName,
+      lastName: req.session.user.lastName,
+      email: req.session.user.email,
       purpose: finalPurpose,
       notes: notes || '',
-      status: 'pending', // waiting for guidance to review
+      status: 'pending',
       createdAt: new Date().toISOString()
     });
 
