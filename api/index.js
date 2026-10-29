@@ -263,37 +263,70 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 
 // Google OAuth callback
 app.get('/auth/google/callback', (req, res, next) => {
-  passport.authenticate('google', { session: true }, (err, user, info) => {
-    if (err || !user) {
-      console.error('❌ Auth failed:', err?.message || info?.message || 'Unknown error');
-      return res.redirect('/login?error=auth_failed');
-    }
+  try {
+    console.log('🔐 CALLBACK: Starting auth...');
+    
+    passport.authenticate('google', { session: true }, (err, user, info) => {
+      try {
+        if (err) {
+          console.error('❌ PASSPORT ERROR:', err.message);
+          return res.redirect('/login?error=oauth_error');
+        }
 
-    req.logIn(user, (loginErr) => {
-      if (loginErr) {
-        console.error('❌ Login failed:', loginErr.message);
-        return res.redirect('/login?error=login_failed');
+        if (!user) {
+          console.error('❌ NO USER RETURNED');
+          return res.redirect('/login?error=no_user');
+        }
+
+        console.log('✅ User from passport:', user.email);
+
+        try {
+          req.logIn(user, (loginErr) => {
+            try {
+              if (loginErr) {
+                console.error('❌ LOGIN ERROR:', loginErr.message);
+                return res.redirect('/login?error=login_failed');
+              }
+
+              console.log('✅ User logged in via Passport');
+
+              // Set session user
+              req.session.user = {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role || 'student',
+                avatar: user.avatar || null
+              };
+
+              console.log('✅ Session user set:', req.session.user.email);
+
+              const role = user.role || 'student';
+              const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
+                                 : role === 'cashier' ? '/cashier/dashboard'
+                                 : '/student/dashboard';
+
+              console.log('✅ Redirecting to:', redirectPath);
+              res.redirect(redirectPath);
+            } catch (innerErr) {
+              console.error('❌ ERROR IN LOGIN CALLBACK:', innerErr.message);
+              res.status(500).send('Login callback error');
+            }
+          });
+        } catch (loginErr) {
+          console.error('❌ ERROR CALLING LOGIN:', loginErr.message);
+          res.status(500).send('Login error');
+        }
+      } catch (authErr) {
+        console.error('❌ ERROR IN PASSPORT CALLBACK:', authErr.message);
+        res.status(500).send('Passport callback error');
       }
-
-      // Set session user
-      req.session.user = {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role || 'student',
-        avatar: user.avatar || null
-      };
-
-      const role = user.role || 'student';
-      const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
-                         : role === 'cashier' ? '/cashier/dashboard'
-                         : '/student/dashboard';
-
-      console.log('✅ User logged in:', user.email, '→', redirectPath);
-      res.redirect(redirectPath);
-    });
-  })(req, res, next);
+    })(req, res, next);
+  } catch (e) {
+    console.error('❌ CALLBACK ERROR:', e.message);
+    res.status(500).send('Callback error: ' + e.message);
+  }
 });
 
 app.get('/auth/logout', authController.logout);
