@@ -49,7 +49,7 @@
                 {{this.message}}
               </p>
               <p class="text-gray-400 text-xs mt-1">
-                {{timeAgo this.createdAt}}
+                {{formatDateTime this.createdAt}}
               </p>
             </div>
 
