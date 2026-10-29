@@ -648,6 +648,7 @@ const deployTime = new Date().toISOString();
 console.log(`✅ API SERVER INITIALIZING [${deployTime}] - All routes registered`);
 console.log('   Routes include: /auth/google/callback (all methods), /auth/google, /login, /health, etc.');
 console.log('   Session: Cookie-based (Vercel serverless compatible)');
+console.log('   vercel.json: using rewrites (fixed routing)');
 
 // Export the Express app directly
 export default app;
