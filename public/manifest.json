@@ -1,8 +1,9 @@
 {
-  "name": "GuidanceConnect - MinSU Bongabong",
-  "short_name": "GuidanceConnect",
-  "description": "MinSU Bongabong Campus Good Moral Certificate Online Application System",
+  "name": "UniGuide — MinSU Bongabong",
+  "short_name": "UniGuide",
+  "description": "MinSU Bongabong Campus Guidance Office Management System",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1b5e38",
@@ -10,27 +11,28 @@
   "icons": [
     {
       "src": "/uploads/minsulogo.png",
-      "sizes": "105x107",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/uploads/minsulogo.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
   "categories": ["education", "productivity"],
   "shortcuts": [
     {
       "name": "Student Dashboard",
       "short_name": "Dashboard",
-      "description": "View your applications and status",
-      "url": "/student/dashboard",
-      "icons": []
+      "url": "/student/dashboard"
     },
     {
       "name": "Apply for Good Moral",
       "short_name": "Apply",
-      "description": "Submit a new application",
-      "url": "/student/apply",
-      "icons": []
+      "url": "/student/apply"
     }
   ]
 }
