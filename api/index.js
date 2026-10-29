@@ -35,29 +35,47 @@ class FirestoreSessionStore extends session.Store {
   }
 
   get(sid, callback) {
-    this.db.collection(this.collection).doc(sid).get().then(doc => {
-      if (!doc.exists) return callback(null, null);
-      const sess = doc.data();
-      if (sess.expires && new Date() > new Date(sess.expires)) {
-        this.destroy(sid, callback);
-      } else {
-        callback(null, sess.data);
-      }
-    }).catch(err => callback(err));
+    try {
+      this.db.collection(this.collection).doc(sid).get().then(doc => {
+        if (!doc.exists) return callback(null, null);
+        const sess = doc.data();
+        if (sess.expires && new Date() > new Date(sess.expires)) {
+          this.destroy(sid, callback);
+        } else {
+          // Convert back to plain object
+          callback(null, sess.data || sess);
+        }
+      }).catch(err => callback(err));
+    } catch (err) {
+      callback(err);
+    }
   }
 
   set(sid, sess, callback) {
-    const expires = sess.cookie.expires || new Date(Date.now() + sess.cookie.maxAge);
-    this.db.collection(this.collection).doc(sid).set({
-      data: sess,
-      expires: expires.toISOString()
-    }).then(() => callback()).catch(err => callback(err));
+    try {
+      const expires = sess.cookie?.expires ? new Date(sess.cookie.expires) : new Date(Date.now() + (sess.cookie?.maxAge || 28800000));
+      
+      // Convert session to plain JSON object (remove methods/prototypes)
+      const plainData = JSON.parse(JSON.stringify(sess));
+      
+      this.db.collection(this.collection).doc(sid).set({
+        data: plainData,
+        expires: expires.toISOString(),
+        createdAt: new Date().toISOString()
+      }).then(() => callback()).catch(err => callback(err));
+    } catch (err) {
+      callback(err);
+    }
   }
 
   destroy(sid, callback) {
-    this.db.collection(this.collection).doc(sid).delete()
-      .then(() => callback())
-      .catch(err => callback(err));
+    try {
+      this.db.collection(this.collection).doc(sid).delete()
+        .then(() => callback())
+        .catch(err => callback(err));
+    } catch (err) {
+      callback(err);
+    }
   }
 }
 
