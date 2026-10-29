@@ -640,5 +640,8 @@ app.use((err, req, res, next) => {
 // EXPORT FOR VERCEL SERVERLESS
 // ================================================================
 
+console.log('✅ API SERVER INITIALIZING - All routes registered');
+console.log('   Routes include: /auth/google/callback, /auth/google, /login, /health, etc.');
+
 // Export the Express app directly
 export default app;
