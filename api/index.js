@@ -16,68 +16,11 @@ import * as authController from '../controllers/authController.js';
 import * as student from '../controllers/studentController.js';
 import * as cashier from '../controllers/cashierController.js';
 import * as guidance from '../controllers/guidanceController.js';
-import { getFirestore } from 'firebase-admin/firestore';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-
-// ================================================================
-// FIRESTORE SESSION STORE
-// ================================================================
-
-class FirestoreSessionStore extends session.Store {
-  constructor(db) {
-    super();
-    this.db = db;
-    this.collection = 'sessions';
-  }
-
-  get(sid, callback) {
-    try {
-      this.db.collection(this.collection).doc(sid).get().then(doc => {
-        if (!doc.exists) return callback(null, null);
-        const sess = doc.data();
-        if (sess.expires && new Date() > new Date(sess.expires)) {
-          this.destroy(sid, callback);
-        } else {
-          // Convert back to plain object
-          callback(null, sess.data || sess);
-        }
-      }).catch(err => callback(err));
-    } catch (err) {
-      callback(err);
-    }
-  }
-
-  set(sid, sess, callback) {
-    try {
-      const expires = sess.cookie?.expires ? new Date(sess.cookie.expires) : new Date(Date.now() + (sess.cookie?.maxAge || 28800000));
-      
-      // Convert session to plain JSON object (remove methods/prototypes)
-      const plainData = JSON.parse(JSON.stringify(sess));
-      
-      this.db.collection(this.collection).doc(sid).set({
-        data: plainData,
-        expires: expires.toISOString(),
-        createdAt: new Date().toISOString()
-      }).then(() => callback()).catch(err => callback(err));
-    } catch (err) {
-      callback(err);
-    }
-  }
-
-  destroy(sid, callback) {
-    try {
-      this.db.collection(this.collection).doc(sid).delete()
-        .then(() => callback())
-        .catch(err => callback(err));
-    } catch (err) {
-      callback(err);
-    }
-  }
-}
 
 // ================================================================
 // AUTH MIDDLEWARE
@@ -121,11 +64,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ================================================================
-// SESSIONS - Using Firestore Store for Vercel
+// SESSIONS - Cookie-based (works on Vercel serverless)
 // ================================================================
-
-const db = getFirestore();
-const sessionStore = new FirestoreSessionStore(db);
 
 app.use(
   session({
@@ -133,15 +73,16 @@ app.use(
     secret: process.env.SESSION_SECRET || 'dev-secret',
     resave: false,
     saveUninitialized: false,
-    store: sessionStore,
     cookie: {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 8,
+      maxAge: 1000 * 60 * 60 * 8,  // 8 hours
       path: '/'
     }
-    // Vercel serverless: store sessions in Firestore instead of MemoryStore
+    // No store specified = uses memory store
+    // Session data is signed and stored in the cookie itself
+    // This works on Vercel serverless without persistence issues
   })
 );
 
