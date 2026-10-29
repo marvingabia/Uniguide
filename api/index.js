@@ -377,7 +377,9 @@ app.get('/auth-test', (req, res) => {
 // ================================================================
 
 app.post('/auth/login', authController.login);
+app.post('/login', authController.login);           // login form posts here
 app.post('/auth/register', authController.register);
+app.post('/register', authController.register);     // register form posts here
 app.get('/auth/google', passport.authenticate('google', { 
   scope: ['profile', 'email'], 
   prompt: 'select_account',
