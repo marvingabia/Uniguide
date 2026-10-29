@@ -212,6 +212,29 @@ hbs.registerHelper('notifClass', (type) => {
   return map[type] || 'bg-gray-50';
 });
 
+// ── Logic / comparison helpers ─────────────────────────────────
+hbs.registerHelper('or', (...args) => {
+  // last arg is the Handlebars options object — ignore it
+  const vals = args.slice(0, -1);
+  return vals.some(Boolean);
+});
+
+hbs.registerHelper('and', (...args) => {
+  const vals = args.slice(0, -1);
+  return vals.every(Boolean);
+});
+
+hbs.registerHelper('not', (val) => !val);
+
+hbs.registerHelper('gt',  (a, b) => parseFloat(a) >  parseFloat(b));
+hbs.registerHelper('gte', (a, b) => parseFloat(a) >= parseFloat(b));
+hbs.registerHelper('lt',  (a, b) => parseFloat(a) <  parseFloat(b));
+hbs.registerHelper('lte', (a, b) => parseFloat(a) <= parseFloat(b));
+
+// ── Array helper ───────────────────────────────────────────────
+// Usage: {{#each (list 'a' 'b' 'c')}} … {{/each}}
+hbs.registerHelper('list', (...args) => args.slice(0, -1));
+
 app.engine('xian', (filePath, options, callback) => {
   try {
     hbs.__express(filePath, options, (err, html) => {
