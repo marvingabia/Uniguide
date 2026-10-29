@@ -260,94 +260,37 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 
 // Google OAuth callback
 app.get('/auth/google/callback', (req, res, next) => {
-  try {
-    console.log('🔐 [CALLBACK] Request received');
-    console.log('   Code:', req.query.code ? '✅' : '❌');
-    console.log('   State:', req.query.state ? '✅' : '❌');
-    console.log('   Session ID:', req.sessionID);
-    
-    passport.authenticate('google', { session: true }, async (err, user, info) => {
-      try {
-        console.log('🔐 [PASSPORT RESULT]');
-        console.log('   Error:', err ? `YES - ${err.message}` : 'NO');
-        console.log('   User:', user ? `YES - ${user.email}` : 'NO');
-        console.log('   Info:', info);
-        
-        if (err) {
-          console.error('❌ Google OAuth error:', err);
-          return res.status(401).json({ 
-            error: 'OAuth failed',
-            message: err.message,
-            type: err.name
-          });
-        }
-        
-        if (!user) {
-          console.log('❌ No user returned. Info:', info);
-          return res.status(401).json({ 
-            error: 'Authentication failed',
-            message: info?.message || 'Unknown error',
-            details: info
-          });
-        }
-        
-        // User exists, log them in
-        console.log('✅ User authenticated:', user.email);
-        console.log('   User role:', user.role);
-        console.log('   User ID:', user.id);
-        
-        req.logIn(user, { session: true }, (loginErr) => {
-          try {
-            if (loginErr) {
-              console.error('❌ Login error:', loginErr.message);
-              return res.status(500).json({ error: 'Login failed', message: loginErr.message });
-            }
-            
-            req.session.user = {
-              id: user.id,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-              role: user.role || 'student',
-              avatar: user.avatar || null
-            };
-            
-            console.log('✅ Session user set:', req.session.user.email, 'Role:', req.session.user.role);
-            
-            req.session.save((saveErr) => {
-              try {
-                if (saveErr) {
-                  console.error('❌ Session save error:', saveErr.message);
-                  return res.status(500).json({ error: 'Session save failed', message: saveErr.message });
-                }
-                
-                const role = user.role || 'student';
-                const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
-                                   : role === 'cashier' ? '/cashier/dashboard'
-                                   : '/student/dashboard';
-                
-                console.log('✅ Redirecting to:', redirectPath);
-                console.log('   Session saved, redirecting...');
-                res.redirect(redirectPath);
-              } catch (e) {
-                console.error('❌ CRITICAL ERROR in session.save callback:', e);
-                res.status(500).json({ error: 'Session redirect failed', message: e.message });
-              }
-            });
-          } catch (e) {
-            console.error('❌ CRITICAL ERROR in logIn callback:', e);
-            res.status(500).json({ error: 'Login callback error', message: e.message });
-          }
-        });
-      } catch (e) {
-        console.error('❌ CRITICAL ERROR in passport authenticate callback:', e);
-        res.status(500).json({ error: 'Passport error', message: e.message, stack: e.stack });
+  passport.authenticate('google', { session: true }, (err, user, info) => {
+    if (err || !user) {
+      console.error('❌ Auth failed:', err?.message || info?.message || 'Unknown error');
+      return res.redirect('/login?error=auth_failed');
+    }
+
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        console.error('❌ Login failed:', loginErr.message);
+        return res.redirect('/login?error=login_failed');
       }
-    })(req, res, next);
-  } catch (e) {
-    console.error('❌ CRITICAL ERROR in callback route:', e);
-    res.status(500).json({ error: 'Callback error', message: e.message, stack: e.stack });
-  }
+
+      // Set session user
+      req.session.user = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role || 'student',
+        avatar: user.avatar || null
+      };
+
+      const role = user.role || 'student';
+      const redirectPath = role === 'guidance' ? '/guidance/dashboard' 
+                         : role === 'cashier' ? '/cashier/dashboard'
+                         : '/student/dashboard';
+
+      console.log('✅ User logged in:', user.email, '→', redirectPath);
+      res.redirect(redirectPath);
+    });
+  })(req, res, next);
 });
 
 app.get('/auth/logout', authController.logout);
