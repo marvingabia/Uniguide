@@ -4,496 +4,114 @@
 
   {{> sidebar-guidance activePage="home"}}
 
-
   <div class="w-full min-h-screen overflow-y-auto bg-slate-100">
 
-    <!-- Top Navigation -->
-
     <div class="nav-top" style="margin-left: 50px;">
-
       <div>
-
-        <h1 class="text-base font-bold text-slate-800">
-          UniGuide Home
-        </h1>
-
-        <p class="text-slate-500 text-xs">
-          MinSU Bongabong Campus — Guidance Office
-        </p>
-
+        <h1 class="text-base font-bold text-slate-800">UniGuide Home</h1>
+        <p class="text-slate-500 text-xs">MinSU Bongabong Campus — Guidance Office</p>
       </div>
-
-
-      <div class="flex items-center gap-3">
-
-        <span class="text-teal-700 text-sm font-medium">
-          👤 {{user.firstName}} {{user.lastName}}
-        </span>
-
-      </div>
-
+      <span class="text-teal-700 text-sm font-medium">👤 {{user.firstName}} {{user.lastName}}</span>
     </div>
-
 
     <div class="px-5 py-5">
 
       {{> flash}}
 
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
 
-      <!-- Statistics -->
-
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6"
-      >
-
-        <div class="card flex items-center gap-3">
-
-          <div
-            class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0"
-          >
-            💰
-          </div>
-
+        <a href="/guidance/applications?status=payment_verified" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">💰</div>
           <div>
-
-            <p class="text-xl font-bold text-blue-600">
-              {{verifiedCount}}
-            </p>
-
-            <p class="text-gray-500 text-xs">
-              Payment Verified
-            </p>
-
+            <p class="text-xl font-bold text-blue-600">{{verifiedCount}}</p>
+            <p class="text-gray-500 text-xs">Payment Verified</p>
           </div>
+        </a>
 
-        </div>
-
-
-        <div class="card flex items-center gap-3">
-
-          <div
-            class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0"
-          >
-            📑
-          </div>
-
+        <a href="/guidance/applications?status=receipt_issued" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">📑</div>
           <div>
-
-            <p class="text-xl font-bold text-purple-600">
-              {{readyCount}}
-            </p>
-
-            <p class="text-gray-500 text-xs">
-              Ready to Process
-            </p>
-
+            <p class="text-xl font-bold text-purple-600">{{readyCount}}</p>
+            <p class="text-gray-500 text-xs">Ready to Process</p>
           </div>
+        </a>
 
-        </div>
-
-
-        <div class="card flex items-center gap-3">
-
-          <div
-            class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0"
-          >
-            🎓
-          </div>
-
+        <a href="/guidance/applications?status=released" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">🎓</div>
           <div>
-
-            <p class="text-xl font-bold text-green-700">
-              {{releasedCount}}
-            </p>
-
-            <p class="text-gray-500 text-xs">
-              Released
-            </p>
-
+            <p class="text-xl font-bold text-green-700">{{releasedCount}}</p>
+            <p class="text-gray-500 text-xs">Released</p>
           </div>
+        </a>
 
-        </div>
-
-
-        <div class="card flex items-center gap-3">
-
-          <div
-            class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0"
-          >
-            📊
-          </div>
-
+        <a href="/guidance/applications" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">📊</div>
           <div>
-
-            <p class="text-xl font-bold text-slate-800">
-              {{totalApps}}
-            </p>
-
-            <p class="text-gray-500 text-xs">
-              Total Requests
-            </p>
-
+            <p class="text-xl font-bold text-slate-800">{{totalApps}}</p>
+            <p class="text-gray-500 text-xs">Total Requests</p>
           </div>
-
-        </div>
+        </a>
 
       </div>
 
+      <!-- Quick Links -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-      <!-- Ready for Processing -->
-
-      <div class="space-y-5">
-
-        <div>
-
-          <div class="flex items-center justify-between mb-2">
-
-            <h2 class="font-semibold text-teal-700">
-              📑 Ready for Processing
-            </h2>
-
-            <span class="text-xs text-slate-400">
-              {{toProcess.length}} item(s)
-            </span>
-
-          </div>
-
-
-          {{#if toProcess.length}}
-
-            <div class="card p-0 overflow-x-auto">
-
-              <table>
-
-                <thead>
-
-                  <tr>
-                    <th>#</th>
-                    <th>Student</th>
-                    <th>Documents</th>
-                    <th>OR No.</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {{#each toProcess}}
-
-                    <tr>
-
-                      <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1; padding: 6px;">
-                        #{{@index}}
-                      </td>
-
-
-                      <td>
-
-                        <div class="text-slate-800 text-sm font-medium">
-                          {{this.surname}}, {{this.givenName}}
-                        </div>
-
-                        <div class="text-gray-600 text-xs">
-                          {{this.student.email}}
-                        </div>
-
-                      </td>
-
-
-                      <td class="text-gray-600 text-xs">
-
-                        {{#if (gt this.qtyGoodMoral 0)}}
-                          <div>
-                            Good Moral: {{this.qtyGoodMoral}}
-                          </div>
-                        {{/if}}
-
-                        {{#if (gt this.qtyCTC 0)}}
-                          <div>
-                            CTC/Auth: {{this.qtyCTC}}
-                          </div>
-                        {{/if}}
-
-                      </td>
-
-
-                      <td class="text-slate-600 text-xs font-mono">
-                        {{this.orNumber}}
-                      </td>
-
-
-                      <td class="text-gray-500 text-xs">
-                        {{formatDate this.updatedAt}}
-                      </td>
-
-
-                      <td>
-
-                        <div class="flex gap-1">
-
-                          <a
-                            href="/guidance/application/{{this.id}}"
-                            class="btn-outline btn-sm"
-                          >
-                            View
-                          </a>
-
-
-                          <form
-                            action="/guidance/application/{{this.id}}/approve"
-                            method="POST"
-                          >
-
-                            <button
-                              type="submit"
-                              class="btn-green btn-sm"
-                              onclick="return confirm('Approve this request?')"
-                            >
-                              Approve
-                            </button>
-
-                          </form>
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-
-                  {{/each}}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          {{else}}
-
-            <div class="card text-center py-8">
-
-              <p class="text-gray-600 text-sm">
-                No requests ready for processing.
-              </p>
-
-            </div>
-
-          {{/if}}
-
-        </div>
-
-
-        <!-- Approved -->
-
-        {{#if approved.length}}
-
+        <a href="/guidance/applications" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-2xl shrink-0">📋</div>
           <div>
-
-            <div class="flex items-center justify-between mb-2">
-
-              <h2 class="font-semibold text-teal-700">
-                🎓 Approved — Ready to Release
-              </h2>
-
-              <span class="text-xs text-slate-400">
-                {{approved.length}} item(s)
-              </span>
-
-            </div>
-
-
-            <div class="card p-0 overflow-x-auto">
-
-              <table>
-
-                <thead>
-
-                  <tr>
-                    <th>#</th>
-                    <th>Student</th>
-                    <th>Documents</th>
-                    <th>OR No.</th>
-                    <th>Action</th>
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {{#each approved}}
-
-                    <tr>
-
-                      <td class="text-gray-500 text-xs font-bold" style="background-color: #dbeafe; color: #0369a1; padding: 6px;">
-                        #{{@index}}
-                      </td>
-
-
-                      <td>
-
-                        <div class="text-slate-800 text-sm font-medium">
-                          {{this.surname}}, {{this.givenName}}
-                        </div>
-
-                      </td>
-
-
-                      <td class="text-gray-600 text-xs">
-
-                        {{#if (gt this.qtyGoodMoral 0)}}
-                          <div>
-                            Good Moral: {{this.qtyGoodMoral}}
-                          </div>
-                        {{/if}}
-
-                        {{#if (gt this.qtyCTC 0)}}
-                          <div>
-                            CTC/Auth: {{this.qtyCTC}}
-                          </div>
-                        {{/if}}
-
-                      </td>
-
-
-                      <td class="text-slate-600 text-xs font-mono">
-                        {{this.orNumber}}
-                      </td>
-
-
-                      <td>
-
-                        <form
-                          action="/guidance/application/{{this.id}}/release"
-                          method="POST"
-                        >
-
-                          <button
-                            type="submit"
-                            class="btn-green btn-sm"
-                            onclick="return confirm('Mark as released?')"
-                          >
-                            ✓ Release
-                          </button>
-
-                        </form>
-
-                      </td>
-
-                    </tr>
-
-                  {{/each}}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
+            <p class="font-semibold text-slate-800">Applications</p>
+            <p class="text-gray-500 text-xs">View and process all requests</p>
           </div>
+        </a>
 
-        {{/if}}
-
-
-        <!-- Appointments -->
-
-        {{#if appointments.length}}
-
+        <a href="/guidance/appointments" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl shrink-0">📅</div>
           <div>
-
-            <div class="flex items-center justify-between mb-2">
-
-              <h2 class="font-semibold text-teal-700">
-                📅 Pending Appointments
-              </h2>
-
-              <a
-                href="/guidance/appointments"
-                class="text-green-700 text-xs hover:underline font-medium"
-              >
-                See all
-              </a>
-
-            </div>
-
-
-            <div class="card p-0 overflow-x-auto">
-
-              <table>
-
-                <thead>
-
-                  <tr>
-                    <th>Student</th>
-                    <th>Purpose</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Action</th>
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {{#each appointments}}
-
-                    <tr>
-
-                      <td class="text-slate-700 text-sm">
-                        {{this.student.firstName}}
-                        {{this.student.lastName}}
-                      </td>
-
-                      <td class="text-slate-500 text-xs">
-                        {{this.purpose}}
-                      </td>
-
-                      <td class="text-slate-500 text-xs">
-                        {{formatDate this.date}}
-                      </td>
-
-                      <td class="text-slate-500 text-xs">
-                        {{this.timeSlot}}
-                      </td>
-
-                      <td>
-
-                        <a
-                          href="/guidance/appointments"
-                          class="text-green-700 text-xs hover:underline"
-                        >
-                          Manage
-                        </a>
-
-                      </td>
-
-                    </tr>
-
-                  {{/each}}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
+            <p class="font-semibold text-slate-800">Appointments</p>
+            <p class="text-gray-500 text-xs">Manage counseling schedules</p>
           </div>
+        </a>
 
-        {{/if}}
+        <a href="/guidance/announcements/new" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center text-2xl shrink-0">📣</div>
+          <div>
+            <p class="font-semibold text-slate-800">Announcements</p>
+            <p class="text-gray-500 text-xs">Post announcements to students</p>
+          </div>
+        </a>
+
+        <a href="/guidance/profiling" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-2xl shrink-0">👥</div>
+          <div>
+            <p class="font-semibold text-slate-800">Student Profiles</p>
+            <p class="text-gray-500 text-xs">View and update student records</p>
+          </div>
+        </a>
+
+        <a href="/guidance/reports" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-2xl shrink-0">📈</div>
+          <div>
+            <p class="font-semibold text-slate-800">Reports</p>
+            <p class="text-gray-500 text-xs">Monthly and yearly statistics</p>
+          </div>
+        </a>
+
+        <a href="/guidance/notifications" class="card flex items-center gap-4 hover:shadow-lg transition-shadow">
+          <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-2xl shrink-0">🔔</div>
+          <div>
+            <p class="font-semibold text-slate-800">Notifications</p>
+            <p class="text-gray-500 text-xs">{{#if (gt unreadNotifCount 0)}}{{unreadNotifCount}} unread{{else}}All caught up{{/if}}</p>
+          </div>
+        </a>
 
       </div>
 
     </div>
-
   </div>
-
 </div>
 
 {{> pwa-install-banner}}
-
 </body>
 </html>
