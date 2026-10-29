@@ -448,13 +448,13 @@ export const editAnnouncement = async (req, res) => {
     
     if (!announcement) {
       req.flash('error', 'Announcement not found.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author
-    if (announcement.authorId !== req.session.user.id) {
+    // Check if user is the author (lenient — allow if no authorId set)
+    if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only edit your own announcements.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
     res.render('guidance/edit-announcement', {
@@ -465,7 +465,7 @@ export const editAnnouncement = async (req, res) => {
   } catch (error) {
     console.error('Edit announcement error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
-    res.redirect('/guidance');
+    res.redirect('/guidance/announcements/new');
   }
 };
 
@@ -483,13 +483,13 @@ export const updateAnnouncement = async (req, res) => {
     
     if (!announcement) {
       req.flash('error', 'Announcement not found.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author
-    if (announcement.authorId !== req.session.user.id) {
+    // Check if user is the author (lenient — allow if no authorId set)
+    if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only edit your own announcements.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
     // Update announcement in Firestore
@@ -522,11 +522,11 @@ export const updateAnnouncement = async (req, res) => {
     }
 
     req.flash('success', 'Announcement updated and students have been notified.');
-    res.redirect('/guidance');
+    res.redirect('/guidance/announcements/new');
   } catch (error) {
     console.error('Update announcement error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
-    res.redirect('/guidance');
+    res.redirect('/guidance/announcements/new');
   }
 };;
 
@@ -539,13 +539,13 @@ export const deleteAnnouncement = async (req, res) => {
     
     if (!announcement) {
       req.flash('error', 'Announcement not found.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
-    // Check if user is the author
-    if (announcement.authorId !== req.session.user.id) {
+    // Check if user is the author (lenient — allow if no authorId set)
+    if (announcement.authorId && announcement.authorId !== req.session.user.id) {
       req.flash('error', 'You can only delete your own announcements.');
-      return res.redirect('/guidance');
+      return res.redirect('/guidance/announcements/new');
     }
 
     // Soft delete by marking as inactive
@@ -555,11 +555,11 @@ export const deleteAnnouncement = async (req, res) => {
     });
 
     req.flash('success', 'Announcement deleted.');
-    res.redirect('/guidance');
+    res.redirect('/guidance/announcements/new');
   } catch (error) {
     console.error('Delete announcement error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
-    res.redirect('/guidance');
+    res.redirect('/guidance/announcements/new');
   }
 };;
 
@@ -1285,4 +1285,6 @@ export const toggleTimeSlot = async (req, res) => {
     res.redirect('/guidance/time-slots');
   }
 };
+
+
 
