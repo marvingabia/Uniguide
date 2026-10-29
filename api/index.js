@@ -274,9 +274,9 @@ app.post('/auth/register', authController.register);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 
 // Google OAuth callback - handle both real OAuth and test requests
-app.get('/auth/google/callback', (req, res, next) => {
+app.all('/auth/google/callback', (req, res, next) => {
   try {
-    console.log('🔐 CALLBACK: Request received');
+    console.log('🔐 CALLBACK: Request received - Method:', req.method);
     console.log('   Has code?', !!req.query.code);
     console.log('   Has error?', !!req.query.error);
 
@@ -296,7 +296,11 @@ app.get('/auth/google/callback', (req, res, next) => {
       return res.redirect('/login?error=' + req.query.error);
     }
 
-    // Real OAuth callback with code
+    // Real OAuth callback with code - only process GET
+    if (req.method !== 'GET') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     console.log('🔐 Processing OAuth callback with code');
     
     passport.authenticate('google', { session: false }, (err, user, info) => {
@@ -640,8 +644,10 @@ app.use((err, req, res, next) => {
 // EXPORT FOR VERCEL SERVERLESS
 // ================================================================
 
-console.log('✅ API SERVER INITIALIZING - All routes registered');
-console.log('   Routes include: /auth/google/callback, /auth/google, /login, /health, etc.');
+const deployTime = new Date().toISOString();
+console.log(`✅ API SERVER INITIALIZING [${deployTime}] - All routes registered`);
+console.log('   Routes include: /auth/google/callback (all methods), /auth/google, /login, /health, etc.');
+console.log('   Session: Cookie-based (Vercel serverless compatible)');
 
 // Export the Express app directly
 export default app;
