@@ -158,6 +158,7 @@
               {{currency pendingTotal}}
             </p>
             <p class="text-gray-500 text-xs">Pending Collection</p>
+            <!-- v2bc75c3 -->
           </div>
 
         </a>
