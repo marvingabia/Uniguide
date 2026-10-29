@@ -248,31 +248,30 @@ export const approveApplication = async (req, res) => {
   }
 };
 
-// Reject application
+// Reject application (guidance)
 export const rejectApplication = async (req, res) => {
   try {
-    if (!Application) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/guidance/applications');
-    }
-
     const { remarks } = req.body;
-    const app = await Application.findByPk(req.params.id, {
-      include: [{ model: User, as: 'student' }]
-    });
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
     if (!app) return res.redirect('/guidance/applications');
 
-    await app.update({ status: 'rejected', remarks });
-    if (Notification) {
-      await createNotification(
-        app.userId,
-        `Your Good Moral Certificate request #${app.id} was rejected. Reason: ${remarks}`,
-        'danger',
-        `/student/application/${app.id}`
-      );
-    }
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      status: 'rejected',
+      remarks: remarks || '',
+      rejectedAt: new Date().toISOString(),
+      rejectedBy: req.session.user.email
+    });
 
-    req.flash('success', 'Application rejected.');
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'danger',
+      title: 'Application Rejected',
+      message: `❌ Your Good Moral Certificate request #${req.params.id} was rejected. Reason: ${remarks || 'No reason provided'}`,
+      applicationId: req.params.id,
+      isRead: false
+    });
+
+    req.flash('success', 'Application rejected and student notified.');
     res.redirect('/guidance/applications');
   } catch (error) {
     console.error('Reject application error:', error.message);
@@ -328,38 +327,25 @@ export const releaseCertificate = async (req, res) => {
 // Mark as claimed
 export const markClaimed = async (req, res) => {
   try {
-    if (!Application) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/guidance/applications');
-    }
-
-    const app = await Application.findByPk(req.params.id, {
-      include: [{ model: User, as: 'student' }]
-    });
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
     if (!app) return res.redirect('/guidance/applications');
-    
-    await app.update({ claimStatus: 'claimed' });
-    
-    if (Notification) {
-      // Notify student
-      await createNotification(
-        app.userId,
-        `✅ Your Good Moral Certificate (Request #${app.id}) has been successfully claimed. Thank you!`,
-        'success',
-        `/student/application/${app.id}`
-      );
-      
-      // Notify counselor who handled it
-      await createNotification(
-        req.session.user.id,
-        `Certificate for request #${app.id} (${app.surname}, ${app.givenName}) has been claimed.`,
-        'info',
-        `/guidance/application/${app.id}`
-      );
-    }
-    
+
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      claimStatus: 'claimed',
+      claimedAt: new Date().toISOString()
+    });
+
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'success',
+      title: 'Certificate Claimed',
+      message: `✅ Your Good Moral Certificate (Request #${req.params.id}) has been successfully claimed. Thank you!`,
+      applicationId: req.params.id,
+      isRead: false
+    });
+
     req.flash('success', 'Certificate marked as claimed. Student has been notified.');
-    res.redirect(`/guidance/application/${app.id}`);
+    res.redirect(`/guidance/application/${req.params.id}`);
   } catch (error) {
     console.error('Mark claimed error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
@@ -615,20 +601,24 @@ export const manageUsers = async (req, res) => {
 
 export const createStaffAccount = async (req, res) => {
   try {
-    if (!User) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/guidance/users');
-    }
-
     const bcrypt = await import('bcrypt');
     const { firstName, lastName, email, password, role } = req.body;
-    const existing = await User.findOne({ where: { email } });
+
+    const existing = await FirestoreAdapter.findUserByEmail(email);
     if (existing) {
       req.flash('error', 'Email already exists.');
       return res.redirect('/guidance/users');
     }
+
     const hashed = await bcrypt.default.hash(password, 10);
-    await User.create({ firstName, lastName, email, password: hashed, role });
+    await FirestoreAdapter.createUser({
+      firstName, lastName, email,
+      password: hashed,
+      role,
+      authMethod: 'local',
+      isApproved: true
+    });
+
     req.flash('success', `${role.charAt(0).toUpperCase() + role.slice(1)} account created.`);
     res.redirect('/guidance/users');
   } catch (error) {
@@ -680,27 +670,29 @@ export const manageAppointments = async (req, res) => {
 
 export const updateAppointment = async (req, res) => {
   try {
-    if (!Appointment) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/guidance/appointments');
-    }
-
     const { status, cancelReason } = req.body;
-    const appt = await Appointment.findByPk(req.params.id);
+    const appt = await FirestoreAdapter.getCollectionData('appointmentRequests')
+      .then(list => list.find(a => a.id === req.params.id));
     if (!appt) return res.redirect('/guidance/appointments');
 
-    await appt.update({ status, cancelReason: cancelReason || null });
+    await FirestoreAdapter.updateAppointmentRequest(req.params.id, {
+      status,
+      cancelReason: cancelReason || null
+    });
 
-    if (Notification) {
-      const messages = {
-        approved:  'Your appointment has been approved.',
-        cancelled: `Your appointment was cancelled. Reason: ${cancelReason || 'N/A'}`,
-        done:      'Your appointment has been marked as completed.'
-      };
-      if (messages[status]) {
-        await createNotification(appt.userId, messages[status],
-          status === 'cancelled' ? 'danger' : 'success', '/student/appointments');
-      }
+    const messages = {
+      approved:  '✅ Your appointment has been approved.',
+      cancelled: `❌ Your appointment was cancelled. Reason: ${cancelReason || 'N/A'}`,
+      done:      '✓ Your appointment has been marked as completed.'
+    };
+    if (messages[status]) {
+      await FirestoreAdapter.createNotification({
+        userId: appt.userId,
+        type: status === 'cancelled' ? 'danger' : 'success',
+        title: 'Appointment Update',
+        message: messages[status],
+        isRead: false
+      });
     }
 
     req.flash('success', `Appointment ${status}.`);
@@ -715,31 +707,27 @@ export const updateAppointment = async (req, res) => {
 // Reschedule appointment
 export const rescheduleAppointment = async (req, res) => {
   try {
-    if (!Appointment) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/guidance/appointments');
-    }
-
     const { newDate, newTimeSlot } = req.body;
-    const appt = await Appointment.findByPk(req.params.id, {
-      include: [{ model: User, as: 'student' }]
-    });
+    const appt = await FirestoreAdapter.getCollectionData('appointmentRequests')
+      .then(list => list.find(a => a.id === req.params.id));
     if (!appt) return res.redirect('/guidance/appointments');
 
-    const oldDate     = appt.date;
+    const oldDate = appt.date;
     const oldTimeSlot = appt.timeSlot;
 
-    await appt.update({ date: newDate, timeSlot: newTimeSlot });
-    if (Notification) {
-      await createNotification(
-        appt.userId,
-        `📅 Your appointment has been rescheduled by the Guidance Office.\n` +
-        `Old schedule: ${oldDate} at ${oldTimeSlot}\n` +
-        `New schedule: ${newDate} at ${newTimeSlot}`,
-        'warning',
-        '/student/appointments'
-      );
-    }
+    await FirestoreAdapter.updateAppointmentRequest(req.params.id, {
+      date: newDate,
+      timeSlot: newTimeSlot,
+      status: 'approved'
+    });
+
+    await FirestoreAdapter.createNotification({
+      userId: appt.userId,
+      type: 'warning',
+      title: 'Appointment Rescheduled',
+      message: `📅 Your appointment has been rescheduled.\nOld: ${oldDate} at ${oldTimeSlot}\nNew: ${newDate} at ${newTimeSlot}`,
+      isRead: false
+    });
 
     req.flash('success', `Appointment rescheduled to ${newDate} at ${newTimeSlot}. Student has been notified.`);
     res.redirect('/guidance/appointments');
@@ -797,11 +785,11 @@ export const viewNotifications = async (req, res) => {
 
 export const markNotificationsRead = async (req, res) => {
   try {
-    if (Notification) {
-      await Notification.update(
-        { isRead: true },
-        { where: { userId: req.session.user.id, isRead: false } }
-      );
+    const notifications = await FirestoreAdapter.getUserNotifications(req.session.user.id);
+    for (const notif of notifications) {
+      if (!notif.isRead) {
+        await FirestoreAdapter.markNotificationAsRead(notif.id);
+      }
     }
     res.json({ ok: true });
   } catch (error) {

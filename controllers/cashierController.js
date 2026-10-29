@@ -274,33 +274,29 @@ export const issueReceipt = async (req, res) => {
   }
 };
 
-// Reject application
+// Reject application (cashier)
 export const rejectApplication = async (req, res) => {
   try {
-    if (!Application) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/cashier/dashboard');
-    }
-
     const { remarks } = req.body;
-    const app = await Application.findByPk(req.params.id, {
-      include: [{ model: User, as: 'student' }]
-    });
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
     if (!app) return res.redirect('/cashier/dashboard');
 
-    await app.update({ status: 'rejected', remarks });
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      status: 'rejected',
+      remarks: remarks || '',
+      rejectedAt: new Date().toISOString()
+    });
 
-    // Notify student
-    if (Notification) {
-      await createNotification(
-        app.userId,
-        `Your payment for request #${app.id} was rejected. Reason: ${remarks}`,
-        'danger',
-        `/student/application/${app.id}`
-      );
-    }
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'danger',
+      title: 'Application Rejected',
+      message: `❌ Your payment for request #${req.params.id} was rejected. Reason: ${remarks || 'No reason provided'}`,
+      applicationId: req.params.id,
+      isRead: false
+    });
 
-    req.flash('success', 'Application rejected.');
+    req.flash('success', 'Application rejected and student notified.');
     res.redirect('/cashier/dashboard');
   } catch (error) {
     console.error('Reject application error:', error.message);
@@ -312,53 +308,29 @@ export const rejectApplication = async (req, res) => {
 // Re-issue receipt
 export const reissueReceipt = async (req, res) => {
   try {
-    if (!Application) {
-      req.flash('warning', 'Test mode - Database disabled');
-      return res.redirect('/cashier/dashboard');
-    }
-
     const { orNumber, reissueReason } = req.body;
-    const app = await Application.findByPk(req.params.id, {
-      include: [{ model: User, as: 'student' }]
-    });
-    
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
     if (!app) return res.redirect('/cashier/dashboard');
 
     const updates = {};
-    
-    // OR number is optional
-    if (orNumber && orNumber.trim()) {
-      updates.orNumber = orNumber.trim();
-    }
-    
-    // Update receipt file if new one uploaded
-    if (req.file) {
-      updates.receiptFile = `/uploads/receipts/${req.file.filename}`;
-    }
-    
-    await app.update(updates);
+    if (orNumber && orNumber.trim()) updates.orNumber = orNumber.trim();
+    if (req.file) updates.receiptFile = `/uploads/receipts/${req.file.filename}`;
 
-    // Notify student about receipt update
-    if (Notification) {
-      const orText = updates.orNumber ? ` OR Number: ${updates.orNumber}.` : '';
-      await createNotification(
-        app.userId,
-        `📝 Your receipt information has been updated.${orText} Reason: ${reissueReason}`,
-        'info',
-        `/student/application/${app.id}`
-      );
+    await FirestoreAdapter.updateApplication(req.params.id, updates);
 
-      // Notify guidance about the update
-      await notifyAllRole(
-        'guidance',
-        `Receipt updated for request #${app.id} (${app.surname}, ${app.givenName}). Reason: ${reissueReason}`,
-        'warning',
-        `/guidance/application/${app.id}`
-      );
-    }
+    // Notify student
+    const orText = updates.orNumber ? ` OR Number: ${updates.orNumber}.` : '';
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'info',
+      title: 'Receipt Updated',
+      message: `📝 Your receipt has been updated.${orText} Reason: ${reissueReason || 'Updated by cashier'}`,
+      applicationId: req.params.id,
+      isRead: false
+    });
 
-    req.flash('success', `Receipt information updated successfully.`);
-    res.redirect(`/cashier/application/${app.id}`);
+    req.flash('success', 'Receipt information updated successfully.');
+    res.redirect(`/cashier/application/${req.params.id}`);
   } catch (error) {
     console.error('Reissue receipt error:', error.message);
     req.flash('error', 'An error occurred. Please try again.');
