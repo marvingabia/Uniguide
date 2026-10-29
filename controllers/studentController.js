@@ -46,7 +46,7 @@ export const dashboard = async (req, res) => {
 
     // Fetch notifications from Firestore
     try {
-      notifications = await FirestoreAdapter.getNotifications(req.session.user.id);
+      notifications = await FirestoreAdapter.getUserNotifications(req.session.user.id);
       console.log(`🔔 Dashboard: Found ${notifications.length} notifications`);
     } catch (e) {
       console.error('Error fetching notifications:', e.message);
