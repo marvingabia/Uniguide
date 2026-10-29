@@ -85,8 +85,28 @@ function handlePWAInstall() {
       }
     });
   } else {
-    // Prompt not ready yet — show browser instructions
-    alert('To install:\n\nChrome: Click the install icon (⊕) in the address bar\nEdge: Click the install icon in the address bar\n\nIf you don\'t see it, try refreshing the page first.');
+    // Show a more helpful modal instead of alert
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:16px;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:24px;max-width:380px;width:100%;">
+        <h3 style="font-weight:700;font-size:16px;margin:0 0 16px;color:#1b5e38;">📲 Install UniGuide</h3>
+        <p style="font-size:14px;color:#374151;margin:0 0 12px;font-weight:600;">On Chrome Desktop:</p>
+        <ol style="font-size:13px;color:#374151;line-height:1.8;padding-left:18px;margin:0 0 16px;">
+          <li>Look for the <strong>⊕ install icon</strong> in the address bar (right side)</li>
+          <li>Click it and select <strong>"Install"</strong></li>
+          <li>Or click <strong>⋮ menu → "Install UniGuide..."</strong></li>
+        </ol>
+        <p style="font-size:14px;color:#374151;margin:0 0 8px;font-weight:600;">On Android Chrome:</p>
+        <ol style="font-size:13px;color:#374151;line-height:1.8;padding-left:18px;margin:0 0 20px;">
+          <li>Tap <strong>⋮ menu</strong> (3 dots)</li>
+          <li>Tap <strong>"Add to Home screen"</strong></li>
+          <li>Tap <strong>Install</strong></li>
+        </ol>
+        <button onclick="this.closest('[style*=inset]').remove()" style="width:100%;background:#1b5e38;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;">Got it</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
   }
 }
 
