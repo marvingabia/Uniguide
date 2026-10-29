@@ -84,15 +84,14 @@ export const dashboard = async (req, res) => {
     });
   } catch (error) {
     console.error('Dashboard error:', error.message);
-    const { notifications, unreadNotifCount } = await getSidebarNotifs(req.session.user.id);
+    const { notifications, unreadNotifCount } = await getSidebarNotifs(req.session.user.id).catch(() => ({ notifications: [], unreadNotifCount: 0 }));
     res.render('guidance/dashboard', {
       title: 'Guidance Home— UniGuide',
       user: req.session.user,
       toProcess: [], approved: [], released: [], announcements: [], appointments: [],
       notifications, unreadNotifCount,
       totalApps: 0, pendingCount: 0, verifiedCount: 0, readyCount: 0, releasedCount: 0,
-      testMode: true,
-      error: 'Test mode - Database disabled'
+      testMode: false
     });
   }
 };
@@ -149,8 +148,7 @@ export const allApplications = async (req, res) => {
       search: '',
       notifications,
       unreadNotifCount,
-      testMode: true,
-      error: 'Test mode'
+      testMode: false
     });
   }
 };;
@@ -588,8 +586,7 @@ export const manageUsers = async (req, res) => {
       user: req.session.user,
       users: [],
       notifications, unreadNotifCount,
-      testMode: true,
-      error: 'Test mode - Database disabled'
+      testMode: false
     });
   }
 };
@@ -772,8 +769,7 @@ export const viewNotifications = async (req, res) => {
       allNotifications: [],
       notifications,
       unreadNotifCount,
-      testMode: true,
-      error: 'Test mode'
+      testMode: false
     });
   }
 };
@@ -851,8 +847,7 @@ export const reports = async (req, res) => {
       applications: [], totalCollection: 0,
       reportType: 'monthly', selectedYear: new Date().getFullYear(), selectedMonth: new Date().getMonth() + 1,
       notifications, unreadNotifCount,
-      testMode: true,
-      error: 'Test mode - Database disabled'
+      testMode: false
     });
   }
 };
@@ -1115,8 +1110,7 @@ export const manageTimeSlots = async (req, res) => {
       user: req.session.user,
       timeSlots: [],
       notifications, unreadNotifCount,
-      testMode: true,
-      error: 'Test mode - Database disabled'
+      testMode: false
     });
   }
 };
@@ -1291,3 +1285,4 @@ export const toggleTimeSlot = async (req, res) => {
     res.redirect('/guidance/time-slots');
   }
 };
+
