@@ -42,8 +42,8 @@
 
       <div class="max-w-2xl">
 
-        <a href="/guidance" class="text-green-700 text-sm hover:underline mb-4 inline-block">
-          ← Back to Dashboard
+        <a href="/guidance/announcements/new" class="text-green-700 text-sm hover:underline mb-4 inline-block">
+          ← Back to Announcements
         </a>
 
 
@@ -174,7 +174,7 @@
                 💾 Save Changes
               </button>
 
-              <a href="/guidance" class="btn-outline">
+              <a href="/guidance/announcements/new" class="btn-outline">
                 Cancel
               </a>
 
