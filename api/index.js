@@ -353,6 +353,156 @@ app.get('/auth/google/callback', (req, res, next) => {
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
+// PUBLIC PAGES (For Google OAuth Branding)
+// ================================================================
+
+// Privacy Policy
+app.get('/privacy', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Privacy Policy - UniGuide</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <h1>Privacy Policy - UniGuide</h1>
+      <p><strong>Last Updated: October 27, 2026</strong></p>
+      
+      <h2>1. Information We Collect</h2>
+      <p>UniGuide collects the following information:</p>
+      <ul>
+        <li>Google account information (name, email, profile picture)</li>
+        <li>Application submissions and personal data related to applications</li>
+        <li>Payment information and transaction records</li>
+        <li>Session data and login activity</li>
+      </ul>
+      
+      <h2>2. How We Use Your Information</h2>
+      <p>We use your information to:</p>
+      <ul>
+        <li>Authenticate users through Google OAuth</li>
+        <li>Process applications and payments</li>
+        <li>Maintain user sessions and accounts</li>
+        <li>Provide guidance office services</li>
+      </ul>
+      
+      <h2>3. Data Protection</h2>
+      <p>Your data is encrypted and stored securely. We do not share your personal information with third parties except as required by law.</p>
+      
+      <h2>4. Contact Us</h2>
+      <p>For privacy concerns, contact: <strong>marvingabia5@gmail.com</strong></p>
+    </body>
+    </html>
+  `);
+});
+
+// Terms of Service
+app.get('/terms', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Terms of Service - UniGuide</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <h1>Terms of Service - UniGuide</h1>
+      <p><strong>Last Updated: October 27, 2026</strong></p>
+      
+      <h2>1. Acceptance of Terms</h2>
+      <p>By using UniGuide, you agree to these terms and conditions.</p>
+      
+      <h2>2. User Responsibilities</h2>
+      <ul>
+        <li>Provide accurate information when registering</li>
+        <li>Maintain confidentiality of your account</li>
+        <li>Use the service for legitimate purposes only</li>
+      </ul>
+      
+      <h2>3. Service Availability</h2>
+      <p>UniGuide is provided "as is" without warranties. We reserve the right to modify or discontinue services.</p>
+      
+      <h2>4. Limitation of Liability</h2>
+      <p>UniGuide and its developers are not liable for any indirect, incidental, or consequential damages.</p>
+      
+      <h2>5. Contact</h2>
+      <p>For questions about these terms, contact: <strong>marvingabia5@gmail.com</strong></p>
+    </body>
+    </html>
+  `);
+});
+
+// App Info Page (Home for OAuth)
+app.get('/info', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>UniGuide - Guidance Office Management System</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; background: #f5f5f5; }
+        .container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 20px; }
+        .features { list-style: none; padding: 0; }
+        .features li { padding: 8px 0; padding-left: 20px; }
+        .features li:before { content: "✓ "; color: green; font-weight: bold; margin-right: 10px; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🎓 UniGuide</h1>
+        <p><strong>Guidance Office Management System</strong></p>
+        
+        <h2>About UniGuide</h2>
+        <p>UniGuide is a modern, secure platform designed to streamline guidance office operations. Students can submit applications, make payments, and request appointments online. Guidance officers can manage applications, verify payments, and conduct counseling sessions efficiently.</p>
+        
+        <h2>Key Features</h2>
+        <ul class="features">
+          <li>Google OAuth authentication</li>
+          <li>Online application submissions</li>
+          <li>Payment processing and verification</li>
+          <li>Appointment scheduling</li>
+          <li>Real-time notifications</li>
+          <li>Secure data management</li>
+        </ul>
+        
+        <h2>User Roles</h2>
+        <ul>
+          <li><strong>Students:</strong> Submit applications, make payments, view status</li>
+          <li><strong>Cashiers:</strong> Verify payments and issue receipts</li>
+          <li><strong>Guidance Officers:</strong> Manage applications and conduct counseling</li>
+        </ul>
+        
+        <div class="footer">
+          <p>For more information, visit the <a href="/privacy">Privacy Policy</a> or <a href="/terms">Terms of Service</a>.</p>
+          <p>Support: <strong>marvingabia5@gmail.com</strong></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// ================================================================
 // STUDENT ROUTES
 // ================================================================
 
