@@ -18,44 +18,52 @@
 
       {{> flash}}
 
-      <!-- Stat Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
+      <!-- Welcome Banner -->
+      <div class="card flex items-center gap-5" style="background:linear-gradient(135deg,#0c1f0e,#1b5e38);border-color:#166534;">
+        <div class="w-16 h-16 rounded-full bg-green-800 flex items-center justify-center text-3xl shrink-0">🎓</div>
+        <div>
+          <h2 class="text-white font-bold text-xl">Welcome, {{user.firstName}}!</h2>
+          <p class="text-green-300 text-sm mt-1">Guidance Office — MinSU Bongabong Campus</p>
+          <p class="text-green-400 text-xs mt-1">Use the sidebar to navigate Applications, Appointments, Reports, and more.</p>
+        </div>
+      </div>
 
-        <a href="/guidance/applications?status=payment_verified" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+
+        <div class="card flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">💰</div>
           <div>
             <p class="text-xl font-bold text-blue-600">{{verifiedCount}}</p>
             <p class="text-gray-500 text-xs">Payment Verified</p>
           </div>
-        </a>
+        </div>
 
-        <a href="/guidance/applications?status=receipt_issued" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+        <div class="card flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">📑</div>
           <div>
             <p class="text-xl font-bold text-purple-600">{{readyCount}}</p>
             <p class="text-gray-500 text-xs">Ready to Process</p>
           </div>
-        </a>
+        </div>
 
-        <a href="/guidance/applications?status=released" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+        <div class="card flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">🎓</div>
           <div>
             <p class="text-xl font-bold text-green-700">{{releasedCount}}</p>
             <p class="text-gray-500 text-xs">Released</p>
           </div>
-        </a>
+        </div>
 
-        <a href="/guidance/applications" class="card flex items-center gap-3 hover:shadow-lg transition-shadow">
+        <div class="card flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">📊</div>
           <div>
             <p class="text-xl font-bold text-slate-800">{{totalApps}}</p>
             <p class="text-gray-500 text-xs">Total Requests</p>
           </div>
-        </a>
+        </div>
 
       </div>
-
-
 
     </div>
   </div>
