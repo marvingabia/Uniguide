@@ -353,6 +353,24 @@ app.get('/auth/google/callback', (req, res, next) => {
 app.get('/auth/logout', authController.logout);
 
 // ================================================================
+// DEBUG ROUTES
+// ================================================================
+
+// Check session status
+app.get('/debug/session', (req, res) => {
+  res.json({
+    sessionID: req.sessionID,
+    hasSession: !!req.session,
+    hasUser: !!req.session?.user,
+    user: req.session?.user || null,
+    cookies: req.cookies,
+    headers: {
+      cookie: req.headers.cookie
+    }
+  });
+});
+
+// ================================================================
 // PUBLIC PAGES (For Google OAuth Branding)
 // ================================================================
 
