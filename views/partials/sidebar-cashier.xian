@@ -92,7 +92,7 @@
       class="sidebar-link {{#if (eq activePage 'home')}}active{{/if}}"
     >
       <span>🏠</span>
-      <span>Dashboard</span>
+      <span>Home</span>
     </a>
 
     <!-- PAYMENT LIST -->
