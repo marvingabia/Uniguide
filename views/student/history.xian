@@ -20,7 +20,7 @@
           <div class="flex items-start justify-between mb-3">
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-sm font-bold text-slate-800">Request #{{this.id}}</span>
+                <span class="text-sm font-bold text-slate-800">Request #{{add @index 1}}</span>
                 <span class="badge {{statusClass this.status}}">{{statusLabel this.status}}</span>
               </div>
               <p class="text-slate-700 font-medium text-sm mb-1">{{this.surname}}, {{this.givenName}} {{this.middleName}}</p>
@@ -135,7 +135,10 @@
               </div>
               <div>
                 <p class="text-xs text-gray-500 mb-1">Purpose:</p>
-                <p class="text-sm text-slate-700">{{this.purposes}}</p>
+                <div class="flex flex-wrap gap-1">
+                  {{#each (parsePurposes this.purposes)}}<span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs">{{this}}</span>{{/each}}
+                  {{#if this.otherPurpose}}<span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">{{this.otherPurpose}}</span>{{/if}}
+                </div>
               </div>
             </div>
             {{#if this.totalAmount}}

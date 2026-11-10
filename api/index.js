@@ -163,6 +163,16 @@ hbs.registerHelper('multiply', (a, b) => {
   return (parseFloat(a) || 0) * (parseFloat(b) || 0);
 });
 
+// ── Index helper ───────────────────────────────────────────────
+hbs.registerHelper('add', (a, b) => (parseInt(a) || 0) + (parseInt(b) || 0));
+
+// ── Parse purposes JSON → array ────────────────────────────────
+hbs.registerHelper('parsePurposes', (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  try { return JSON.parse(val); } catch { return [val]; }
+});
+
 // ── Application status helpers ─────────────────────────────────
 const STATUS_LABELS = {
   pending:             'Pending',
