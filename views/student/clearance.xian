@@ -17,7 +17,6 @@
     }
     .btn-back  { color: #1b5e38; font-size: 13px; font-weight: 600; text-decoration: none; }
     .btn-dl    { background: #1b5e38; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .btn-pay   { background: #2563eb; color: #fff; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; }
 
     /* ── Print area ── */
     #pdf-content {
@@ -110,16 +109,18 @@
       body { background: #fff; }
       #pdf-content { border: none; margin: 0; padding: 20px; box-shadow: none; }
     }
+
+    /* Hide action bar + instructions when inside iframe */
+    body.in-iframe .action-bar,
+    body.in-iframe .instructions { display: none !important; }
+    body.in-iframe #pdf-content { margin-bottom: 0; }
   </style>
 </head>
 <body>
 
-  <!-- ACTION BAR -->
-  <div class="action-bar">
-    <a href="/student/dashboard" class="btn-back">← Back to Home</a>
-    <div style="flex:1"></div>
+  <!-- ACTION BAR — hidden when loaded inside modal iframe -->
+  <div class="action-bar" id="actionBar">
     <button class="btn-dl" onclick="downloadPDF()">⬇️ Download PDF</button>
-    <a href="/student/application/{{app.id}}/payment" class="btn-pay">💳 Proceed to Payment</a>
   </div>
 
   <!-- FORM CONTENT -->
@@ -267,7 +268,6 @@
       <li>Submit the completed form + Official Receipt to the <strong>Guidance Office</strong></li>
       <li>Claim your <strong>Good Moral Certificate</strong></li>
     </ol>
-    <p style="margin-top:10px;font-size:12px;">— or if you prefer online payment, click <strong>Proceed to Payment</strong> above.</p>
   </div>
 
   <script>
@@ -290,6 +290,11 @@
       btn.innerHTML = original;
       btn.disabled = false;
     });
+  }
+
+  // Detect if inside iframe — hide action bar and instructions
+  if (window.self !== window.top) {
+    document.body.classList.add('in-iframe');
   }
   </script>
 
