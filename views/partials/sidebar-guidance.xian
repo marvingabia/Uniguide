@@ -101,8 +101,8 @@
 
     <!-- Student Request -->
     <a
-      href="/guidance/Student Request"
-      class="sidebar-link {{#if (eq activePage 'Student Request')}}active{{/if}}"
+      href="/guidance/applications"
+      class="sidebar-link {{#if (eq activePage 'applications')}}active{{/if}}"
     >
       <span>📋</span>
       <span>Student Request</span>
@@ -232,4 +232,5 @@
   </div>
 
 </aside>
+
 
