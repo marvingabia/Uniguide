@@ -54,15 +54,27 @@ window.addEventListener('appinstalled', function() {
   var fab = document.getElementById('pwa-install-fab');
   if (fab) fab.style.display = 'none';
   _pwaPrompt = null;
+  localStorage.setItem('pwa-installed', '1');
 });
+
+// Hide on load if already installed as PWA or previously installed
+(function() {
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  var wasInstalled = localStorage.getItem('pwa-installed') === '1';
+  if (isStandalone || wasInstalled) {
+    var fab = document.getElementById('pwa-install-fab');
+    if (fab) fab.style.display = 'none';
+  }
+})();
 
 function handlePWAInstall() {
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-  // Already installed
+  // Already installed — hide button silently
   if (isStandalone) {
-    alert('UniGuide is already installed on your device!');
+    var fab = document.getElementById('pwa-install-fab');
+    if (fab) fab.style.display = 'none';
     return;
   }
 
