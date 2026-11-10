@@ -34,11 +34,12 @@ export const dashboard = async (req, res) => {
     // Fetch from Firestore
     try {
       // New flow: guidance processes ALL pending + payment statuses directly
-      const pending  = await FirestoreAdapter.getAllApplications({ status: 'pending' });
-      const verified = await FirestoreAdapter.getAllApplications({ status: 'payment_verified' });
+      const pending   = await FirestoreAdapter.getAllApplications({ status: 'pending' });
+      const waiting   = await FirestoreAdapter.getAllApplications({ status: 'waiting_for_cashier' });
+      const verified  = await FirestoreAdapter.getAllApplications({ status: 'payment_verified' });
       const receipted = await FirestoreAdapter.getAllApplications({ status: 'receipt_issued' });
       const submitted = await FirestoreAdapter.getAllApplications({ status: 'payment_submitted' });
-      toProcess = [...pending, ...submitted, ...verified, ...receipted];
+      toProcess = [...pending, ...waiting, ...submitted, ...verified, ...receipted];
       approved = await FirestoreAdapter.getAllApplications({ status: 'approved' });
       released = await FirestoreAdapter.getAllApplications({ status: 'released' });
 
@@ -98,6 +99,41 @@ export const dashboard = async (req, res) => {
 };
 
 // All applications
+// Notify student to proceed to cashier for payment
+export const notifyPayment = async (req, res) => {
+  try {
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
+    if (!app) {
+      req.flash('error', 'Application not found');
+      return res.redirect('/guidance/applications');
+    }
+
+    // Update status to waiting_for_cashier
+    await FirestoreAdapter.updateApplication(req.params.id, {
+      status: 'waiting_for_cashier',
+      notifiedForPaymentAt: new Date().toISOString(),
+      notifiedBy: req.session.user.email
+    });
+
+    // Notify student
+    await FirestoreAdapter.createNotification({
+      userId: app.userId,
+      type: 'info',
+      title: '💳 Proceed to Cashier for Payment',
+      message: `Your Good Moral Certificate request has been reviewed. Please proceed to the Cashier to pay ₱${app.totalAmount}.00 and present your clearance form.`,
+      applicationId: req.params.id,
+      isRead: false
+    });
+
+    req.flash('success', 'Student has been notified to proceed to the cashier for payment.');
+    res.redirect(`/guidance/application/${req.params.id}`);
+  } catch (error) {
+    console.error('Notify payment error:', error.message);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect(`/guidance/application/${req.params.id}`);
+  }
+};
+
 // View clearance form (guidance can view/download student's clearance)
 export const viewClearanceForm = async (req, res) => {
   try {

@@ -139,6 +139,21 @@
       </script>
 
       {{#if (or (eq app.status 'pending') (eq app.status 'receipt_issued') (eq app.status 'payment_verified') (eq app.status 'payment_submitted'))}}
+
+      <!-- Proceed to Cashier button — only for pending (before payment) -->
+      {{#if (eq app.status 'pending')}}
+      <div class="mb-3">
+        <form action="/guidance/application/{{app.id}}/notify-payment" method="POST">
+          <button type="submit" class="w-full py-2 text-sm font-semibold rounded-lg"
+            style="background:#2563eb;color:#fff;border:none;cursor:pointer;"
+            onclick="return confirm('Notify student to proceed to cashier for payment?')">
+            💳 Proceed to Cashier for Payment
+          </button>
+        </form>
+        <p class="text-gray-400 text-xs text-center mt-1">Student will receive a notification to pay at the cashier</p>
+      </div>
+      {{/if}}
+
       <div class="flex gap-3">
         <form action="/guidance/application/{{app.id}}/approve" method="POST" class="flex-1">
           <button class="btn-green w-full py-3" onclick="return confirm('Approve and prepare certificate?')">✓ Approve Request</button>
