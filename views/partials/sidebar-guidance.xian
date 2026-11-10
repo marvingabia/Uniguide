@@ -99,13 +99,13 @@
       <span>Home</span>
     </a>
 
-    <!-- APPLICATIONS -->
+    <!-- Student Request -->
     <a
-      href="/guidance/applications"
-      class="sidebar-link {{#if (eq activePage 'applications')}}active{{/if}}"
+      href="/guidance/Student Request"
+      class="sidebar-link {{#if (eq activePage 'Student Request')}}active{{/if}}"
     >
       <span>📋</span>
-      <span>Applications</span>
+      <span>Student Request</span>
     </a>
 
     <!-- APPOINTMENTS -->
@@ -232,3 +232,4 @@
   </div>
 
 </aside>
+

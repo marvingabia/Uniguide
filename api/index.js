@@ -167,11 +167,11 @@ hbs.registerHelper('multiply', (a, b) => {
 const STATUS_LABELS = {
   pending:             'Pending',
   payment_submitted:   'Payment Submitted',
-  waiting_for_cashier: 'Waiting for Cashier',
+  waiting_for_cashier: 'Pending Payment',
   payment_verified:    'Payment Verified',
   receipt_issued:      'Receipt Issued',
   approved:            'Approved',
-  released:            'Released',
+  released:            'Ready to Claim',
   rejected:            'Rejected',
   claimed:             'Claimed',
 };
