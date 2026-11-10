@@ -121,6 +121,7 @@
   <!-- ACTION BAR — hidden when loaded inside modal iframe -->
   <div class="action-bar" id="actionBar">
     <button class="btn-dl" onclick="downloadPDF()">⬇️ Download PDF</button>
+    <a href="/student/dashboard" style="background:#64748b;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;">✓ Done</a>
   </div>
 
   <!-- FORM CONTENT -->
