@@ -236,6 +236,16 @@ hbs.registerHelper('lte', (a, b) => parseFloat(a) <= parseFloat(b));
 // Usage: {{#each (list 'a' 'b' 'c')}} … {{/each}}
 hbs.registerHelper('list', (...args) => args.slice(0, -1));
 
+// Usage: {{#if (includes array 'value')}}
+hbs.registerHelper('includes', (arr, val) => {
+  if (!arr) return false;
+  if (Array.isArray(arr)) return arr.includes(val);
+  if (typeof arr === 'string') {
+    try { return JSON.parse(arr).includes(val); } catch { return arr.includes(val); }
+  }
+  return false;
+});
+
 // ── Time ago helper ────────────────────────────────────────────
 hbs.registerHelper('timeAgo', (val) => {
   if (!val) return '—';
@@ -660,6 +670,7 @@ app.get('/student/apply', requireRole('student'), student.showApplyForm);
 app.post('/student/apply', requireRole('student'), student.submitApplication);
 app.get('/student/application/:id', requireRole('student'), student.viewApplication);
 app.post('/student/application/:id/delete', requireRole('student'), student.deleteApplication);
+app.get('/student/application/:id/clearance', requireRole('student'), student.showClearanceForm);
 app.get('/student/application/:id/payment', requireRole('student'), student.showPaymentForm);
 app.post('/student/application/:id/payment', requireRole('student'), uploadPayment.single('screenshot'), student.submitPayment);
 app.get('/student/notifications', requireRole('student'), student.viewNotifications);

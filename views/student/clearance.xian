@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clearance Form — UniGuide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f1f5f9; margin: 0; padding: 0; }
+
+    /* ── Print area ── */
+    .print-area {
+      background: #fff;
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 28px 32px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* ── MSU Header ── */
+    .msu-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+    .msu-logo { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; }
+    .msu-title { flex: 1; }
+    .msu-title h1 { font-size: 20px; font-weight: 900; margin: 0 0 2px; color: #000; }
+    .msu-title p { font-size: 10px; color: #555; margin: 0; }
+    .msu-contact { font-size: 9px; color: #555; text-align: right; min-width: 180px; line-height: 1.6; }
+
+    .form-title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 13px;
+      border-top: 1.5px solid #000;
+      border-bottom: 1.5px solid #000;
+      padding: 5px 0;
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Sections ── */
+    .section-title { font-weight: 700; font-size: 12px; margin: 12px 0 6px; }
+    .info-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 8px; }
+    .info-table td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; }
+    .info-table .field-label { font-size: 10px; color: #333; white-space: nowrap; width: 170px; }
+    .info-table .field-value { font-weight: 600; color: #000; }
+
+    /* ── Purpose row ── */
+    .purpose-row { display: flex; gap: 24px; flex-wrap: wrap; font-size: 11px; margin: 4px 0 10px; }
+    .purpose-item { display: flex; align-items: center; gap: 5px; }
+    .chk-box {
+      width: 11px; height: 11px; border: 1px solid #000;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 9px; flex-shrink: 0;
+    }
+    .chk-box.checked { background: #000; color: #fff; }
+
+    /* ── Verification table ── */
+    .verify-table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 6px 0; }
+    .verify-table th, .verify-table td {
+      border: 1px solid #000; padding: 5px 7px; vertical-align: top; text-align: left;
+    }
+    .verify-table th { background: #f0f0f0; font-weight: 700; font-size: 10px; text-align: center; }
+    .verify-table td.office-col { width: 160px; font-weight: 600; }
+    .verify-table td.aspect-col { width: 180px; }
+    .verify-table td.remarks-col { width: 130px; }
+    .verify-table td.verified-col { width: 130px; }
+    .verify-table td.date-col { width: 70px; }
+    .verify-table td.blank { min-height: 36px; height: 36px; }
+
+    /* ── Recommendation ── */
+    .rec-section { margin-top: 10px; font-size: 11px; }
+    .rec-row { display: flex; gap: 20px; margin-bottom: 4px; }
+
+    /* ── Signature line ── */
+    .sig-line { border-bottom: 1px solid #000; min-width: 200px; display: inline-block; margin-right: 4px; }
+
+    /* ── Notes ── */
+    .notes-section { font-size: 10px; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 8px; }
+    .notes-section ul { margin: 4px 0 0 16px; padding: 0; }
+    .notes-section li { margin-bottom: 2px; }
+
+    /* ── Form code ── */
+    .form-code { text-align: right; font-size: 9px; color: #888; margin-top: 8px; }
+
+    /* ── Action buttons (screen only) ── */
+    .action-bar {
+      max-width: 750px; margin: 0 auto;
+      padding: 16px 0;
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+
+    @media print {
+      .action-bar { display: none !important; }
+      body { background: #fff; }
+      .print-area { border: none; margin: 0; padding: 20px; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ACTION BAR (hidden on print) -->
+  <div class="action-bar">
+    <a href="/student/dashboard" style="color:#1b5e38;font-size:13px;font-weight:600;text-decoration:none;">← Back to Dashboard</a>
+    <div style="flex:1;"></div>
+    <button onclick="window.print()" style="background:#1b5e38;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Print / Save PDF</button>
+    <a href="/student/application/{{app.id}}/payment" style="background:#2563eb;color:#fff;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:700;text-decoration:none;">💳 Proceed to Payment</a>
+  </div>
+
+  <!-- PRINT AREA -->
+  <div class="print-area">
+
+    <!-- MSU Header -->
+    <div class="msu-header">
+      <img src="/uploads/minsulogo.png" class="msu-logo" alt="MSU Logo">
+      <div class="msu-title">
+        <h1>Mindoro State University</h1>
+        <p>Victoria, Oriental Mindoro 5205 Philippines</p>
+      </div>
+      <div class="msu-contact">
+        Email: universitypresident@minsu.edu.ph<br>
+        Website: www.minsu.edu.ph<br>
+        Mobile: +63 977 846 72 28
+      </div>
+    </div>
+
+    <div class="form-title">Verification Checklist for Certificate of Good Moral Character</div>
+
+    <!-- I. Student Information -->
+    <div class="section-title">I.&nbsp;&nbsp; Student Information</div>
+    <table class="info-table">
+      <tr>
+        <td class="field-label">Name of Student/Client:</td>
+        <td class="field-value" colspan="3">{{app.surname}}, {{app.givenName}} {{app.middleName}}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Student Number (if necessary):</td>
+        <td class="field-value" colspan="3">{{user.studentId}}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Program &amp; Year:</td>
+        <td class="field-value" colspan="3">{{app.course}}{{#if app.yearLevel}} — {{app.yearLevel}}{{/if}}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Contact Number:</td>
+        <td class="field-value">{{app.contactNumber}}</td>
+        <td class="field-label" style="width:120px;">Date of Request:</td>
+        <td class="field-value">{{dateToday}}</td>
+      </tr>
+    </table>
+
+    <!-- II. Purpose of Request -->
+    <div class="section-title">II.&nbsp;&nbsp; Purpose of Request</div>
+    <div class="purpose-row">
+      <div class="purpose-item">
+        <span class="chk-box {{#if (or (includes purposes 'Transfer') (includes purposes 'Transfer to Another School'))}}checked{{/if}}">{{#if (or (includes purposes 'Transfer') (includes purposes 'Transfer to Another School'))}}✓{{/if}}</span>
+        For Transfer
+      </div>
+      <div class="purpose-item">
+        <span class="chk-box {{#if (includes purposes 'Employment')}}checked{{/if}}">{{#if (includes purposes 'Employment')}}✓{{/if}}</span>
+        For Employment
+      </div>
+      <div class="purpose-item">
+        <span class="chk-box {{#if (includes purposes 'Scholarship')}}checked{{/if}}">{{#if (includes purposes 'Scholarship')}}✓{{/if}}</span>
+        For Scholarship
+      </div>
+      <div class="purpose-item">
+        <span class="chk-box {{#if app.otherPurpose}}checked{{/if}}">{{#if app.otherPurpose}}✓{{/if}}</span>
+        Others: <span style="border-bottom:1px solid #000;min-width:100px;display:inline-block;padding:0 4px;">{{app.otherPurpose}}{{#if (includes purposes 'OJT')}}OJT{{/if}}{{#if (includes purposes 'Board Examination')}}Board Exam{{/if}}{{#if (includes purposes 'PNP/AFP Application')}}PNP/AFP{{/if}}{{#if (includes purposes 'Passport Application')}}Passport{{/if}}</span>
+      </div>
+    </div>
+
+    <!-- III. Verification Areas -->
+    <div class="section-title">III.&nbsp;&nbsp; Verification Areas</div>
+    <table class="verify-table">
+      <thead>
+        <tr>
+          <th class="office-col">Office/ Person Concerned</th>
+          <th class="aspect-col">Aspect to Verify</th>
+          <th class="remarks-col">Verified Remarks/ Findings</th>
+          <th class="verified-col">Verified By<br>(Signature over Printed Name)</th>
+          <th class="date-col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="office-col">Registrar's Office</td>
+          <td class="aspect-col">Academic performance (e.g., Passed/Failed subjects; remarks on academic record)</td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+        </tr>
+        <tr>
+          <td class="office-col">Subject Teacher</td>
+          <td class="aspect-col">Classroom attitude, punctuality, cooperation, and respectfulness</td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+        </tr>
+        <tr>
+          <td class="office-col">Dean/ Program Chair</td>
+          <td class="aspect-col">General behavior and academic conduct within the department</td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+        </tr>
+        <tr>
+          <td class="office-col">Director for Student Support &amp; Engagement</td>
+          <td class="aspect-col">University-level disciplinary record, including any major or minor offenses, sanctions, or pending disciplinary actions, in accordance with the Student Handbook</td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+          <td class="blank"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- IV. Recommendation -->
+    <div class="section-title">IV.&nbsp;&nbsp; Recommendation:</div>
+    <div class="rec-section">
+      <div class="rec-row">
+        <div class="purpose-item"><span class="chk-box"></span> QUALIFIED for issuance of Certificate of Good Moral Character</div>
+      </div>
+      <div class="rec-row">
+        <div class="purpose-item"><span class="chk-box"></span> NOT QUALIFIED (State reason): <span class="sig-line" style="min-width:260px;"></span></div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;">
+        Verified and Checked by: <span class="sig-line" style="min-width:200px;"></span><br>
+        <span style="margin-left:4px;">Date: <span class="sig-line" style="min-width:120px;"></span></span>
+        <span style="margin-left:12px;font-style:italic;">(Guidance Counselor/ Staff)</span>
+      </div>
+    </div>
+
+    <!-- V. Notes -->
+    <div class="notes-section">
+      <strong>V.&nbsp;&nbsp; Notes:</strong>
+      <ul>
+        <li>-This checklist must be completed before the issuance of the Certificate of Good Moral Character.</li>
+        <li>-Any falsified or incomplete verification automatically invalidates the request.</li>
+        <li>-Attach the following supporting documents:</li>
+      </ul>
+      <ul style="list-style:disc;margin-left:32px;">
+        <li>Photocopy of the Student I.D. with signature</li>
+        <li>Fully accomplished CGMC Request Form</li>
+        <li>Official Receipt with DST</li>
+      </ul>
+    </div>
+
+    <div class="form-code">MSU-GUI-FR-02.02</div>
+
+  </div>
+
+  <!-- Instructions below print area (screen only) -->
+  <div class="action-bar" style="flex-direction:column;align-items:flex-start;padding:16px;">
+    <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:14px 18px;max-width:750px;width:100%;font-size:13px;color:#78350f;">
+      <p style="font-weight:700;margin:0 0 8px;">📋 Next Steps after Printing:</p>
+      <ol style="margin:0;padding-left:18px;line-height:1.9;">
+        <li><strong>Print</strong> this form and have it verified by the offices listed above</li>
+        <li><strong>Proceed to the Cashier</strong> to pay ₱{{app.totalAmount}}.00 and get your Official Receipt</li>
+        <li><strong>Submit</strong> the completed form + Official Receipt to the Guidance Office</li>
+        <li><strong>Claim</strong> your Good Moral Certificate from the Guidance Office</li>
+      </ol>
+      <p style="margin:10px 0 0;font-size:12px;">— OR — if you prefer online payment:</p>
+    </div>
+    <a href="/student/application/{{app.id}}/payment" style="background:#2563eb;color:#fff;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;text-decoration:none;margin-top:10px;">💳 Submit Online Payment Proof Instead</a>
+  </div>
+
+</body>
+</html>

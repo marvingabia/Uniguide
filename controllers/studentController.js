@@ -202,13 +202,9 @@ export const submitApplication = async (req, res) => {
     );
 
     console.log('✅ Application created successfully:', application.id);
-    req.flash('success', 'Application submitted! Please proceed to payment.');
-    
-    return req.session.save((err) => {
-      if (err) console.error('❌ Session save error:', err.message);
-      // Redirect to payment page with application ID
-      res.redirect(`/student/application/${application.id}/payment`);
-    });
+    req.flash('success', 'Application submitted! Please print your clearance form.');
+    // Redirect to clearance form for printing
+    res.redirect(`/student/application/${application.id}/clearance`);
 
   } catch (err) {
     console.error('❌ Submit error:', err.message);
@@ -222,6 +218,28 @@ export const submitApplication = async (req, res) => {
 };
 
 // Show payment form
+// Show clearance form (printable MSU form)
+export const showClearanceForm = async (req, res) => {
+  try {
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
+    if (!app || app.userId !== req.session.user.id) {
+      return res.redirect('/student/dashboard');
+    }
+    let purposes = [];
+    try { purposes = JSON.parse(app.purposes || '[]'); } catch {}
+    res.render('student/clearance', {
+      title: 'Clearance Form — UniGuide',
+      user: req.session.user,
+      app,
+      purposes,
+      dateToday: new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
+    });
+  } catch (error) {
+    console.error('Clearance form error:', error.message);
+    res.redirect('/student/dashboard');
+  }
+};
+
 export const showPaymentForm = async (req, res) => {
   try {
     console.log('');
