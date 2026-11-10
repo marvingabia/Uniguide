@@ -99,11 +99,44 @@
       <!-- Actions -->
       <!-- View Clearance Form - always visible -->
       <div class="mb-4">
-        <a href="/guidance/application/{{app.id}}/clearance" target="_blank"
+        <button onclick="openClearanceModal()" 
            class="btn-outline w-full py-2 text-center block text-sm font-semibold">
           📄 View / Download Clearance Form
-        </a>
+        </button>
       </div>
+
+      <!-- Clearance Form Modal -->
+      <div id="clearanceModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;overflow-y:auto;">
+        <div style="max-width:800px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;">
+          <div style="background:#1b5e38;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="color:#fff;font-weight:700;font-size:14px;">📄 Clearance Form</span>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <a href="/guidance/application/{{app.id}}/clearance-pdf" download style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;text-decoration:none;">⬇️ Download PDF</a>
+              <button onclick="closeClearanceModal()" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:16px;cursor:pointer;">✕</button>
+            </div>
+          </div>
+          <iframe id="clearanceFrame" src="" style="width:100%;height:80vh;border:none;"></iframe>
+        </div>
+      </div>
+
+      <script>
+      function openClearanceModal() {
+        var modal = document.getElementById('clearanceModal');
+        var frame = document.getElementById('clearanceFrame');
+        frame.src = '/guidance/application/{{app.id}}/clearance';
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+      function closeClearanceModal() {
+        document.getElementById('clearanceModal').style.display = 'none';
+        document.getElementById('clearanceFrame').src = '';
+        document.body.style.overflow = '';
+      }
+      // Close on backdrop click
+      document.getElementById('clearanceModal').addEventListener('click', function(e) {
+        if (e.target === this) closeClearanceModal();
+      });
+      </script>
 
       {{#if (or (eq app.status 'pending') (eq app.status 'receipt_issued') (eq app.status 'payment_verified') (eq app.status 'payment_submitted'))}}
       <div class="flex gap-3">
