@@ -704,6 +704,7 @@ app.get('/guidance/home', requireRole('guidance'), guidance.dashboard);
 app.get('/guidance/dashboard', requireRole('guidance'), guidance.dashboard);
 app.get('/guidance/applications', requireRole('guidance'), guidance.allApplications);
 app.get('/guidance/application/:id', requireRole('guidance'), guidance.viewApplication);
+app.get('/guidance/application/:id/clearance', requireRole('guidance'), guidance.viewClearanceForm);
 app.post('/guidance/application/:id/approve', requireRole('guidance'), guidance.approveApplication);
 app.post('/guidance/application/:id/release', requireRole('guidance'), guidance.releaseCertificate);
 app.post('/guidance/application/:id/reject', requireRole('guidance'), guidance.rejectApplication);

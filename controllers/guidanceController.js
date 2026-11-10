@@ -33,11 +33,12 @@ export const dashboard = async (req, res) => {
 
     // Fetch from Firestore
     try {
-      // Fetch applications that are ready for guidance to process
-      // This includes both: verified but not receipted, and receipted applications
+      // New flow: guidance processes ALL pending + payment statuses directly
+      const pending  = await FirestoreAdapter.getAllApplications({ status: 'pending' });
       const verified = await FirestoreAdapter.getAllApplications({ status: 'payment_verified' });
       const receipted = await FirestoreAdapter.getAllApplications({ status: 'receipt_issued' });
-      toProcess = [...verified, ...receipted];
+      const submitted = await FirestoreAdapter.getAllApplications({ status: 'payment_submitted' });
+      toProcess = [...pending, ...submitted, ...verified, ...receipted];
       approved = await FirestoreAdapter.getAllApplications({ status: 'approved' });
       released = await FirestoreAdapter.getAllApplications({ status: 'released' });
 
@@ -45,8 +46,8 @@ export const dashboard = async (req, res) => {
       const allApps = await FirestoreAdapter.getAllApplications();
       totalApps = allApps.length;
       pendingCount = allApps.filter(a => a.status === 'pending').length;
-      verifiedCount = allApps.filter(a => a.status === 'payment_verified' || a.status === 'receipt_issued').length;
-      readyCount = allApps.filter(a => a.status === 'receipt_issued').length;
+      verifiedCount = allApps.filter(a => ['payment_verified','receipt_issued','payment_submitted'].includes(a.status)).length;
+      readyCount = pendingCount + verifiedCount;
       releasedCount = allApps.filter(a => a.status === 'released').length;
 
       console.log(`📊 Guidance Dashboard: ${totalApps} total, ${readyCount} ready to process, ${releasedCount} released`);
@@ -97,6 +98,35 @@ export const dashboard = async (req, res) => {
 };
 
 // All applications
+// View clearance form (guidance can view/download student's clearance)
+export const viewClearanceForm = async (req, res) => {
+  try {
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
+    if (!app) {
+      req.flash('error', 'Application not found');
+      return res.redirect('/guidance/applications');
+    }
+    // Get student info for the form
+    let studentUser = null;
+    try { studentUser = await FirestoreAdapter.findUserById(app.userId); } catch {}
+
+    let purposes = [];
+    try { purposes = typeof app.purposes === 'string' ? JSON.parse(app.purposes) : (app.purposes || []); } catch {}
+
+    res.render('student/clearance', {
+      title: 'Clearance Form — UniGuide',
+      user: req.session.user,
+      app,
+      purposes,
+      studentUser,
+      dateToday: new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
+    });
+  } catch (error) {
+    console.error('View clearance form error:', error.message);
+    res.redirect('/guidance/applications');
+  }
+};
+
 // All Applications
 export const allApplications = async (req, res) => {
   try {
