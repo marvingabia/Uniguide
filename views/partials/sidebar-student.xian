@@ -29,9 +29,10 @@
   .student-sidebar-toggle {
     position: fixed;
     left: 0;
-    top: 100px;
+    top: 0;
 
-    width: 28px;
+    width: 50px;
+    height: 64px;
     height: 36px;
 
     border: none;
@@ -146,9 +147,10 @@
 
 
     .student-sidebar-toggle {
-      top: 12px;
+      top: 0;
       left: 0;
-      width: 30px;
+      width: 50px;
+      height: 64px;
       height: 38px;
     }
 
