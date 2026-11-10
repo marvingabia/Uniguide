@@ -138,9 +138,9 @@
       });
       </script>
 
-      {{#if (or (eq app.status 'pending') (eq app.status 'receipt_issued') (eq app.status 'payment_verified') (eq app.status 'payment_submitted'))}}
+      {{#if (or (eq app.status 'pending') (eq app.status 'waiting_for_cashier') (eq app.status 'payment_submitted') (eq app.status 'payment_verified') (eq app.status 'receipt_issued'))}}
 
-      <!-- Proceed to Cashier button — only for pending (before payment) -->
+      <!-- Proceed to Cashier — only for pending (not yet notified) -->
       {{#if (eq app.status 'pending')}}
       <div class="mb-3">
         <form action="/guidance/application/{{app.id}}/notify-payment" method="POST">
@@ -154,9 +154,18 @@
       </div>
       {{/if}}
 
+      <!-- Status info for waiting_for_cashier -->
+      {{#if (eq app.status 'waiting_for_cashier')}}
+      <div class="card mb-3" style="background:#eff6ff;border-color:#3b82f6;">
+        <p class="text-blue-700 text-sm font-semibold">💳 Student notified to proceed to cashier for payment</p>
+        <p class="text-blue-500 text-xs mt-1">You can still approve once the student has paid.</p>
+      </div>
+      {{/if}}
+
+      <!-- Approve / Reject — available for all pre-approved statuses -->
       <div class="flex gap-3">
         <form action="/guidance/application/{{app.id}}/approve" method="POST" class="flex-1">
-          <button class="btn-green w-full py-3" onclick="return confirm('Approve and prepare certificate?')">✓ Approve Request</button>
+          <button class="btn-green w-full py-3" onclick="return confirm('Approve this request?')">✓ Approve Request</button>
         </form>
         <div class="flex-1">
           <form action="/guidance/application/{{app.id}}/reject" method="POST" class="space-y-2">
@@ -168,9 +177,13 @@
       {{/if}}
 
       {{#if (eq app.status 'approved')}}
+      <div class="card mb-3" style="background:#f0fdf4;border-color:#22c55e;">
+        <p class="text-green-700 font-semibold text-sm">✅ Request Approved — Certificate is being prepared</p>
+        <p class="text-green-600 text-xs mt-1">Click below when the certificate is ready for the student to claim.</p>
+      </div>
       <form action="/guidance/application/{{app.id}}/release" method="POST">
-        <button class="btn-green w-full py-3 text-base" onclick="return confirm('Mark certificate as released? Student will be notified.')">
-          🎓 Release Certificate
+        <button class="btn-green w-full py-3 text-base" onclick="return confirm('Mark as Ready for Claim? Student will be notified.')">
+          🎓 Ready for Claim
         </button>
       </form>
       {{/if}}
@@ -179,13 +192,13 @@
       <div class="card" style="background:#0a1f0a;border-color:#166534">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-green-700 font-bold">🎓 Certificate Released</p>
-            <p class="text-slate-500 text-sm">Released on {{formatDate app.releasedAt}} by {{app.releasedBy}}</p>
-            <p class="text-gray-500 text-sm mt-1">Claim status: <span class="text-slate-700 font-semibold">{{app.claimStatus}}</span></p>
+            <p class="text-green-400 font-bold">🎓 Ready for Claim</p>
+            <p class="text-slate-400 text-sm mt-1">Released on {{formatDate app.releasedAt}} by {{app.releasedBy}}</p>
+            <p class="text-gray-400 text-sm mt-1">Status: <span class="font-semibold text-white">{{#if (eq app.claimStatus 'claimed')}}✅ Claimed{{else}}⏳ Unclaimed{{/if}}</span></p>
           </div>
           {{#if (eq app.claimStatus 'unclaimed')}}
           <form action="/guidance/application/{{app.id}}/claim" method="POST">
-            <button class="btn-outline btn-sm" onclick="return confirm('Mark as claimed?')">Mark Claimed</button>
+            <button class="btn-green btn-sm" onclick="return confirm('Mark certificate as released/claimed?')">✓ Mark as Released</button>
           </form>
           {{/if}}
         </div>
