@@ -1,4 +1,4 @@
-<!-- PWA Install Button - always visible in top right -->
+<!-- PWA Install Button - hidden by default, shown only when browser signals installable -->
 <button
   id="pwa-install-fab"
   title="Install App on your device"
@@ -16,7 +16,7 @@
     font-weight:600;
     cursor:pointer;
     box-shadow:0 2px 8px rgba(0,0,0,0.25);
-    display:flex;
+    display:none;
     align-items:center;
     gap:5px;
   "
@@ -41,12 +41,16 @@
 <script>
 var _pwaPrompt = null;
 
-// Capture install prompt
+// Capture install prompt — show button only when browser is ready AND not installed
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   _pwaPrompt = e;
-  console.log('[PWA] Install prompt ready');
-  window.dispatchEvent(new CustomEvent('pwaInstallPromptReady'));
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  var wasInstalled = localStorage.getItem('pwa-installed') === '1';
+  if (!isStandalone && !wasInstalled) {
+    var fab = document.getElementById('pwa-install-fab');
+    if (fab) fab.style.display = 'flex';
+  }
 });
 
 window.addEventListener('appinstalled', function() {
