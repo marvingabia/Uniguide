@@ -1,6 +1,7 @@
 import { Application, Announcement, Notification, Appointment, User, TimeSlot } from '../models/index.js';
 import { FirestoreAdapter } from '../models/firestore-adapter.js';
 import { createNotification, notifyAllRole } from '../utils/notifications.js';
+import { recommendSlot } from '../utils/appointmentML.js';
 import { Op } from 'sequelize';
 import { sequelize } from '../models/db.js';
 
@@ -484,8 +485,7 @@ export const showAppointmentForm = async (req, res) => {
 export const bookAppointment = async (req, res) => {
   try {
     const { purpose, notes, otherPurpose } = req.body;
-    
-    // Validate purpose
+
     if (!purpose || purpose === 'Select purpose') {
       req.flash('error', 'Please select a purpose');
       return res.redirect('/student/appointments');
@@ -493,32 +493,87 @@ export const bookAppointment = async (req, res) => {
 
     const finalPurpose = purpose === 'Other' && otherPurpose ? otherPurpose : purpose;
 
-    // Create appointment request in Firestore
+    // ── 🤖 ML: Fetch available slots and run recommendation ──────
+    let mlResult = null;
+    let assignedDate = null;
+    let assignedTime = null;
+    let assignedSlotId = null;
+
+    try {
+      const availableSlots = await FirestoreAdapter.getTimeSlots({ isAvailable: true });
+      const existingBookings = await FirestoreAdapter.getAppointmentRequests({ status: 'approved' });
+
+      if (availableSlots && availableSlots.length > 0) {
+        mlResult = recommendSlot(
+          finalPurpose,
+          req.session.user,
+          availableSlots,
+          existingBookings
+        );
+
+        if (mlResult?.recommended) {
+          assignedDate   = mlResult.recommended.date;
+          assignedTime   = mlResult.recommended.time || mlResult.recommended.timeSlot;
+          assignedSlotId = mlResult.recommended.id;
+          console.log(`🤖 ML auto-assigned: ${assignedDate} ${assignedTime}`);
+        }
+      }
+    } catch (mlErr) {
+      console.error('⚠️ ML recommendation failed (non-critical):', mlErr.message);
+    }
+
+    // ── Create appointment request ───────────────────────────────
+    const status = assignedDate ? 'approved' : 'pending';
+
     const appointmentRequest = await FirestoreAdapter.createAppointmentRequest({
-      userId: req.session.user.id,
+      userId:    req.session.user.id,
       firstName: req.session.user.firstName,
-      lastName: req.session.user.lastName,
-      email: req.session.user.email,
-      purpose: finalPurpose,
-      notes: notes || '',
-      status: 'pending',
-      createdAt: new Date().toISOString()
+      lastName:  req.session.user.lastName,
+      email:     req.session.user.email,
+      purpose:   finalPurpose,
+      notes:     notes || '',
+      status,
+      // ML-assigned fields
+      date:          assignedDate || null,
+      timeSlot:      assignedTime || null,
+      assignedSlotId: assignedSlotId || null,
+      mlAssigned:    !!assignedDate,
+      mlReason:      mlResult?.reason || null,
+      mlConfidence:  mlResult?.confidence || null,
+      createdAt:     new Date().toISOString()
     });
 
-    // Get student info for notification
-    const student = await FirestoreAdapter.findUserById(req.session.user.id);
+    // ── Notify guidance ──────────────────────────────────────────
+    const guidanceUser = await FirestoreAdapter.findUserByEmail('guidance@minsu.edu.ph').catch(() => null);
+    const guidanceId   = guidanceUser?.id || 'guidance@minsu.edu.ph';
 
-    // Send notification to guidance that new appointment request came in
     await FirestoreAdapter.createNotification({
-      userId: 'guidance@minsu.edu.ph',
-      type: 'info',
-      title: '📅 New Appointment Request',
-      message: `${student?.firstName || 'A student'} requested a counselling appointment for: ${finalPurpose}`,
+      userId: guidanceId,
+      type:   'info',
+      title:  '📅 New Appointment Request',
+      message: assignedDate
+        ? `${req.session.user.firstName} ${req.session.user.lastName} requested ${finalPurpose}. 🤖 ML auto-assigned: ${assignedDate} at ${assignedTime}`
+        : `${req.session.user.firstName} ${req.session.user.lastName} requested a counselling appointment for: ${finalPurpose}. No available slots found — please assign manually.`,
       appointmentId: appointmentRequest.id,
       isRead: false
     });
 
-    req.flash('success', '✓ Appointment request submitted! Guidance will review and assign a schedule.');
+    // ── Notify student if ML auto-assigned ───────────────────────
+    if (assignedDate) {
+      await FirestoreAdapter.createNotification({
+        userId: req.session.user.id,
+        type:   'success',
+        title:  '✅ Appointment Scheduled',
+        message: `🤖 Your appointment has been automatically scheduled!\n📅 Date: ${assignedDate}\n⏰ Time: ${assignedTime}\n📌 Purpose: ${finalPurpose}\n\n${mlResult?.reason || ''}`,
+        appointmentId: appointmentRequest.id,
+        isRead: false
+      });
+
+      req.flash('success', `✅ Appointment auto-scheduled by our smart system! 📅 ${assignedDate} at ${assignedTime}`);
+    } else {
+      req.flash('success', '✓ Appointment request submitted! Guidance will review and assign a schedule.');
+    }
+
     res.redirect('/student/appointments');
   } catch (err) {
     console.error('Booking error:', err.message);
