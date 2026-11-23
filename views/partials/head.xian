@@ -287,11 +287,22 @@
       margin-left: 0;
 
       background: #ffffff;
-
       border-bottom: 1px solid #e2e8f0;
 
       position: sticky;
       top: 0;
+      z-index: 101;
+    }
+
+    /* ── Toggle sits inside nav-top via absolute on mobile ── */
+    .sidebar-toggle {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      height: 64px !important;
+      width: 50px !important;
+      z-index: 10001 !important;
+    }
 
       z-index: 100;
     }
@@ -582,9 +593,10 @@
       }
 
       .sidebar-toggle {
-        top: 70px;
-        width: 30px;
-        height: 46px;
+        top: 0 !important;
+        left: 0;
+        width: 50px;
+        height: 64px !important;
       }
 
       .sidebar-toggle.open {
