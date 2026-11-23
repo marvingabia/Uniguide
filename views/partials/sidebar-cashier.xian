@@ -5,7 +5,7 @@
   onclick="toggleSidebar()"
   aria-label="Toggle sidebar"
   title="Open navigation"
-  style="margin: 8px; margin-left: 12px;"
+  style="margin:0;"
 >
   <div class="hamburger">
     <span></span>
@@ -183,3 +183,4 @@
   </div>
 
 </aside>
+
