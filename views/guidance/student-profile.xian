@@ -17,15 +17,16 @@
     <div class="px-5 py-5">
       {{> flash}}
 
-      <div class="grid grid-cols-3 gap-5">
-        <!-- Left: Profile Info -->
-        <div class="col-span-2 space-y-5">
+      <!-- Mobile: profile card on top, then form below. Desktop: 2/3 + 1/3 side by side -->
+      <div class="flex flex-col md:grid md:grid-cols-3 gap-5">
+        <!-- Left: Profile Info (shown second on mobile, first on desktop) -->
+        <div class="col-span-2 space-y-5 order-2 md:order-1">
           
           <!-- Basic Info Card -->
           <div class="card">
             <h2 class="font-semibold text-teal-700 mb-3">📋 Basic Information</h2>
             <form method="POST" action="/guidance/profiling/student/{{student.id}}">
-              <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 mb-1">Birthdate</label>
                   <input type="date" name="birthdate" value="{{#if student.profile.birthdate}}{{student.profile.birthdate}}{{else}}{{student.birthdate}}{{/if}}" class="input">
@@ -39,7 +40,7 @@
                 <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
                 <textarea name="address" rows="2" class="input">{{#if student.profile.address}}{{student.profile.address}}{{else}}{{student.address}}{{/if}}</textarea>
               </div>
-              <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 mb-1">Guardian Name</label>
                   <input type="text" name="guardianName" value="{{#if student.profile.guardianName}}{{student.profile.guardianName}}{{else}}{{student.guardianName}}{{/if}}" class="input">
@@ -53,7 +54,7 @@
                 <label class="block text-xs font-medium text-gray-700 mb-1">Emergency Contact</label>
                 <input type="text" name="emergencyContact" value="{{#if student.profile.emergencyContact}}{{student.profile.emergencyContact}}{{else}}{{student.emergencyContact}}{{/if}}" class="input">
               </div>
-              <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 mb-1">Previous School</label>
                   <input type="text" name="previousSchool" value="{{#if student.profile.previousSchool}}{{student.profile.previousSchool}}{{else}}{{student.previousSchool}}{{/if}}" class="input">
@@ -65,7 +66,7 @@
               </div>
               
               <h3 class="font-semibold text-teal-700 mb-2 mt-4">📝 Case & Behavioral Notes</h3>
-              <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 mb-1">Case Type</label>
                   <select name="caseType" class="input">
@@ -109,7 +110,7 @@
             <!-- Add Session Form (hidden by default) -->
             <div id="add-session-form" style="display:none;" class="bg-slate-50 p-4 rounded-lg mb-4 border border-slate-200">
               <form method="POST" action="/guidance/profiling/student/{{student.id}}/session">
-                <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                   <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Session Date</label>
                     <input type="datetime-local" name="sessionDate" required class="input">
@@ -119,7 +120,7 @@
                     <input type="number" name="duration" placeholder="30" class="input">
                   </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                   <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Session Type</label>
                     <select name="sessionType" class="input">
@@ -191,8 +192,8 @@
           </div>
         </div>
 
-        <!-- Right: Summary & Quick Stats -->
-        <div class="space-y-5">
+        <!-- Right: Summary & Quick Stats (shown first on mobile, right on desktop) -->
+        <div class="space-y-5 order-1 md:order-2">
           <!-- Profile Summary -->
           <div class="card text-center">
             {{#if student.profileImage}}
@@ -256,3 +257,4 @@
   </div>
 </div>
 </body></html>
+
