@@ -28,7 +28,7 @@
       <!-- Student Info -->
       <div class="card mb-4">
         <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Student Information</h3>
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><span class="label">Course</span><span class="text-slate-700 font-semibold">{{app.course}}{{#if app.major}} — {{app.major}}{{/if}}</span></div>
           <div><span class="label">Year Level / Section</span><span class="text-slate-700 font-semibold">{{app.yearLevel}} {{app.section}}</span></div>
           <div><span class="label">Gender</span><span class="text-slate-700 font-semibold">{{app.gender}}</span></div>
@@ -75,7 +75,7 @@
           </div>
         </div>
         
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><span class="label">Payment Method</span><span class="text-slate-700 font-semibold">{{app.paymentMethod}}</span></div>
           <div><span class="label">Reference No.</span><span class="text-slate-700 font-mono font-bold">{{app.referenceNumber}}</span></div>
           <div><span class="label">Payment Date</span><span class="text-slate-700 font-semibold">{{formatDate app.paymentDate}}</span></div>
@@ -215,3 +215,4 @@
   </div>
 </div>
 </body></html>
+

@@ -59,7 +59,7 @@
         <!-- Personal Info Card -->
         <div class="card mb-5">
           <h3 class="font-semibold text-teal-700 mb-4 text-sm">Personal Information</h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs text-gray-500 mb-1 font-medium">First Name</label>
               <input type="text" name="firstName" value="{{profileUser.firstName}}" required
@@ -101,7 +101,7 @@
         <!-- Guardian Info Card -->
         <div class="card mb-5">
           <h3 class="font-semibold text-teal-700 mb-4 text-sm">Guardian Information</h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs text-gray-500 mb-1 font-medium">Guardian Name</label>
               <input type="text" name="guardianName" value="{{profileUser.guardianName}}"
@@ -118,7 +118,7 @@
         <!-- Academic Info Card -->
         <div class="card mb-5">
           <h3 class="font-semibold text-teal-700 mb-4 text-sm">Academic Information</h3>
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="col-span-1">
               <label class="block text-xs text-gray-500 mb-1 font-medium">Course / Program</label>
               <input type="text" name="course" value="{{profileUser.course}}"
@@ -199,3 +199,4 @@ function previewAvatar(event) {
 }
 </script>
 </body></html>
+

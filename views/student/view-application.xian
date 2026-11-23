@@ -62,7 +62,7 @@
       <!-- Info -->
       <div class="card mb-4">
         <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Your Information</h3>
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><span class="label">Course</span><span class="text-slate-700 font-semibold">{{app.course}}</span></div>
           <div><span class="label">Year Level</span><span class="text-slate-700 font-semibold">{{app.yearLevel}}</span></div>
           <div><span class="label">Enrollment</span><span class="text-slate-700 font-semibold">{{app.enrollmentStatus}}</span></div>
@@ -99,7 +99,7 @@
       {{#if (ne app.status 'pending')}}
       <div class="card mb-4">
         <h3 class="text-green-700 font-semibold mb-3 text-xs uppercase tracking-wider">Payment Details</h3>
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><span class="label">Method</span><span class="text-slate-700 font-semibold">{{app.paymentMethod}}</span></div>
           <div><span class="label">Reference No.</span><span class="text-slate-700 font-mono font-bold">{{app.referenceNumber}}</span></div>
           <div><span class="label">Payment Date</span><span class="text-slate-700 font-semibold">{{formatDate app.paymentDate}}</span></div>
@@ -142,3 +142,4 @@
   </div>
 </div>
 </body></html>
+
