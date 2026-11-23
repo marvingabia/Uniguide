@@ -7,7 +7,7 @@
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
 
-    <div class="nav-top" style="margin-left: 50px;">
+    <div class="nav-top">
 
       <div>
 

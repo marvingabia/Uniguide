@@ -282,9 +282,9 @@
       align-items: center;
       justify-content: space-between;
 
-      padding: 12px 24px;
+      padding: 12px 16px 12px 60px;
       margin-top: 0;
-      margin-left: 50px;
+      margin-left: 0;
 
       background: #ffffff;
 
@@ -592,8 +592,8 @@
       }
 
       .nav-top {
-        padding: 12px 16px;
-        margin-left: 50px;
+        padding: 12px 16px 12px 60px;
+        margin-left: 0;
       }
 
       .nav-top h1 {

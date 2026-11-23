@@ -9,7 +9,7 @@
 
     <!-- Top Navigation -->
 
-    <div class="nav-top" style="margin-left: 50px;">
+    <div class="nav-top">
 
       <div>
 
@@ -196,3 +196,4 @@
 
 </body>
 </html>
+

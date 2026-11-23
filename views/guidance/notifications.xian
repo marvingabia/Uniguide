@@ -3,7 +3,7 @@
   {{> sidebar-guidance activePage="notifications"}}
 
   <div class="flex-1 overflow-y-auto bg-slate-100">
-    <div class="nav-top" style="margin-left: 50px;">
+    <div class="nav-top">
       <div>
         <h1 class="text-base font-bold text-slate-800">🔔 Notifications — Uniguide</h1>
         <p class="text-slate-500 text-xs">MinSU Bongabong Campus — Guidance Office</p>
@@ -48,3 +48,4 @@
   </div>
 </div>
 </body></html>
+

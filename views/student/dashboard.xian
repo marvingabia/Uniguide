@@ -7,7 +7,7 @@
   <div class="w-full min-h-screen overflow-y-auto bg-slate-100">
 
     <!-- Top Navigation -->
-    <div class="nav-top" style="margin-left: 50px;">
+    <div class="nav-top">
 
       <div>
 
