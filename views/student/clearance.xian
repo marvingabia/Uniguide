@@ -30,6 +30,31 @@
       line-height: 1.4;
     }
 
+    /* ── Mobile: scale down and allow scroll ── */
+    @media (max-width: 600px) {
+      #pdf-content {
+        padding: 16px 12px;
+        font-size: 9pt;
+        overflow-x: auto;
+      }
+      .msu-header { gap: 6px; }
+      .msu-logo { width: 45px; height: 45px; }
+      .msu-name h1 { font-size: 14pt; }
+      .msu-contact { font-size: 7pt; min-width: 120px; }
+      .form-title { font-size: 9pt; }
+      .v-tbl { font-size: 7.5pt; }
+      .v-tbl th, .v-tbl td { padding: 3px 4px; }
+      .info-tbl { font-size: 8.5pt; }
+      .info-tbl td { padding: 3px 5px; }
+      .purpose-row { gap: 10px; font-size: 8.5pt; }
+      .sec { font-size: 9pt; }
+      .rec { font-size: 8.5pt; }
+      .notes { font-size: 7.5pt; }
+      /* Make table scrollable on mobile */
+      .v-tbl-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
+    }
+
     /* ── MSU Header ── */
     .msu-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
     .msu-logo   { width: 65px; height: 65px; object-fit: contain; flex-shrink: 0; }
@@ -193,6 +218,7 @@
 
     <!-- III. Verification Areas -->
     <div class="sec">III.&nbsp;&nbsp;Verification Areas</div>
+    <div class="v-tbl-wrapper">
     <table class="v-tbl">
       <thead>
         <tr>
@@ -226,6 +252,7 @@
         </tr>
       </tbody>
     </table>
+    </div><!-- end v-tbl-wrapper -->
 
     <!-- IV. Recommendation -->
     <div class="sec">IV.&nbsp;&nbsp;Recommendation:</div>

@@ -5,11 +5,10 @@ import { recommendSlot } from '../utils/appointmentML.js';
 import { Op } from 'sequelize';
 import { sequelize } from '../models/db.js';
 
-// Helper to safely get empty defaults for test mode
+// Helper to safely get empty defaults
 const safeRender = (res, template, data) => {
   res.render(template, {
-    ...data,
-    testMode: !Application
+    ...data
   });
 };
 
@@ -78,8 +77,7 @@ export const dashboard = async (req, res) => {
       appointments: [],
       activeCount: 0,
       releasedCount: 0,
-      unreadNotifCount: 0,
-      error: 'Test mode - Database disabled'
+      unreadNotifCount: 0
     });
   }
 };
@@ -108,8 +106,7 @@ export const applicationHistory = async (req, res) => {
     safeRender(res, 'student/history', {
       title: 'Application History — GuidanceConnect',
       user: req.session.user,
-      applications: [],
-      error: 'Test mode'
+      applications: []
     });
   }
 };
@@ -585,14 +582,13 @@ export const bookAppointment = async (req, res) => {
 // Show profile
 export const showProfile = async (req, res) => {
   try {
-    const profileUser = User ?
-      await User.findByPk(req.session.user.id) :
-      req.session.user;
+    // Use Firestore to get latest user data
+    const profileUser = await FirestoreAdapter.findUserById(req.session.user.id).catch(() => req.session.user);
 
     safeRender(res, 'student/profile', {
       title: 'My Profile — UniGuide',
       user: req.session.user,
-      profileUser
+      profileUser: profileUser || req.session.user
     });
   } catch (error) {
     console.error('Profile error:', error.message);
@@ -606,17 +602,11 @@ export const showProfile = async (req, res) => {
 
 // Update profile
 export const updateProfile = async (req, res) => {
-  if (!User) {
-    req.flash('error', 'Profile update disabled in test mode');
-    return res.redirect('/student/profile');
-  }
-
   try {
     const { firstName, lastName, contactNo, course, yearLevel, section, studentId, bio,
       birthdate, address, emergencyContact, guardianName, guardianContact,
       previousSchool, scholarshipInfo } = req.body;
 
-    const user = await User.findByPk(req.session.user.id);
     const updates = { firstName, lastName, contactNo, course, yearLevel, section, studentId, bio,
       birthdate, address, emergencyContact, guardianName, guardianContact,
       previousSchool, scholarshipInfo };
@@ -625,7 +615,7 @@ export const updateProfile = async (req, res) => {
       updates.profileImage = `/uploads/avatars/${req.file.filename}`;
     }
 
-    await user.update(updates);
+    await FirestoreAdapter.updateUser(req.session.user.id, updates);
 
     Object.assign(req.session.user, updates);
     if (req.file) req.session.user.profileImage = updates.profileImage;
@@ -641,17 +631,10 @@ export const updateProfile = async (req, res) => {
 
 // Delete application
 export const deleteApplication = async (req, res) => {
-  if (!Application) {
-    req.flash('error', 'Delete disabled in test mode');
-    return res.redirect('/student/history');
-  }
-
   try {
-    const app = await Application.findOne({
-      where: { id: req.params.id, userId: req.session.user.id }
-    });
+    const app = await FirestoreAdapter.getApplicationById(req.params.id);
 
-    if (!app) {
+    if (!app || app.userId !== req.session.user.id) {
       req.flash('error', 'Application not found');
       return res.redirect('/student/history');
     }
@@ -661,12 +644,13 @@ export const deleteApplication = async (req, res) => {
       return res.redirect('/student/history');
     }
 
-    await app.destroy();
-    req.flash('success', 'Application deleted');
+    await FirestoreAdapter.deleteDocument('applications', req.params.id);
+    req.flash('success', 'Application deleted successfully');
     res.redirect('/student/history');
   } catch (err) {
     console.error('Delete error:', err.message);
-    req.flash('error', `Failed: ${err.message}`);
+    req.flash('error', `Failed to delete: ${err.message}`);
     res.redirect('/student/history');
   }
 };
+
